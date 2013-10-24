@@ -4,35 +4,11 @@ using System.Collections.Generic;
 
 public class VerticlesIndexer : MonoBehaviour 
 {
-	string _id;
+	public string Id;
 	
 	Dictionary<string, int> _index; //since we handle planes, only one vertice is needed.
-	Vector3[] _verts;
-	Mesh mesh;
-
-	public string Id 
-	{
-		get 
-		{
-			return this._id;
-		}
-		set 
-		{
-			_id = value;
-		}
-	}
-	
-	public Vector3[] Verts 
-	{
-		get 
-		{
-			return this._verts;
-		}
-		set 
-		{
-			_verts = value;
-		}
-	}
+	public Vector3[] _verts;
+	Mesh mesh=null;
 	
 	public Dictionary<string, int> Index 
 	{
@@ -48,7 +24,8 @@ public class VerticlesIndexer : MonoBehaviour
 	
 	void Start()
 	{
-		refreshIndex();
+		if(mesh==null)
+			refreshIndex();
 	}
 
 	//refresh the index dictionnary... 
@@ -60,7 +37,7 @@ public class VerticlesIndexer : MonoBehaviour
 		
 		_verts = mesh.vertices;
 		
-		for(int i=0; i<mesh.vertices.Length; i++)
+		/*for(int i=0; i<mesh.vertices.Length; i++)
 		{
 			Vector3 vert = mesh.vertices[i];
 			
@@ -72,18 +49,53 @@ public class VerticlesIndexer : MonoBehaviour
 			{
 				//this should not happen unless a different shape from the default one has been selected, if it is the case, proceed anyway.
 			}
-		}
+		}*/
 	}
 	
 	public List<int> getNearestVertices(Vector3 point, float range)
 	{
 		List<int> chosenVertices = new List<int>();
-		foreach(string s in _index.Keys)
+		for(int i=0; i<_verts.Length; i++)
 		{
-			if(Vector3.Distance(transform.TransformPoint(_verts[_index[s]]), point)<range)
-				chosenVertices.Add(_index[s]);
+			if(Vector3.Distance(transform.TransformPoint(_verts[i]), point)<range)
+				chosenVertices.Add(i);
 		}
 		return chosenVertices;
+	}
+	
+	public int getNearestVertice(Vector3 point)
+	{
+		float lastRange = float.MaxValue;
+		int chosenVertice=-1;
+		for(int i=0; i<_verts.Length; i++)
+		{
+			float distance = Vector3.Distance(transform.TransformPoint(_verts[i]), point);
+			if(distance<lastRange)
+			{
+				lastRange = distance;
+				chosenVertice = i;
+			}
+		}
+		return chosenVertice;
+	}
+	
+	//same principle as getNearestVertice but we convert Vector3 coords to Vector2.
+	public int getNearestPlanarVertice(Vector3 worldPoint)
+	{
+		Vector2 point = new Vector2(worldPoint.x, worldPoint.z);
+		float lastRange = float.MaxValue;
+		int chosenVertice=-1;
+		for(int i=0; i<_verts.Length; i++)
+		{
+			Vector2 planarWorldVerticePoint = new Vector2(transform.TransformPoint(_verts[i]).x, transform.TransformPoint(_verts[i]).z);
+			float distance = Vector2.Distance(planarWorldVerticePoint, point);
+			if(distance<lastRange)
+			{
+				lastRange = distance;
+				chosenVertice = i;
+			}
+		}
+		return chosenVertice;
 	}
 	
 	public void applySmoothTranslationToVerticles(Vector3 point, Vector3 translation, float brushSize, float intensity, float MAX_HEIGHT)
