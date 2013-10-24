@@ -7,13 +7,12 @@ using System;
  * */
 public class MainInterface: MonoBehaviour 
 {
+	public Texture2D mainIcon;
 	
 	public WorldEditor worldEditor;
 	
-	void Start()
-	{
-		
-	}
+	//show credits first...
+	bool credits = true;
 	
 	int currentDoodad = 0;
 	int currentTexture = 0;
@@ -31,11 +30,25 @@ public class MainInterface: MonoBehaviour
 	
 	void OnGUI()
 	{
+		if(credits)
+		{
+			GUI.Box(new Rect(Screen.width/2-150, Screen.height/2-100, 300, 200), "MWorld Editor v1.0 Alpha");
+			GUI.DrawTexture(new Rect(Screen.width/2-50, Screen.height/2-80, 100, 100), mainIcon);
+			GUI.Label(new Rect(Screen.width/2-145, Screen.height/2+20, 300, 200), "Welcome to the First Alpha release of the MWorld Editor. The MWorld Editor is a powerfull tool that allows its users to manipulate most of the aspects of the 'M' powered games.");
+			
+			if(GUI.Button(new Rect(Screen.width/2+83, Screen.height/2+70, 60, 25),"Start"))
+				credits = false;
+			
+			return;
+		}
+		
 		if(worldEditor.mapName.Length==0)
 		{
 			if(!loadingInterface)
 			{
+				
 				GUI.Box(new Rect(Screen.width/2-100, 100, 200, 100), "Create a new Map");
+				
 				tmpMapName = GUI.TextField(new Rect(Screen.width/2-90, 170, 100, 25), tmpMapName);
 				if(GUI.Button(new Rect(Screen.width/2+30, 170, 60, 25), "Create"))
 				{
@@ -70,6 +83,9 @@ public class MainInterface: MonoBehaviour
 			GUILayout.BeginArea(worldEditor.guiArea);
 	        
 			GUILayout.BeginHorizontal();
+			
+			GUILayout.Label("Map: "+worldEditor.mapName);
+			
 			if(GUILayout.Button("Save"))
 			{
 				worldEditor.ioManager.saveMap(Application.dataPath+"/Maps/"+worldEditor.mapName+"/", worldEditor.World);
