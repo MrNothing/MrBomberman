@@ -3,12 +3,39 @@ using System.Collections;
 
 public enum ServerEventType
 {
-	ping=0, position=1, chat=2, pm=3, joinGame=4, joinChannel=5, custom=6
+	//called when the player has been authenticated
+	login = 0,
+	
+	//in game high frequency position informations
+	position = 1,
+	
+	//simple chat messages (if the client has joined a channel)
+	chat = 2, 
+	
+	//private messages
+	pm = 3,
+	
+	//event called when a player joins a channel I am in
+	playerJoin = 4,
+	
+	//event called when a player leaves a channel I am in
+	playerLeave = 5,
+	
+	//all "heavier" messages that are specific to custom situations
+	custom = 6
+	
+	//server messages 
+	serverMessage = 7
 }
 
 public class NetworkManager : MonoBehaviour 
 {
 	public UICore core;
+	
+	public void Start()
+	{
+		
+	}
 	
 	public void connect(string server, string port)
 	{
@@ -22,14 +49,50 @@ public class NetworkManager : MonoBehaviour
 		{
 			eventType, parameters
 		};
-		networkView.RPC("onClientEvent",RPCMode.Server, data);
+		networkView.RPC("onClientEvent", RPCMode.Server, data);
 	}
 	
-	//this function is used to handle data coming from the server
+	/*
+	 * this function is used to handle data coming from the server
+	 * 
+	 * Every event message has an eventType, a clientId, and specific parameters
+	 */
+	
 	[RPC]
-	void OnServerEvent(byte eventType, System.Object parameters)
+	void OnServerEvent(System.Object parameters)
 	{
-		if(eventType==(byte)ServerEventType.ping)
+		byte eventType = parameters[0];
+		if(eventType==(byte)ServerEventType.login)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.playerJoin)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.playerLeave)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.position)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.chat)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.pm)
+		{
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.custom)
 		{
 			
 		}
