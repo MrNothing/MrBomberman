@@ -26,7 +26,13 @@ public enum ServerEventType
 	custom = 6,
 	
 	//server messages 
-	serverMessage = 7
+	serverMessage = 7,
+	
+	//channelsList
+	channelsList = 8,
+	
+	//gamesList
+	gamesList = 9
 }
 
 public class Core : MonoBehaviour 
@@ -50,7 +56,21 @@ public class Core : MonoBehaviour
 	void Start () 
 	{
 		Network.InitializeSecurity();
-		Network.InitializeServer(int.MaxValue, 9999);
+		Network.InitializeServer(100, 6600, true);
+		
+		//create the default channel
+		Channel defaultChannel = new Channel("Public", ChannelType.chat, 100, false);
+		channels.Add(defaultChannel.GetHashCode(), defaultChannel);
+		channelsByName.Add(defaultChannel.Name, defaultChannel.Id);
+	}
+	
+	//send a message to all players in the server
+	public void Send(ServerEventType type, object[] data)
+	{
+		foreach(int playerId in players.Keys)
+		{
+			players[playerId].Send(type, data);
+		}
 	}
 	
 	//called when a player connects to the server, the first thing we do is create a new player object and assign this player a unique session id
@@ -96,6 +116,8 @@ public class Core : MonoBehaviour
 			{
 				myPlayer.Name, myPlayer.Id
 			};
+			
+			myPlayer.Send(ServerEventType.login, playerInfos);
 		}
 		
 		//channel join requests
@@ -135,6 +157,52 @@ public class Core : MonoBehaviour
 					myPlayer.Send(ServerEventType.serverMessage, message);
 				}
 			}
+		}
+		
+		if(eventType==(byte)ServerEventType.channelsList)
+		{
+			object[] _channels = new object[channels.Count];
+			
+			int counter = 0;
+			foreach(int channelId in channels.Keys)
+			{
+				if(!channels[channelId].IsPrivate)
+				{
+					object[] channelInfos = new object[4];
+					channelInfos[0] = channels[channelId].Name;
+					channelInfos[1] = channels[channelId].Id;
+					channelInfos[2] = channels[channelId].getPlayersCount();
+					channelInfos[3] = channels[channelId].MaxPlayers;
+					
+					_channels[counter] = channelInfos;
+					counter++;
+				}
+			}
+			
+			myPlayer.Send(ServerEventType.channelsList, _channels);
+		}
+		
+		if(eventType==(byte)ServerEventType.gamesList)
+		{
+			object[] _channels = new object[games.Count];
+			
+			int counter = 0;
+			foreach(int channelId in games.Keys)
+			{
+				if(!channels[channelId].IsPrivate)
+				{
+					object[] channelInfos = new object[4];
+					channelInfos[0] = channels[channelId].Name;
+					channelInfos[1] = channels[channelId].Id;
+					channelInfos[2] = channels[channelId].getPlayersCount();
+					channelInfos[3] = channels[channelId].MaxPlayers;
+					
+					_channels[counter] = channelInfos;
+					counter++;
+				}
+			}
+			
+			myPlayer.Send(ServerEventType.gamesList, _channels);
 		}
 	}
 }

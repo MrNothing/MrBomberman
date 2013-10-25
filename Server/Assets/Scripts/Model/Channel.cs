@@ -9,27 +9,42 @@ public enum ChannelType
 
 public class Channel 
 {
+	int _id;
+
 	string _name;
 
-	List<Player> _players;
+	List<Player> _players = new List<Player>();
 	
 	ChannelType _type;
 	
 	bool _isPrivate;
 	
 	int _maxPlayers;
+	
+	string _password;
 
 	public Channel(string name, ChannelType type, int maxPlayers, bool isPrivate)
 	{
+		_id = this.GetHashCode();
 		_name = name;
 		_type = type;
 		_maxPlayers = maxPlayers;
 		_isPrivate = isPrivate;
 	}
 	
+	public Channel(string name, ChannelType type, int maxPlayers, bool isPrivate, string password)
+	{
+		_id = this.GetHashCode();
+		_name = name;
+		_type = type;
+		_maxPlayers = maxPlayers;
+		_isPrivate = isPrivate;
+		_password = password;
+	}
+	
 	public void addPlayer(Player player)
 	{
-		if(player.Channel.GetHashCode()==this.GetHashCode())
+		if(player.Channel.GetHashCode()==_id)
 		{
 			//this player is already in this channel (or something messed up pretty bad...)
 			
@@ -92,6 +107,11 @@ public class Channel
 		}
 	}
 	
+	public int getPlayersCount()
+	{
+		return _players.Count;
+	}
+	
 	public bool IsPrivate 
 	{
 		get 
@@ -139,4 +159,16 @@ public class Channel
 			_maxPlayers = value;
 		}
 	}
+	
+	public int Id 
+	{
+		get 
+		{
+			return this._id;
+		}
+		set 
+		{
+			_id = value;
+		}
+	}	
 }

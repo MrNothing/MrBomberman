@@ -22,10 +22,16 @@ public enum ServerEventType
 	playerLeave = 5,
 	
 	//all "heavier" messages that are specific to custom situations
-	custom = 6
+	custom = 6,
 	
 	//server messages 
-	serverMessage = 7
+	serverMessage = 7,
+	
+	//channelsList
+	channelsList = 8,
+	
+	//gamesList
+	gamesList = 9
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -43,7 +49,7 @@ public class NetworkManager : MonoBehaviour
 	}
 	
 	//this function is used to send data to the server
-	public void send(byte eventType, System.Object parameters)
+	public void send(byte eventType, System.Object[] parameters)
 	{
 		object[] data = new object[]
 		{
@@ -59,12 +65,17 @@ public class NetworkManager : MonoBehaviour
 	 */
 	
 	[RPC]
-	void OnServerEvent(System.Object parameters)
+	void OnServerEvent(System.Object[] parameters)
 	{
-		byte eventType = parameters[0];
+		byte eventType = (byte)parameters[0];
 		if(eventType==(byte)ServerEventType.login)
 		{
 			
+		}
+		
+		if(eventType==(byte)ServerEventType.serverMessage)
+		{
+			core.errorInterface.showMessage((string)parameters[1], Color.red, true);
 		}
 		
 		if(eventType==(byte)ServerEventType.playerJoin)

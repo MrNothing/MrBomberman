@@ -10,6 +10,7 @@ public class ServerInterface : MonoBehaviour
 	void Start()
 	{
 		core = GetComponent<Core>();
+		logs = "Server started, listening to port: 6600 \nWelcome to the MServer console. Type help for a list of commands.\n";
 	}
 	
 	void OnGUI () 
@@ -30,7 +31,7 @@ public class ServerInterface : MonoBehaviour
 	{
 		if(_command.IndexOf("help")==0)
 		{
-			logs+="Commands: \n help, \n players, \n channels, \n games, \n clear \n";
+			logs+="Commands: \n help, \n players, \n channels, \n games, \n clear, \n broadcast [message] {sends a server message to all the clients} \n";
 			return;
 		}
 		
@@ -55,6 +56,26 @@ public class ServerInterface : MonoBehaviour
 		if(_command.IndexOf("clear")==0)
 		{
 			logs = string.Empty;
+			return;
+		}
+		
+		if(_command.IndexOf("broadcast ")==0)
+		{
+			_command = _command.Replace("broadcast ", "");
+			
+			if(_command.Length>0)
+			{
+				logs += "sending message: "+_command+"\n";
+				
+				object[] message = new object[]
+				{
+					"Channel not found!"
+				};
+				core.Send(ServerEventType.serverMessage, message);
+			}
+			else
+				logs += "You must type a message!\n";
+				
 			return;
 		}
 		

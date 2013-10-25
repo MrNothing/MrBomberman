@@ -26,10 +26,10 @@ public class StartScreen : MonoBehaviour
 		title = (MGUIText) gui.setText("titleText", new Rect(-10, 10, 0, 0), "Bomberman version 0 (alpha)", core.normalFont, Color.white);
 		
 		//server string
-		serverTextField = (MGUITextfield) gui.setTextField("server", new Rect(-10, 0, 10, 1.5f), new Vector3(0, 0), "127.0.0.1:9999", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
+		serverTextField = (MGUITextfield) gui.setTextField("server", new Rect(-10, 0, 10, 1.5f), new Vector3(0, 0), "127.0.0.1:6600", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
 		
 		//server string
-		//localportTextField = (MGUITextfield) gui.setTextField("localServerPort", new Rect(-10, -5, 10, 1.5f), new Vector3(0, 0), "9999", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
+		//localportTextField = (MGUITextfield) gui.setTextField("localServerPort", new Rect(-10, -5, 10, 1.5f), new Vector3(0, 0), "6600", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
 		
 		//Play Button
 		connectButton = (MGUIButton)gui.setButton("playBut", new Rect(10, 0, 7, 2.5f), new Vector2(0, 0), "Connect", core.normalFont, Color.green, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
