@@ -31,12 +31,16 @@ public enum ServerEventType
 	channelsList = 8,
 	
 	//gamesList
-	gamesList = 9
+	gamesList = 9,
+	
+	roomInfos = 10
 }
 
 public class NetworkManager : MonoBehaviour 
 {
 	public UICore core;
+	
+	HashMapSerializer serializer = new HashMapSerializer();
 	
 	public void Start()
 	{
@@ -49,13 +53,19 @@ public class NetworkManager : MonoBehaviour
 	}
 	
 	//this function is used to send data to the server
-	public void send(byte eventType, System.Object[] parameters)
+	public void send(ServerEventType eventType, string data)
 	{
-		object[] data = new object[]
+		object[] parameters = new object[]
 		{
-			eventType, parameters
+			(int)eventType, data
 		};
-		networkView.RPC("onClientEvent", RPCMode.Server, data);
+		networkView.RPC("OnClientEvent", RPCMode.Server, parameters);
+	}
+	
+	[RPC]
+	void OnClientEvent(int eventType, string data)
+	{
+		
 	}
 	
 	/*
@@ -65,27 +75,51 @@ public class NetworkManager : MonoBehaviour
 	 */
 	
 	[RPC]
-	void OnServerEvent(System.Object[] parameters)
+	void OnServerEvent(int eventTypeInt, string data)
 	{
-		byte eventType = (byte)parameters[0];
+		byte eventType = (byte)eventTypeInt;
 		if(eventType==(byte)ServerEventType.login)
 		{
-			
+			Hashtable infos = serializer.dataToHashMap(data);
+			core.errorInterface.showMessage("Logged in as: "+infos["name"]+"!", Color.green, true);
 		}
 		
 		if(eventType==(byte)ServerEventType.serverMessage)
 		{
-			core.errorInterface.showMessage((string)parameters[1], Color.red, true);
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, data, core.normalFont, Color.red); 
+			else
+				core.errorInterface.showMessage(data, Color.red, true);
 		}
 		
 		if(eventType==(byte)ServerEventType.playerJoin)
 		{
+			Hashtable infos = serializer.dataToHashMap(data);
 			
+			string msg = infos["name"]+" has joined the Channel";
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
+		}
+		
+		if(eventType==(byte)ServerEventType.roomInfos)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			string msg = "Joined the Channel: "+infos["name"];
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
 		}
 		
 		if(eventType==(byte)ServerEventType.playerLeave)
 		{
+			Hashtable infos = serializer.dataToHashMap(data);
 			
+			string msg = infos["name"]+" has left the Channel";
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
 		}
 		
 		if(eventType==(byte)ServerEventType.position)
@@ -95,17 +129,49 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.chat)
 		{
+			Hashtable infos = serializer.dataToHashMap(data);
 			
+			string msg = infos["sender"]+": "+infos["msg"];
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.white); 
 		}
 		
 		if(eventType==(byte)ServerEventType.pm)
 		{
 			
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			string msg = infos["sender"]+" whispers: "+infos["msg"];
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.green);
 		}
 		
-		if(eventType==(byte)ServerEventType.custom)
+		if(eventType==(byte)ServerEventType.channelsList)
 		{
+			Hashtable infos = serializer.dataToHashMap(data);
+				
+			core.gui.insertText(core.lobby.textArea.id, "Channels:", core.normalFont, Color.cyan);
 			
+			foreach(string s in infos.Keys)
+			{
+				Hashtable channel = (Hashtable) infos[s];
+				core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.gamesList)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+				
+			core.gui.insertText(core.lobby.textArea.id, "Games:", core.normalFont, Color.cyan);
+			
+			foreach(string s in infos.Keys)
+			{
+				Hashtable channel = (Hashtable) infos[s];
+				core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+			}
 		}
 	}
 	

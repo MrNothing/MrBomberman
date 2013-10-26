@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ServerInterface : MonoBehaviour 
 {
@@ -67,11 +68,7 @@ public class ServerInterface : MonoBehaviour
 			{
 				logs += "sending message: "+_command+"\n";
 				
-				object[] message = new object[]
-				{
-					"Channel not found!"
-				};
-				core.Send(ServerEventType.serverMessage, message);
+				core.Send(ServerEventType.serverMessage, _command);
 			}
 			else
 				logs += "You must type a message!\n";

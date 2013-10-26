@@ -19,12 +19,17 @@ public class Channel
 	
 	bool _isPrivate;
 	
+	bool _isTemp = false;
+
 	int _maxPlayers;
 	
 	string _password;
+	
+	Core _core;
 
-	public Channel(string name, ChannelType type, int maxPlayers, bool isPrivate)
+	public Channel(Core core, string name, ChannelType type, int maxPlayers, bool isPrivate)
 	{
+		_core = core;
 		_id = this.GetHashCode();
 		_name = name;
 		_type = type;
@@ -32,74 +37,119 @@ public class Channel
 		_isPrivate = isPrivate;
 	}
 	
-	public Channel(string name, ChannelType type, int maxPlayers, bool isPrivate, string password)
+	public Channel(Core core, string name, ChannelType type, int maxPlayers, bool isPrivate, string password, bool isTemp)
 	{
+		_core = core;
 		_id = this.GetHashCode();
 		_name = name;
 		_type = type;
 		_maxPlayers = maxPlayers;
 		_isPrivate = isPrivate;
 		_password = password;
+		_isTemp = isTemp;
 	}
 	
 	public void addPlayer(Player player)
 	{
-		if(player.Channel.GetHashCode()==_id)
+		bool allowed;
+		
+		if(player.Name.Length==0)
 		{
-			//this player is already in this channel (or something messed up pretty bad...)
-			
-			object[] message = new object[]
+			//this player has not been authentificated, he needs a name to join a channel.
+			player.Send(ServerEventType.serverMessage, "You have not logged in!");
+			allowed = false;
+		}
+		else if(player.Channel!=null)
+		{
+			if(player.Channel.GetHashCode()==_id)
 			{
-				"You have already joined this channel!"
-			};
-			
-			player.Send(ServerEventType.serverMessage, message);
+				//this player is already in this channel (or something messed up pretty bad...)
+				
+				player.Send(ServerEventType.serverMessage, "You have already joined this channel!");
+				allowed = false;
+			}
+			else
+				allowed = true;
 		}
 		else
+			allowed = true;
+	
+		if(allowed)
 		{
 			_players.Add(player);
 			
 			player.Channel = this;
 			
-			//we need to notify everyone that this player has joined...
+			//we need to notify everyone that this player has joined and inform the player that he is in this room...
+			
+			//we will need the serializer
+			HashMapSerializer serializer = new HashMapSerializer();
 			
 			//we send the player's name and id
-			object[] playerInfos = new object[]
-			{
-				player.Name, 
-				player.Id
-			};
+			Hashtable playerInfos = new Hashtable();
+			playerInfos.Add("name",player.Name);
+			playerInfos.Add("id", player.Id);
+			
+			//we prepare a list of all players in the channel for the new player
+			Hashtable playersList = new Hashtable();
 			
 			foreach(Player p in _players)
 			{
-				p.Send(ServerEventType.playerJoin, playerInfos);
+				//we send the new player's informations to every players in the channel
+				p.Send(ServerEventType.playerJoin, serializer.hashMapToData(playerInfos));
+				
+				//we store the interated player's infos
+				Hashtable pInfos = new Hashtable();
+				pInfos.Add("name", p.Name);
+				pInfos.Add("id", p.Id);
+				playersList.Add(p.Id, playersList);
 			}
+			
+			//room infos:
+			Hashtable roomInfos = new Hashtable();
+			roomInfos.Add("name", Name);
+			roomInfos.Add("id", Id);
+			roomInfos.Add("type", Type);
+			roomInfos.Add("players", playersList);
+			player.Send(ServerEventType.roomInfos, serializer.hashMapToData(roomInfos));
+			
 		}
 	}
 	
 	public void removePlayer(Player player)
 	{
+		if(_players.Count>0)
+		{
+			//we need to notify everyone that this player has left...
+			
+			//we send the player's name and id
+			Hashtable playerInfos = new Hashtable();
+			playerInfos.Add("name",player.Name);
+			playerInfos.Add("id", player.Id);
+			
+			HashMapSerializer serializer = new HashMapSerializer();
+			
+			foreach(Player p in _players)
+			{
+				p.Send(ServerEventType.playerLeave, serializer.hashMapToData(playerInfos));
+			}
+		}
+		else
+		{
+			if(_isTemp) //if this is a temp room, destroy it.
+			{
+				_core.DestroyChannel(this);
+			}
+		}
+		
 		_players.Remove(player);
 		
 		player.Channel = null;
 		
-		//we need to notify everyone that this player has left...
-		
-		//we send the player's name and id
-		object[] playerInfos = new object[]
-		{
-			player.Name, 
-			player.Id
-		};
-		
-		foreach(Player p in _players)
-		{
-			p.Send(ServerEventType.playerLeave, playerInfos);
-		}
 	}
 	
 	//send a message to all players in the channel
-	public void Send(ServerEventType type, object[] data)
+	public void Send(ServerEventType type, string data)
 	{
 		foreach(Player p in _players)
 		{
@@ -169,6 +219,18 @@ public class Channel
 		set 
 		{
 			_id = value;
+		}
+	}
+	
+	public bool IsTemp 
+	{
+		get 
+		{
+			return this._isTemp;
+		}
+		set 
+		{
+			_isTemp = value;
 		}
 	}	
 }

@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Player 
 {
 	int _id;
 	
 	//the nickname of the player in game
-	string _name;
+	string _name=string.Empty;
 	
 	//the active channel the player is in
 	Channel _channel=null;
@@ -24,14 +25,14 @@ public class Player
 		_networkPlayer = networkPlayer;
 	}
 	
-	public void Send(ServerEventType type, object[] parameters)
+	public void Send(ServerEventType type, string data)
 	{
-		object[] data = new object[]
+		object[] parameters = new object[]
 		{
-			type, parameters
+			(int)type, data
 		};
 		
-		_core.networkView.RPC("OnServerEvent", _networkPlayer, data);
+		_core.networkView.RPC("OnServerEvent", _networkPlayer, parameters);
 	}
 	
 	public Channel Channel 

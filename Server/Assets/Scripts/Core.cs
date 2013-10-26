@@ -32,7 +32,10 @@ public enum ServerEventType
 	channelsList = 8,
 	
 	//gamesList
-	gamesList = 9
+	gamesList = 9,
+	
+	//roomInfos
+	roomInfos = 10
 }
 
 public class Core : MonoBehaviour 
@@ -53,19 +56,22 @@ public class Core : MonoBehaviour
 	//all active games are listed here:
 	public Dictionary<int, GameRoom> games = new Dictionary<int, GameRoom>();
 	
+	//This is used for serialization
+	HashMapSerializer serializer = new HashMapSerializer();
+	
 	void Start () 
 	{
 		Network.InitializeSecurity();
 		Network.InitializeServer(100, 6600, true);
 		
 		//create the default channel
-		Channel defaultChannel = new Channel("Public", ChannelType.chat, 100, false);
-		channels.Add(defaultChannel.GetHashCode(), defaultChannel);
+		Channel defaultChannel = new Channel(this, "Public", ChannelType.chat, 100, false);
+		channels.Add(defaultChannel.Id, defaultChannel);
 		channelsByName.Add(defaultChannel.Name, defaultChannel.Id);
 	}
 	
 	//send a message to all players in the server
-	public void Send(ServerEventType type, object[] data)
+	public void Send(ServerEventType type, string data)
 	{
 		foreach(int playerId in players.Keys)
 		{
@@ -85,47 +91,88 @@ public class Core : MonoBehaviour
 		Network.RemoveRPCs(player);
         //Network.DestroyPlayerObjects(player);
 		Player myPlayer = players[player.GetHashCode()];
-		myPlayer.Channel.removePlayer(myPlayer);
+		
+		//if i am logged
+		if(myPlayer.Name.Length>0)
+			playersByName.Remove(myPlayer.Name);
+		
+		//if my player has a channel
+		if(myPlayer.Channel!=null)
+			myPlayer.Channel.removePlayer(myPlayer);
 		
     }
 	
+	//used for compatibility
+	[RPC]
+	void OnServerEvent(int eventType, string data)
+	{
+		
+	}
+	
 	//used to handle client requests
 	[RPC]
-	void onClientEvent(object[] parameters, NetworkMessageInfo sender)
+	void OnClientEvent(int eventTypeInt, string data, NetworkMessageInfo senderInfos)
 	{
 		//the type of event sent by the client
-		byte eventType = (byte) parameters[0];
+		byte eventType = (byte) eventTypeInt;
 		
 		//the Player object associated to this client's instance
-		Player myPlayer = players[sender.networkView.GetHashCode()];
-		
-		//the specific data
-		object[] data = (object[]) parameters[1];
+		Player myPlayer = players[senderInfos.sender.GetHashCode()];
 		
 		//login requests
 		if(eventType==(byte)ServerEventType.login)
 		{
-			string username = (string) data[0];
+			string username = data;
 			
 			//no secure authentification for now...
 			//string password = (string) data[1];
-			
-			myPlayer.Name = username;
-			
-			object[] playerInfos = new object[]
+			if(myPlayer.Name.Length==0)
 			{
-				myPlayer.Name, myPlayer.Id
-			};
-			
-			myPlayer.Send(ServerEventType.login, playerInfos);
+				try
+				{
+					if(playersByName[username]>0)
+					{
+						myPlayer.Send(ServerEventType.serverMessage, "This username is already taken!");
+					}
+				}
+				catch
+				{
+					myPlayer.Name = username;
+					playersByName.Add(myPlayer.Name, myPlayer.Id);
+				
+					Hashtable playerInfos = new Hashtable();
+					playerInfos.Add("name",myPlayer.Name);
+					playerInfos.Add("id", myPlayer.Id);
+					
+					myPlayer.Send(ServerEventType.login, serializer.hashMapToData(playerInfos));	
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are already logged in!");
+			}
+		}
+		
+		//channel leave requests
+		if(eventType==(byte)ServerEventType.playerLeave)
+		{
+			if(myPlayer.Channel!=null)
+			{
+				myPlayer.Channel.removePlayer(myPlayer);
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a channel!");
+			}
 		}
 		
 		//channel join requests
 		if(eventType==(byte)ServerEventType.playerJoin)
 		{
-			if(data[0].GetType().Equals(typeof(int)))
+			Hashtable rawChannel = serializer.dataToHashMap(data);
+			if(rawChannel["id"]!=null)
 			{
-				int channelId = (int) data[0];
+				int channelId = (int) rawChannel["id"];
 				
 				try
 				{
@@ -133,16 +180,12 @@ public class Core : MonoBehaviour
 				}
 				catch
 				{
-					object[] message = new object[]
-					{
-						"Channel not found!"
-					};
-					myPlayer.Send(ServerEventType.serverMessage, message);
+					myPlayer.Send(ServerEventType.serverMessage, "Channel not found!");
 				}
 			}
 			else
 			{
-				string channelName = (string) data[0];
+				string channelName = (string) rawChannel["name"];
 				
 				try
 				{
@@ -150,59 +193,101 @@ public class Core : MonoBehaviour
 				}
 				catch
 				{
-					object[] message = new object[]
-					{
-						"Channel not found!"
-					};
-					myPlayer.Send(ServerEventType.serverMessage, message);
+					myPlayer.Send(ServerEventType.serverMessage, "Channel not found!");
 				}
 			}
 		}
 		
 		if(eventType==(byte)ServerEventType.channelsList)
 		{
-			object[] _channels = new object[channels.Count];
+			Hashtable _channels = new Hashtable();
 			
-			int counter = 0;
 			foreach(int channelId in channels.Keys)
 			{
 				if(!channels[channelId].IsPrivate)
 				{
-					object[] channelInfos = new object[4];
-					channelInfos[0] = channels[channelId].Name;
-					channelInfos[1] = channels[channelId].Id;
-					channelInfos[2] = channels[channelId].getPlayersCount();
-					channelInfos[3] = channels[channelId].MaxPlayers;
+					Hashtable channelInfos = new Hashtable();
+					channelInfos.Add("name", channels[channelId].Name);
+					channelInfos.Add("id", channels[channelId].Id);
+					channelInfos.Add("players", channels[channelId].getPlayersCount());
+					channelInfos.Add("maxPlayers", channels[channelId].MaxPlayers);
 					
-					_channels[counter] = channelInfos;
-					counter++;
+					_channels.Add(channelId.ToString(),channelInfos);
 				}
 			}
 			
-			myPlayer.Send(ServerEventType.channelsList, _channels);
+			myPlayer.Send(ServerEventType.channelsList, serializer.hashMapToData(_channels));
 		}
 		
 		if(eventType==(byte)ServerEventType.gamesList)
 		{
-			object[] _channels = new object[games.Count];
+			Hashtable _channels = new Hashtable();
 			
-			int counter = 0;
 			foreach(int channelId in games.Keys)
 			{
 				if(!channels[channelId].IsPrivate)
 				{
-					object[] channelInfos = new object[4];
-					channelInfos[0] = channels[channelId].Name;
-					channelInfos[1] = channels[channelId].Id;
-					channelInfos[2] = channels[channelId].getPlayersCount();
-					channelInfos[3] = channels[channelId].MaxPlayers;
+					Hashtable channelInfos = new Hashtable();
+					channelInfos.Add("name", channels[channelId].Name);
+					channelInfos.Add("id", channels[channelId].Id);
+					channelInfos.Add("players", channels[channelId].getPlayersCount());
+					channelInfos.Add("maxPlayers", channels[channelId].MaxPlayers);
 					
-					_channels[counter] = channelInfos;
-					counter++;
+					_channels.Add(channelId.ToString(),channelInfos);
 				}
 			}
 			
-			myPlayer.Send(ServerEventType.gamesList, _channels);
+			myPlayer.Send(ServerEventType.gamesList, serializer.hashMapToData(_channels));
 		}
+		
+		if(eventType==(byte)ServerEventType.chat)
+		{
+			if(myPlayer.Channel!=null)
+			{
+				Hashtable message = new Hashtable();
+				message.Add("sender", myPlayer.Name);
+				message.Add("msg", data);
+				
+				myPlayer.Channel.Send(ServerEventType.chat, serializer.hashMapToData(message));
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Channel!"); 
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.pm)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			if(myPlayer.Channel!=null)
+			{
+				Hashtable message = new Hashtable();
+				message.Add("sender", myPlayer.Name);
+				message.Add("msg", infos["msg"]);
+				
+				try
+				{
+					players[playersByName[infos["target"].ToString()]].Send(ServerEventType.pm, serializer.hashMapToData(message));
+				}
+				catch
+				{
+					myPlayer.Send(ServerEventType.serverMessage, "Player not found!"); 
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Channel!"); 
+			}
+		}
+	}
+	
+	public void DestroyChannel(Channel channel)
+	{
+		channelsByName.Remove(channel.Name);
+		channels.Remove(channel.Id);
+		
+		if(channel.Type==ChannelType.game)
+			games.Remove(channel.Id);
 	}
 }
