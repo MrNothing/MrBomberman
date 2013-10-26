@@ -1,10 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /*
  * Entities include all game elements that have a position and stats 
  * */
-public class Entity {
+public class Entity 
+{
 	
 	string _id;
 	int team = 0;
@@ -21,5 +23,21 @@ public class Entity {
 		_id = id;
 		_infos = infos;
 		_position = position;
+	}
+	
+	//main routine 
+	public void run()
+	{
+		
+	}
+	
+	void applyInfos()
+	{
+		
+	}
+	
+	void regeneratePoints()
+	{
+		
 	}
 }
