@@ -18,7 +18,7 @@ public class MainInterface: MonoBehaviour
 	int currentTexture = 0;
 	int currentBrushType = 0;
 	
-	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.doodads.ToString()};
+	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.fog.ToString(), BrushType.doodads.ToString()};
 	string[] brushModes = new string[]{ "Insert", "Erase"};
 	
 	int mapWidth = 10;
@@ -179,7 +179,7 @@ public class MainInterface: MonoBehaviour
 		        GUILayout.EndHorizontal();
 			}
 			
-			if(worldEditor.brushType==BrushType.paint)
+			if(worldEditor.brushType==BrushType.paint || worldEditor.brushType==BrushType.fog)
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Brush Size: " + worldEditor.brushSize.ToString(), GUILayout.Width(80));

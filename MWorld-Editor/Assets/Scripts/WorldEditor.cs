@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BrushType
 {
-	selection, sculpt, paint, texturePaint, doodads
+	none, selection, sculpt, paint, texturePaint, fog, doodads
 }
 
 public class WorldEditor : MonoBehaviour {
@@ -42,6 +42,7 @@ public class WorldEditor : MonoBehaviour {
 	//Terrain assets...
 	public GameObject defaultTextureTile;
 	public GameObject defaultColorTile;
+	public GameObject defaultFogTile;
 	
 	public Texture2D[] terrainTextures;
 	public GameObject[] doodads;
@@ -137,6 +138,7 @@ public class WorldEditor : MonoBehaviour {
 							applySmoothTranslationToDoodads(hitFloor2.point, brushDirection, brushSize, brushIntensity, maxHeight);
 							((GameObject)((Hashtable)world[s])["textureTile"]).GetComponent<VerticlesIndexer>().applySmoothTranslationToVerticles(hitFloor2.point, brushDirection, brushSize, brushIntensity, maxHeight);
 							((GameObject)((Hashtable)world[s])["colorTile"]).GetComponent<VerticlesIndexer>().applySmoothTranslationToVerticles(hitFloor2.point, brushDirection, brushSize, brushIntensity, maxHeight);
+							((GameObject)((Hashtable)world[s])["fogTile"]).GetComponent<VerticlesIndexer>().applySmoothTranslationToVerticles(hitFloor2.point, brushDirection, brushSize, brushIntensity, maxHeight);
 						}
 						
 						if(Vector3.Distance(((GameObject)((Hashtable)world[s])["textureTile"]).transform.position, hitFloor2.point)<brushSize*DEFAULT_TILE_STEP)
@@ -146,6 +148,10 @@ public class WorldEditor : MonoBehaviour {
 							
 							if(brushType==BrushType.texturePaint)
 								((GameObject)((Hashtable)world[s])["textureTile"]).GetComponent<TileColorHandler>().paintTexture(hitFloor2.point, brushTexture, brushSize, brushIntensity, maxTransparency);
+						
+							if(brushType==BrushType.fog)
+								((GameObject)((Hashtable)world[s])["fogTile"]).GetComponent<FogTileHandler>().clearFog(hitFloor2.point, brushSize);
+						
 						}
 					}
 				}
@@ -245,6 +251,7 @@ public class WorldEditor : MonoBehaviour {
 			//the color tile always comes in front.
 			GameObject textureTile = (GameObject) Instantiate(defaultTextureTile, position, Quaternion.identity);
 			GameObject colorTile = (GameObject) Instantiate(defaultColorTile, position+new Vector3(0, 0.01f, 0), Quaternion.identity);
+			GameObject fogTile = (GameObject) Instantiate(defaultFogTile, position+new Vector3(0, 0.02f, 0), Quaternion.identity);
 			
 			textureTile.GetComponent<VerticlesIndexer>().Id = id;
 			
@@ -257,6 +264,7 @@ public class WorldEditor : MonoBehaviour {
 			//we keep a reference to the tile's gameobjects
 			tileInfos.Add("textureTile", textureTile);
 			tileInfos.Add("colorTile", colorTile);
+			tileInfos.Add("fogTile", fogTile);
 			tileInfos.Add("verticlesIndexer", textureTile.GetComponent<VerticlesIndexer>());
 			
 			world.Add(id, tileInfos);
@@ -364,7 +372,15 @@ public class WorldEditor : MonoBehaviour {
 		else
 		{
 			GameObject.Destroy(((GameObject)elementInfos["textureTile"]).gameObject);
-			GameObject.Destroy(((GameObject)elementInfos["colorTile"]).gameObject);
+			
+			try
+			{
+				GameObject.Destroy(((GameObject)elementInfos["colorTile"]).gameObject);
+			}
+			catch
+			{
+				
+			}
 		}
 		
 		world.Remove(id);

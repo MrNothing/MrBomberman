@@ -51,6 +51,7 @@ public class IOManager
 				
 				elementInfos.Remove("textureTile");
 				elementInfos.Remove("colorTile");
+				elementInfos.Remove("fogTile");
 				elementInfos.Remove("verticlesIndexer");
 			}
 			else
