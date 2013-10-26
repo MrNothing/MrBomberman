@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 /*
- * This file contains all classes required to used MGUI, attach this to a GameObject and keep a refrence to MGUI 
+ * This file contains all classes required to use MGUI, attach this to a GameObject and keep a refrence to MGUI 
  * recommended fuctions: setText, setTextField, setTextArea, setButton, setImage, insertText
  * */
 
