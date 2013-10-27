@@ -18,7 +18,7 @@ public class MainInterface: MonoBehaviour
 	int currentTexture = 0;
 	int currentBrushType = 0;
 	
-	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.fog.ToString(), BrushType.doodads.ToString()};
+	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.fog.ToString(), BrushType.doodads.ToString(), BrushType.entities.ToString(), BrushType.skills.ToString(), BrushType.items.ToString()};
 	string[] brushModes = new string[]{ "Insert", "Erase"};
 	
 	int mapWidth = 10;
@@ -296,6 +296,21 @@ public class MainInterface: MonoBehaviour
 		        
 				worldEditor.brushDoodad = worldEditor.doodads[currentDoodad];
 				GUILayout.EndHorizontal();
+			}
+			
+			if(worldEditor.brushType==BrushType.entities)
+			{
+				//entity's informations are defined in the editor
+			}
+			
+			if(worldEditor.brushType==BrushType.skills)
+			{
+				//skills informations are defined in the editor
+			}
+			
+			if(worldEditor.brushType==BrushType.items)
+			{
+				//items informations are defined in the editor
 			}
 			
 			GUILayout.EndArea();	

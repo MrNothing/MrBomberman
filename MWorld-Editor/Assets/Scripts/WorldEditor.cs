@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BrushType
 {
-	none, selection, sculpt, paint, texturePaint, fog, doodads
+	none, selection, sculpt, paint, texturePaint, fog, doodads, entities, skills, items
 }
 
 public class WorldEditor : MonoBehaviour {
@@ -15,7 +15,7 @@ public class WorldEditor : MonoBehaviour {
 	public LayerMask TilesLayer;
 	public LayerMask DoodadsLayer;
 	
-	public Rect guiArea = new Rect(0, 10, 300, 400);
+	public Rect guiArea = new Rect(0, 10, 400, 1000);
 	
 	public GameObject selection=null;
 	public GameObject selectionCube;
@@ -130,6 +130,9 @@ public class WorldEditor : MonoBehaviour {
 						}
 					}
 				}
+			}
+			else if(brushType==BrushType.entities)
+			{
 			}
 			else
 			{
