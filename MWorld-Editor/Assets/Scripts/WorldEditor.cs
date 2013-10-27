@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BrushType
 {
-	none, selection, sculpt, paint, texturePaint, fog, doodads, entities, skills, items
+	none, selection, sculpt, paint, texturePaint, fog, doodads, entities, skills, items, map
 }
 
 public class WorldEditor : MonoBehaviour {
@@ -39,10 +39,14 @@ public class WorldEditor : MonoBehaviour {
 	public GameObject brushDoodad;
 	public int brushMode=0;
 	
+	//for entity brush only...
+	public string brushEntity = string.Empty;
+	
 	//Terrain assets...
 	public GameObject defaultTextureTile;
 	public GameObject defaultColorTile;
 	public GameObject defaultFogTile;
+	public GameObject defaultEntity;
 	
 	public Texture2D[] terrainTextures;
 	public GameObject[] doodads;
@@ -55,6 +59,18 @@ public class WorldEditor : MonoBehaviour {
 	Hashtable world = new Hashtable();
 	
 	List<string> tiles = new List<string>();
+	
+	//game infos...
+	public List<Hashtable> entityInfos = new List<Hashtable>();
+	public Hashtable entityInfosByName = new Hashtable();
+	public Hashtable entities = new Hashtable();
+	
+	public Hashtable skills = new Hashtable();
+	public Hashtable items = new Hashtable();
+	
+	public List<Hashtable> teams = new List<Hashtable>();
+	public Hashtable teamsInfos = new Hashtable();
+	public Hashtable mapInfos = new Hashtable();
 
 	public List<string> Tiles 
 	{
@@ -133,6 +149,18 @@ public class WorldEditor : MonoBehaviour {
 			}
 			else if(brushType==BrushType.entities)
 			{
+				//if i have selected an entity...
+				if(brushEntity.Length>0)
+				{
+					Ray ray = Camera.mainCamera.ScreenPointToRay(Input.mousePosition);
+			
+					RaycastHit hitFloor2;
+					
+					if (Physics.Raycast (ray.origin, ray.direction, out hitFloor2, 100f, TilesLayer.value)) 
+					{
+						addEntity(hitFloor2.point, brushEntity);
+					}
+				}
 			}
 			else
 			{
@@ -349,6 +377,57 @@ public class WorldEditor : MonoBehaviour {
 		}
 	}
 	
+	//behaves like a doodad, except it is stored in the entities hashtable
+	public void addEntity(Vector3 position, string entity)
+	{
+		string id = getIdWithPosition(position, DEFAULT_DOODAD_STEP);
+		
+		if(entities[id]==null)
+		{
+			GameObject tmpDoodad = (GameObject) Instantiate(defaultEntity, smash(position, DEFAULT_DOODAD_STEP), Quaternion.identity);
+			tmpDoodad.name = id;
+			
+			//we need to determine to closest vertice for the 9 closest tiles and apply its height to the entity.
+			float height = 0;
+			
+			float lastDistance = float.MaxValue;
+			
+			List<string> tilesAroundMyPoint = getTilesAroundPoint(tmpDoodad.transform.position, 1);
+			foreach(string s in tilesAroundMyPoint)
+			{
+				Hashtable tmpInfos = (Hashtable) world[s];
+				
+				VerticlesIndexer verticlesIndexer = (tmpInfos["textureTile"] as GameObject).GetComponent<VerticlesIndexer>();
+				
+				int bestVert = verticlesIndexer.getNearestPlanarVertice(tmpDoodad.transform.position);
+				float planarDistance = Vector2.Distance(new Vector2(verticlesIndexer._verts[bestVert].x, verticlesIndexer._verts[bestVert].z), new Vector2(tmpDoodad.transform.position.x, tmpDoodad.transform.position.z)); 
+				if(planarDistance<lastDistance)
+				{
+					height = verticlesIndexer._verts[bestVert].y;
+				}
+			}
+			
+			tmpDoodad.transform.position = tmpDoodad.transform.position+new Vector3(0, height, 0);
+		
+			Hashtable tileInfos = new Hashtable();
+			tileInfos.Add("id", id);
+			tileInfos.Add("x", tmpDoodad.transform.position.x);
+			tileInfos.Add("y", tmpDoodad.transform.position.y);
+			tileInfos.Add("z", tmpDoodad.transform.position.z);
+			
+			tileInfos.Add("rotation_x", tmpDoodad.transform.eulerAngles.x); 
+			tileInfos.Add("rotation_y", tmpDoodad.transform.eulerAngles.y); 
+			tileInfos.Add("rotation_z", tmpDoodad.transform.eulerAngles.z); 
+			tileInfos.Add("scale", tmpDoodad.transform.localScale.x);
+			
+			//we keep a reference to the doodad's gameobjects
+			tileInfos.Add("doodad", tmpDoodad); 
+			tileInfos.Add("name", entity); 
+			
+			entities.Add(id, tileInfos);
+		}
+	}
+	
 	//adds a doodads without taking the map's vertices in account.
 	public void addDoodadSilent(Vector3 position, GameObject doodad)
 	{
@@ -387,27 +466,37 @@ public class WorldEditor : MonoBehaviour {
 	
 	void removeElement(string id)
 	{
-		Hashtable elementInfos = (Hashtable)world[id];
-		
-		if(elementInfos["doodad"]!=null)
+		if(world[id]!=null)
 		{
-			GameObject.Destroy(((GameObject)elementInfos["doodad"]).gameObject);
+			Hashtable elementInfos = (Hashtable)world[id];
+		
+			if(elementInfos["doodad"]!=null)
+			{
+				GameObject.Destroy(((GameObject)elementInfos["doodad"]).gameObject);
+			}
+			else
+			{
+				GameObject.Destroy(((GameObject)elementInfos["textureTile"]).gameObject);
+				
+				try
+				{
+					GameObject.Destroy(((GameObject)elementInfos["colorTile"]).gameObject);
+				}
+				catch
+				{
+					
+				}
+			}
+			
+			world.Remove(id);
 		}
 		else
 		{
-			GameObject.Destroy(((GameObject)elementInfos["textureTile"]).gameObject);
-			
-			try
-			{
-				GameObject.Destroy(((GameObject)elementInfos["colorTile"]).gameObject);
-			}
-			catch
-			{
-				
-			}
-		}
+			Hashtable elementInfos = (Hashtable)entities[id];
 		
-		world.Remove(id);
+			GameObject.Destroy(((GameObject)elementInfos["doodad"]).gameObject);
+			entities.Remove(id);
+		}
 	}
 	
 	public List<string> getTilesAroundPoint(Vector3 point, int radius)

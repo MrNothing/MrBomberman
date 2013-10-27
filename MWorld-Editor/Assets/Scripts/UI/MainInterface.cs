@@ -17,9 +17,18 @@ public class MainInterface: MonoBehaviour
 	int currentDoodad = 0;
 	int currentTexture = 0;
 	int currentBrushType = 0;
+	int currentEntity = 0;
+	int currentCameraMode = 0;
+	int currentGameMode = 0;
 	
-	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.fog.ToString(), BrushType.doodads.ToString(), BrushType.entities.ToString(), BrushType.skills.ToString(), BrushType.items.ToString()};
+	string[] brushes = new string[]{ BrushType.selection.ToString(), BrushType.sculpt.ToString(), BrushType.paint.ToString(), BrushType.texturePaint.ToString(), BrushType.fog.ToString(), BrushType.doodads.ToString(), BrushType.entities.ToString(), BrushType.skills.ToString(), BrushType.items.ToString(), BrushType.map.ToString()};
 	string[] brushModes = new string[]{ "Insert", "Erase"};
+	
+	//rpg mode includes serverside persistence
+	string[] gameModes = new string[]{ "rpg", "dota", "rts"};
+	
+	//fps and mmo modes require an hero
+	string[] cameraModes = new string[]{ "rts", "fps", "mmo"};
 	
 	int mapWidth = 10;
 	int mapHeight = 10;
@@ -29,6 +38,8 @@ public class MainInterface: MonoBehaviour
 	string tmpMapName = "Untitled";
 	
 	bool loadingInterface = false;
+	
+	bool createEntity = false;
 	
 	void OnGUI()
 	{
@@ -107,9 +118,9 @@ public class MainInterface: MonoBehaviour
 			
 	        GUILayout.EndHorizontal();
 			
-			GUILayout.Label("-------");
+			GUILayout.Label("------- "+brushes[currentBrushType]+" -------");
 			
-			currentBrushType = GUILayout.SelectionGrid(currentBrushType, brushes, 3);
+			currentBrushType = GUILayout.SelectionGrid(currentBrushType, brushes, 5);
 			worldEditor.brushType = (BrushType)Enum.Parse(typeof(BrushType), brushes[currentBrushType], true);
 			
 			GUILayout.Label("-------");
@@ -301,6 +312,110 @@ public class MainInterface: MonoBehaviour
 			if(worldEditor.brushType==BrushType.entities)
 			{
 				//entity's informations are defined in the editor
+		        
+				if(!createEntity)
+				{
+					if(GUILayout.Button("Create new Entity"))
+						createEntity = true;	
+					
+					if(worldEditor.entityInfos.Count>0)
+					{
+						GUILayout.BeginHorizontal();
+						if(GUILayout.Button("<"))
+						{
+							if(currentEntity>0)
+								currentEntity--;
+						}
+						GUILayout.Label("Entity "+currentEntity);
+						if(GUILayout.Button(">"))
+						{
+							if(currentEntity<worldEditor.entityInfos.Count-1)
+							{
+								currentEntity++;
+							}
+						}
+				        GUILayout.EndHorizontal();
+						
+						worldEditor.brushEntity = worldEditor.entityInfos[currentEntity]["name"].ToString();
+					}
+				}
+				else
+				{
+					//entity creation interface...
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Prefab: ");
+					newEntityPrefab = GUILayout.TextField(newEntityPrefab);
+					
+					GUILayout.Label("Name: ");
+					newEntityName = GUILayout.TextField(newEntityName);
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("level: ");
+					newEntityLevel = float.Parse(GUILayout.TextField(newEntityLevel.ToString()));
+					
+					GUILayout.Label("speed: ");
+					newEntitySpeed = float.Parse(GUILayout.TextField(newEntitySpeed.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("hp: ");
+					newEntityHp = float.Parse(GUILayout.TextField(newEntityHp.ToString()));
+					
+					GUILayout.Label("mp: ");
+					newEntityMp = float.Parse(GUILayout.TextField(newEntityMp.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("dmg: ");
+					newEntityDamage = float.Parse(GUILayout.TextField(newEntityDamage.ToString()));
+					
+					GUILayout.Label("power: ");
+					newEntityPower = float.Parse(GUILayout.TextField(newEntityPower.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("armor: ");
+					newEntityArmor = float.Parse(GUILayout.TextField(newEntityArmor.ToString()));
+					
+					GUILayout.Label("resist: ");
+					newEntityResistance = float.Parse(GUILayout.TextField(newEntityResistance.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					newEntityIsHero = GUILayout.Toggle(newEntityIsHero, "Hero ");	
+					newEntityIsImmortal = GUILayout.Toggle(newEntityIsImmortal, "Immortal ");	
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					if(GUILayout.Button("Cancel"))
+						createEntity = false;
+					
+					if(GUILayout.Button("Save"))
+					{
+						Hashtable newEntity = new Hashtable();
+						newEntity.Add("name", newEntityName);
+						newEntity.Add("hero", newEntityIsHero);
+						newEntity.Add("immortal", newEntityIsImmortal);
+						newEntity.Add("prefab", newEntityPrefab);
+						newEntity.Add("maxhp", newEntityMaxHp);
+						newEntity.Add("hp", newEntityHp);
+						newEntity.Add("maxmp", newEntityMaxMp);
+						newEntity.Add("mp", newEntityMp);
+						newEntity.Add("damage", newEntityDamage);
+						newEntity.Add("power", newEntityPower);
+						newEntity.Add("armor", newEntityArmor);
+						newEntity.Add("resistance", newEntityResistance);
+						newEntity.Add("speed", newEntitySpeed);
+						
+						worldEditor.entityInfos.Add(newEntity);
+						worldEditor.entityInfosByName.Add(newEntityName, newEntity);
+						
+						createEntity = false;
+					}
+					
+					GUILayout.EndHorizontal();
+				}
 			}
 			
 			if(worldEditor.brushType==BrushType.skills)
@@ -313,7 +428,56 @@ public class MainInterface: MonoBehaviour
 				//items informations are defined in the editor
 			}
 			
+			if(worldEditor.brushType==BrushType.map)
+			{
+				GUILayout.Label("Map properties:");
+				mapInfosFogEnabled = GUILayout.Toggle(mapInfosFogEnabled, "Enable Fog ");	
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Game mode: ");
+				currentGameMode = GUILayout.SelectionGrid(currentGameMode, gameModes, 5);
+				GUILayout.EndHorizontal();
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Camera mode: ");
+				currentCameraMode = GUILayout.SelectionGrid(currentCameraMode, cameraModes, 5);
+				GUILayout.EndHorizontal();
+				
+				for(int i=0; i<12; i++)
+				{
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("team "+i+", players: ");
+					mapInfosTeamsPlayers[i] = int.Parse(GUILayout.TextField(mapInfosTeamsPlayers[i]+""));
+					
+					GUILayout.Label("name: ");
+					mapInfosTeamsNames[i] = GUILayout.TextField(mapInfosTeamsNames[i]+"");
+					GUILayout.EndHorizontal();
+				}
+				
+			}
+			
 			GUILayout.EndArea();	
 		}
 	}
+	
+	//temp map infos are stored here
+	bool mapInfosFogEnabled = false;
+	int[] mapInfosTeamsPlayers = new int[12];
+	string[] mapInfosTeamsNames = new string[12];
+	
+	//we temporarly store the new unit's stats
+	string newEntityPrefab = "";
+	string newEntityName = "";
+	float newEntityLevel = 0;
+	float newEntityHp = 0;
+	float newEntityMaxHp = 0;
+	float newEntityMp = 0;
+	float newEntityMaxMp = 0;
+	float newEntityDamage = 0;
+	float newEntityPower = 0;
+	float newEntityArmor = 0;
+	float newEntityResistance = 0;
+	float newEntitySpeed = 0;
+	bool newEntityIsHero = false;
+	bool newEntityIsImmortal = false;
 }

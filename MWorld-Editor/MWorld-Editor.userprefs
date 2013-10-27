@@ -1,13 +1,14 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Tools\FogTileHandler.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UI\MainInterface.cs">
     <Files>
-      <File FileName="Assets\Scripts\WorldEditor.cs" Line="153" Column="95" />
+      <File FileName="Assets\Scripts\Tools\TileColorHandler.cs" Line="16" Column="4" />
+      <File FileName="Assets\Scripts\WorldEditor.cs" Line="152" Column="38" />
       <File FileName="Assets\Scripts\Managers\IOManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Tools\FogTileHandler.cs" Line="33" Column="22" />
-      <File FileName="Assets\Scripts\Tools\VerticlesIndexer.cs" Line="126" Column="3" />
-      <File FileName="Assets\Scripts\UI\MainInterface.cs" Line="21" Column="1" />
-      <File FileName="Assets\Assets\Shaders\VertexColored.shader" Line="15" Column="38" />
+      <File FileName="Assets\Scripts\Tools\FogTileHandler.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Tools\VerticlesIndexer.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\UI\MainInterface.cs" Line="332" Column="56" />
+      <File FileName="Assets\Assets\Shaders\VertexColored.shader" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

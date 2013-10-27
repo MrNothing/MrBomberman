@@ -75,7 +75,7 @@ public class TileColorHandler : MonoBehaviour {
 					
 					Color newColor = new Color(lastColor.r, lastColor.g, lastColor.b, lastColor.a);
 					
-					//BLEND MODE: NORMAL
+					//BLEND MODE: NORMAL (merge)
 					if(lastColor.r<color.r)
 						newColor.r += Mathf.Abs(lastColor.r-color.r)*relativeIntensity;
 					
