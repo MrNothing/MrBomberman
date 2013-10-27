@@ -52,8 +52,10 @@ public class WorldEditor : MonoBehaviour {
 	public GameObject[] doodads;
 	Dictionary<string, GameObject> doodadsByName = new Dictionary<string, GameObject>();
 	
-	int DEFAULT_TILE_STEP=2;
-	float DEFAULT_DOODAD_STEP=1f;
+	[HideInInspector]
+	public int DEFAULT_TILE_STEP=2;
+	[HideInInspector]
+	public float DEFAULT_DOODAD_STEP=1f;
 	
 	//This is where all the map's indexed informations are stored.
 	Hashtable world = new Hashtable();
@@ -229,6 +231,17 @@ public class WorldEditor : MonoBehaviour {
 		world.Clear();
 		tiles.Clear();
 		
+		entityInfos = new List<Hashtable>();
+		entityInfosByName = new Hashtable();
+		entities = new Hashtable();
+		
+		skills = new Hashtable();
+		items = new Hashtable();
+		
+		teams = new List<Hashtable>();
+		teamsInfos = new Hashtable();
+		mapInfos = new Hashtable();
+		
 		for(int i=0; i<mapSize.x; i++)
 		{
 			for(int j=0; j<mapSize.y; j++)
@@ -249,7 +262,39 @@ public class WorldEditor : MonoBehaviour {
 		world.Clear();
 		tiles.Clear();
 		
-		Hashtable mapData = ioManager.loadMapInfos(path);
+		entityInfos = new List<Hashtable>();
+		entityInfosByName = new Hashtable();
+		entities = new Hashtable();
+		
+		skills = new Hashtable();
+		items = new Hashtable();
+		
+		teamsInfos = new Hashtable();
+		mapInfos = new Hashtable();
+		
+		Hashtable map = ioManager.loadMapInfos(path);
+		
+		mapInfos = (Hashtable)map["mapInfos"];
+		skills = (Hashtable)map["skills"];
+		items = (Hashtable)map["items"];
+		
+		teamsInfos = (Hashtable)map["teamsInfos"];
+		
+		entityInfosByName = (Hashtable)map["entityInfos"];
+				
+		foreach(string s in entityInfosByName.Keys)
+		{
+			entityInfos.Add((Hashtable)entityInfosByName[s]);
+		}
+		
+		Hashtable mapData = (Hashtable)map["mapData"];
+		Hashtable entitiesData = (Hashtable)map["entities"];
+		
+		foreach(string s in entitiesData.Keys)
+		{
+			Hashtable elementInfos = (Hashtable)entitiesData[s];
+			addEntitySilent(new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), elementInfos["name"].ToString());
+		}
 		
 		foreach(string s in mapData.Keys)
 		{
@@ -457,6 +502,37 @@ public class WorldEditor : MonoBehaviour {
 			world.Add(id, tileInfos);
 		}
 	}
+	
+	public void addEntitySilent(Vector3 position, string entity)
+	{
+		string id = getIdWithPosition(position, DEFAULT_DOODAD_STEP);
+		
+		if(entities[id]==null)
+		{
+			GameObject tmpDoodad = (GameObject) Instantiate(defaultEntity, smash(position, DEFAULT_DOODAD_STEP), Quaternion.identity);
+			tmpDoodad.name = id;
+			
+			tmpDoodad.transform.position = tmpDoodad.transform.position;
+		
+			Hashtable tileInfos = new Hashtable();
+			tileInfos.Add("id", id);
+			tileInfos.Add("x", tmpDoodad.transform.position.x);
+			tileInfos.Add("y", tmpDoodad.transform.position.y);
+			tileInfos.Add("z", tmpDoodad.transform.position.z);
+			
+			tileInfos.Add("rotation_x", tmpDoodad.transform.eulerAngles.x); 
+			tileInfos.Add("rotation_y", tmpDoodad.transform.eulerAngles.y); 
+			tileInfos.Add("rotation_z", tmpDoodad.transform.eulerAngles.z); 
+			tileInfos.Add("scale", tmpDoodad.transform.localScale.x);
+			
+			//we keep a reference to the doodad's gameobjects
+			tileInfos.Add("doodad", tmpDoodad); 
+			tileInfos.Add("name", entity); 
+			
+			entities.Add(id, tileInfos);
+		}
+	}
+	
 	
 	List<string> removeQueue = new List<string>();
 	public void removeElementLater(string id)

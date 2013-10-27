@@ -101,7 +101,7 @@ public class MainInterface: MonoBehaviour
 			
 			if(GUILayout.Button("Save"))
 			{
-				worldEditor.ioManager.saveMap(Application.dataPath+"/Maps/"+worldEditor.mapName+"/", worldEditor.World);
+				worldEditor.ioManager.saveMap(Application.dataPath+"/Maps/"+worldEditor.mapName+"/", worldEditor.World, worldEditor.entities, worldEditor.entityInfosByName, worldEditor.teamsInfos, worldEditor.mapInfos, worldEditor.skills, worldEditor.items);
 			}
 			
 			if(GUILayout.Button("Load"))
@@ -145,6 +145,21 @@ public class MainInterface: MonoBehaviour
 						{
 							//Terrain tiles should not be removed...
 							//worldEditor.removeElementLater(worldEditor.selection.GetComponent<VerticlesIndexer>().Id);
+						}
+						else if(worldEditor.selection.GetComponent<Entity>())
+						{
+							Hashtable infos = (Hashtable) worldEditor.entities[worldEditor.selection.name];
+							GUILayout.Label("entity: "+infos["name"]);
+							
+							GUILayout.BeginHorizontal();
+							GUILayout.Label("Team: ");
+							GUILayout.TextField("");
+							GUILayout.EndHorizontal();
+						
+							if(GUILayout.Button("Destroy"))
+							{
+								worldEditor.removeElementLater(worldEditor.selection.name);
+							}
 						}
 						else
 						{
@@ -327,6 +342,26 @@ public class MainInterface: MonoBehaviour
 								currentEntity--;
 						}
 						GUILayout.Label("Entity "+currentEntity);
+						if(GUILayout.Button("Edit"))
+						{
+							Hashtable infos = worldEditor.entityInfos[currentEntity];
+							newEntityName = infos["name"].ToString();
+							newEntityPrefab = infos["prefab"].ToString();
+							newEntityIsHero = (bool)infos["hero"];
+							newEntityIsImmortal = (bool)infos["immortal"];
+							newEntityMaxHp = (float)infos["maxhp"];
+							newEntityHp = (float)infos["hp"];
+							newEntityMaxMp = (float)infos["maxmp"];
+							newEntityMp = (float)infos["mp"];
+							newEntityDamage = (float)infos["damage"];
+							newEntityPower = (float)infos["power"];
+							newEntityArmor = (float)infos["armor"];
+							newEntityResistance = (float)infos["resistance"];
+							newEntitySpeed = (float)infos["speed"];
+							
+							createEntity = true;
+						}
+						
 						if(GUILayout.Button(">"))
 						{
 							if(currentEntity<worldEditor.entityInfos.Count-1)
@@ -408,6 +443,12 @@ public class MainInterface: MonoBehaviour
 						newEntity.Add("resistance", newEntityResistance);
 						newEntity.Add("speed", newEntitySpeed);
 						
+						if(worldEditor.entityInfosByName[newEntityName]!=null)
+						{
+							worldEditor.entityInfos.Remove(worldEditor.entityInfosByName[newEntityName] as Hashtable);
+							worldEditor.entityInfosByName.Remove(newEntityName);
+						}
+						
 						worldEditor.entityInfos.Add(newEntity);
 						worldEditor.entityInfosByName.Add(newEntityName, newEntity);
 						
@@ -431,6 +472,50 @@ public class MainInterface: MonoBehaviour
 			if(worldEditor.brushType==BrushType.map)
 			{
 				GUILayout.Label("Map properties:");
+				
+				if(GUILayout.Button("Load properties"))
+				{
+					mapInfosFogEnabled = (bool) worldEditor.mapInfos["fog"];
+					
+					for(int i=0; i<gameModes.Length; i++)
+					{
+						if(gameModes[i].Equals(worldEditor.mapInfos["gameMode"].ToString()))
+						{
+							currentGameMode = i;
+							break;
+						}
+					}
+					
+					for(int i=0; i<cameraModes.Length; i++)
+					{
+						if(gameModes[i].Equals(worldEditor.mapInfos["cameraMode"].ToString()))
+						{
+							currentCameraMode = i;
+							break;
+						}
+					}
+					
+					for(int i=0; i<12; i++)
+					{
+						mapInfosTeamsNames[i] = worldEditor.mapInfos["team_"+i].ToString();
+						mapInfosTeamsPlayers[i] = (int)worldEditor.mapInfos["team_"+i+"_players"];
+					}
+				}
+				
+				if(GUILayout.Button("Save properties"))
+				{
+					Hashtable mapInfos = new Hashtable();
+					mapInfos.Add("fog", mapInfosFogEnabled);
+					mapInfos.Add("gameMode", gameModes[currentGameMode]);
+					mapInfos.Add("cameraMode", cameraModes[currentCameraMode]);
+					
+					for(int i=0; i<12; i++)
+					{
+						mapInfos.Add("team_"+i, mapInfosTeamsNames[i]);
+						mapInfos.Add("team_"+i+"_players", mapInfosTeamsPlayers[i]);
+					}
+				}
+				
 				mapInfosFogEnabled = GUILayout.Toggle(mapInfosFogEnabled, "Enable Fog ");	
 				
 				GUILayout.BeginHorizontal();
@@ -453,7 +538,6 @@ public class MainInterface: MonoBehaviour
 					mapInfosTeamsNames[i] = GUILayout.TextField(mapInfosTeamsNames[i]+"");
 					GUILayout.EndHorizontal();
 				}
-				
 			}
 			
 			GUILayout.EndArea();	

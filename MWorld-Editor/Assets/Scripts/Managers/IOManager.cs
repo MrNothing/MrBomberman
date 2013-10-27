@@ -12,7 +12,7 @@ public class IOManager
 	/*
 	 * To save the map, we need to save two things, the serializable elements and the Map's tiles textures
 	 * */
-	public void saveMap(string path, Hashtable _world)
+	public void saveMap(string path, Hashtable _world, Hashtable _entities, Hashtable entityInfos, Hashtable teamsInfos, Hashtable mapInfos, Hashtable skills, Hashtable items)
 	{
 		//we create the new folders if they do not exit.
 		createPathIfItDoesNotExist(path);
@@ -60,7 +60,25 @@ public class IOManager
 			}
 		}
 		
-		writeHashtable(path+"mainData", world);
+		Hashtable entities = new Hashtable(_entities);
+		
+		foreach(string s in entities.Keys)
+		{
+			Hashtable elementInfos = (Hashtable) entities[s];
+			elementInfos.Remove("doodad");
+		}
+		
+		Hashtable map = new Hashtable();
+		
+		map.Add("mapData", world);
+		map.Add("entities", entities);
+		map.Add("mapInfos", mapInfos);
+		map.Add("teamsInfos", teamsInfos);
+		map.Add("entityInfos", entityInfos);
+		map.Add("skills", skills);
+		map.Add("items", items);
+		
+		writeHashtable(path+"mainData", map);
 	}
 	
 	public Hashtable loadMapInfos(string path)
