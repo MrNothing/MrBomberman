@@ -53,7 +53,20 @@ public class WorldEditor : MonoBehaviour {
 	
 	//This is where all the map's indexed informations are stored.
 	Hashtable world = new Hashtable();
+	
+	List<string> tiles = new List<string>();
 
+	public List<string> Tiles 
+	{
+		get 
+		{
+			return this.tiles;
+		}
+		set 
+		{
+			tiles = value;
+		}
+	}
 	public Hashtable World 
 	{
 		get 
@@ -150,8 +163,13 @@ public class WorldEditor : MonoBehaviour {
 								((GameObject)((Hashtable)world[s])["textureTile"]).GetComponent<TileColorHandler>().paintTexture(hitFloor2.point, brushTexture, brushSize, brushIntensity, maxTransparency);
 						
 							if(brushType==BrushType.fog)
-								((GameObject)((Hashtable)world[s])["fogTile"]).GetComponent<FogTileHandler>().clearFog(hitFloor2.point, brushSize);
-						
+							{
+								FogTileHandler fog = ((GameObject)((Hashtable)world[s])["fogTile"]).GetComponent<FogTileHandler>();
+								
+								Dictionary<int, float> colliders = fog.findColliders(hitFloor2.point, brushSize, 0.1f);
+								
+								fog.clearFog(hitFloor2.point, brushSize, colliders, 1);
+							}
 						}
 					}
 				}
@@ -177,7 +195,8 @@ public class WorldEditor : MonoBehaviour {
 			removeElement(s);	
 		}
 		
-		world = new Hashtable();
+		world.Clear();
+		tiles.Clear();
 		
 		for(int i=0; i<mapSize.x; i++)
 		{
@@ -196,7 +215,8 @@ public class WorldEditor : MonoBehaviour {
 			removeElement(s);	
 		}
 		
-		world = new Hashtable();
+		world.Clear();
+		tiles.Clear();
 		
 		Hashtable mapData = ioManager.loadMapInfos(path);
 		
@@ -268,6 +288,7 @@ public class WorldEditor : MonoBehaviour {
 			tileInfos.Add("verticlesIndexer", textureTile.GetComponent<VerticlesIndexer>());
 			
 			world.Add(id, tileInfos);
+			tiles.Add(id);
 			
 			return tileInfos;
 		}

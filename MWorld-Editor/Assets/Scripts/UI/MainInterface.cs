@@ -24,6 +24,8 @@ public class MainInterface: MonoBehaviour
 	int mapWidth = 10;
 	int mapHeight = 10;
 	
+	bool enableFog = false;
+	
 	string tmpMapName = "Untitled";
 	
 	bool loadingInterface = false;
@@ -179,7 +181,39 @@ public class MainInterface: MonoBehaviour
 		        GUILayout.EndHorizontal();
 			}
 			
-			if(worldEditor.brushType==BrushType.paint || worldEditor.brushType==BrushType.fog)
+			if(worldEditor.brushType==BrushType.fog)
+			{
+				bool lastFog = enableFog;
+				enableFog = GUILayout.Toggle(enableFog, "Enable Fog");	
+				
+				if(lastFog!=enableFog)
+				{
+					if(enableFog)
+					{
+						foreach(string s in worldEditor.Tiles)
+						{
+							Hashtable tile = (Hashtable)worldEditor.World[s];
+							(tile["fogTile"] as GameObject).GetComponent<FogTileHandler>().setDefaultFog(new Color32(0, 0, 0, 255));
+						}
+					}
+					else
+					{
+						foreach(string s in worldEditor.Tiles)
+						{
+							Hashtable tile = (Hashtable)worldEditor.World[s];
+							(tile["fogTile"] as GameObject).GetComponent<FogTileHandler>().setDefaultFog(new Color32(0, 0, 0, 0));
+						}
+					}
+				}
+				
+				GUILayout.BeginHorizontal();
+				GUILayout.Label("Brush Size: " + worldEditor.brushSize.ToString(), GUILayout.Width(80));
+		        worldEditor.brushSize = GUILayout.HorizontalSlider(worldEditor.brushSize, 0, 10);
+		        GUILayout.EndHorizontal();
+				
+			}
+			
+			if(worldEditor.brushType==BrushType.paint)
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Brush Size: " + worldEditor.brushSize.ToString(), GUILayout.Width(80));

@@ -73,10 +73,32 @@ public class TileColorHandler : MonoBehaviour {
 					
 					Color color = brush.GetPixel(x, y);
 					
-					Color newColor = new Color(lastColor.r+color.r*relativeIntensity, lastColor.g+color.g*relativeIntensity, lastColor.b+color.b*relativeIntensity, lastColor.a+color.a*relativeIntensity);
+					Color newColor = new Color(lastColor.r, lastColor.g, lastColor.b, lastColor.a);
+					
+					//BLEND MODE: NORMAL
+					if(lastColor.r<color.r)
+						newColor.r += Mathf.Abs(lastColor.r-color.r)*relativeIntensity;
+					
+					if(lastColor.r>color.r)
+						newColor.r -= Mathf.Abs(lastColor.r-color.r)*relativeIntensity;
+						
+					if(lastColor.g<color.g)
+						newColor.g += Mathf.Abs(lastColor.g-color.g)*relativeIntensity;
+					
+					if(lastColor.g>color.g)
+						newColor.g -= Mathf.Abs(lastColor.g-color.g)*relativeIntensity;
+					
+					if(lastColor.b<color.b)
+						newColor.b += Mathf.Abs(lastColor.b-color.b)*relativeIntensity;
+					
+					if(lastColor.b>color.b)
+						newColor.b -= Mathf.Abs(lastColor.b-color.b)*relativeIntensity;
 					
 					if(newColor.a>maxTransparency)
 						newColor.a = maxTransparency;
+					
+					//BLEND MODE: ADDITIVE disabled since it has no real use
+					//Color newColor = new Color(lastColor.r+color.r*relativeIntensity, lastColor.g+color.g*relativeIntensity, lastColor.b+color.b*relativeIntensity, lastColor.a+color.a*relativeIntensity);
 					
 					texture.SetPixel(x, y, newColor);
 				}
