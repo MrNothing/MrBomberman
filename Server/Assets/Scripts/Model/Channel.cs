@@ -14,7 +14,9 @@ public class Channel
 	string _name;
 
 	List<Player> _players = new List<Player>();
-	
+
+	int _channelOwner;
+
 	ChannelType _type;
 	
 	bool _isPrivate;
@@ -37,7 +39,8 @@ public class Channel
 		_isPrivate = isPrivate;
 	}
 	
-	public Channel(Core core, string name, ChannelType type, int maxPlayers, bool isPrivate, string password, bool isTemp)
+	//if the channel is created by a player
+	public Channel(Core core, string name, ChannelType type, int maxPlayers, bool isPrivate, string password, bool isTemp, Player creator)
 	{
 		_core = core;
 		_id = this.GetHashCode();
@@ -47,6 +50,7 @@ public class Channel
 		_isPrivate = isPrivate;
 		_password = password;
 		_isTemp = isTemp;
+		_channelOwner = creator.Id;
 	}
 	
 	public void addPlayer(Player player)
@@ -110,9 +114,16 @@ public class Channel
 			roomInfos.Add("name", Name);
 			roomInfos.Add("id", Id);
 			roomInfos.Add("type", Type);
+			roomInfos.Add("owner", ChannelOwner);
 			roomInfos.Add("players", playersList);
 			player.Send(ServerEventType.roomInfos, serializer.hashMapToData(roomInfos));
 			
+			//if this is a game room, we call the game specific functions
+			if(_type==ChannelType.game)
+				((GameRoom)this).onPlayerJoin(player);
+			
+			if(_type==ChannelType.lobby)
+				((Lobby)this).onPlayerJoin(player);
 		}
 	}
 	
@@ -133,6 +144,19 @@ public class Channel
 			{
 				p.Send(ServerEventType.playerLeave, serializer.hashMapToData(playerInfos));
 			}
+			
+			//if the channel owner has left, we define a new one
+			if(ChannelOwner==player.Id)
+			{
+				foreach(Player p in _players)
+				{
+					ChannelOwner = p.Id;
+					//notify everyone there is a new channel owner
+					Send(ServerEventType.channelOwner, p.Name);
+					
+					break;
+				}
+			}
 		}
 		else
 		{
@@ -146,6 +170,11 @@ public class Channel
 		
 		player.Channel = null;
 		
+		if(_type==ChannelType.game)
+			((GameRoom)this).onPlayerLeave(player);
+		
+		if(_type==ChannelType.lobby)
+			((Lobby)this).onPlayerLeave(player);
 	}
 	
 	//send a message to all players in the channel
@@ -155,6 +184,19 @@ public class Channel
 		{
 			p.Send(type, data);
 		}
+	}
+	
+	public void addPlayers(List<Player> list)
+	{
+		foreach(Player p in list)
+			addPlayer(p);
+	}
+	
+	//also destroys the room if it is temp
+	public void kickAllPlayers()
+	{
+		foreach(Player p in _players)
+			removePlayer(p);
 	}
 	
 	public int getPlayersCount()
@@ -233,4 +275,25 @@ public class Channel
 			_isTemp = value;
 		}
 	}	
+	
+	public int ChannelOwner 
+	{
+		get 
+		{
+			return this._channelOwner;
+		}
+		set 
+		{
+			_channelOwner = value;
+		}
+	}	
+	
+	public List<Player> Players 
+	{
+		get 
+		{
+			return this._players;
+		}
+	}	
+	
 }

@@ -1,12 +1,17 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UI\MainLobby.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Networking\NetworkManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\Networking\NetworkManager.cs" Line="90" Column="53" />
-      <File FileName="Assets\Scripts\UI\UICore.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\UI\MainLobby.cs" Line="43" Column="73" />
+      <File FileName="Assets\Scripts\Networking\NetworkManager.cs" Line="84" Column="1" />
+      <File FileName="Assets\Scripts\UI\UICore.cs" Line="12" Column="40" />
+      <File FileName="Assets\Scripts\UI\MainLobby.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\UI\StartScreen.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\UI\MGUI\MGUI.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\UI\GameCreator.cs" Line="61" Column="149" />
+      <File FileName="Assets\Scripts\UI\GamesList.cs" Line="20" Column="2" />
+      <File FileName="Assets\Scripts\UI\GameLobby.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\UI\ErrorInterface.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Managers\IOManager.cs" Line="24" Column="10" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

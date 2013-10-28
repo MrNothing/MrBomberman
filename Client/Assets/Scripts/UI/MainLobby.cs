@@ -19,6 +19,8 @@ public class MainLobby : MonoBehaviour {
 			button.Visible = value;
 			textField.Visible = value;
 			textArea.Visible = value;
+			createGameButton.Visible = value;
+			joinGameButton.Visible = value;
 			this.enabled = value;
 			_visible = value;
 		}
@@ -27,6 +29,8 @@ public class MainLobby : MonoBehaviour {
 	MGUIButton button;
 	MGUITextfield textField;
 	public MGUITextArea textArea;
+	MGUIButton createGameButton;
+	MGUIButton joinGameButton;
 	
 	// Use this for initialization
 	void Start () 
@@ -42,6 +46,12 @@ public class MainLobby : MonoBehaviour {
 		//textarea
 		textArea = (MGUITextArea)gui.setTextArea("textArea1", new Rect(-25, 14, 0, 0), 15, 40, "Bienvenue dans le premier prototype de bomberman utilisant MGUI", core.normalFont, Color.yellow);
 		gui.insertText(textArea.id, "Type /help for a list of commands.", core.normalFont, Color.cyan);
+		
+		createGameButton = (MGUIButton)gui.setButton("createGame", new Rect(15, -10, 8, 1.5f), new Vector2(0, 0), "Create Game", core.normalFont, Color.green, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
+		createGameButton.OnButtonPressed += new MGUIButton.ButtonPressed(onCreateGameButtonPressed);
+		
+		joinGameButton = (MGUIButton)gui.setButton("joinGame", new Rect(15, -7, 8, 1.5f), new Vector2(0, 0), "Join Game", core.normalFont, Color.green, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
+		joinGameButton.OnButtonPressed += new MGUIButton.ButtonPressed(onJoinGameButtonPressed);
 		
 		Visible = false;
 	}
@@ -59,13 +69,25 @@ public class MainLobby : MonoBehaviour {
 		}
 	}
 	
-	void onButton1pressed(int key)
+	void onButton1pressed(MGUIButton key)
 	{
 		if(textField.Text.Length>0)
 		{
 			parseCommands(textField.Text);
 			textField.Text = "";
 		}
+	}
+	
+	void onCreateGameButtonPressed(MGUIButton key)
+	{
+		Visible = false;
+		core.gameCreator.Visible = true;
+	}
+	
+	void onJoinGameButtonPressed(MGUIButton key)
+	{
+		Visible = false;
+		core.gamesList.Visible = true;
 	}
 	
 	void parseCommands(string command)

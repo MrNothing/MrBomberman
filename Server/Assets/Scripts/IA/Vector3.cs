@@ -9,6 +9,29 @@ using System.Text;
 
 namespace B4
 {
+	public struct Vector3Tools
+	{
+		public static string toPosRefId(Vector3 vector, float step)
+		{
+			return Math.Floor(vector.x/step)*step + "_" + Math.Floor(vector.y/step)*step + "_" + Math.Floor(vector.z/step)*step;
+		}
+		
+		public static string toPosRefId(UnityEngine.Vector3 vector, float step)
+		{
+			return Math.Floor(vector.x/step)*step + "_" + Math.Floor(vector.y/step)*step + "_" + Math.Floor(vector.z/step)*step;
+		}
+		
+        public static Vector3 smash(Vector3 vector, float factor)
+        {
+            return new Vector3((float)Math.Floor(vector.x / factor) * factor, (float)Math.Floor(vector.y / factor) * factor, (float)Math.Floor(vector.z / factor) * factor);
+        }
+
+        public static Vector3 smash(Vector3 vector, Vector3 factorAsVector)
+        {
+            return new Vector3((float)Math.Floor(vector.x / factorAsVector.x) * factorAsVector.x, (float)Math.Floor(vector.y / factorAsVector.y) * factorAsVector.y, (float)Math.Floor(vector.z / factorAsVector.z) * factorAsVector.z);
+        }
+	}
+	
 	public class Vector3
 	{
 		public float x=0;

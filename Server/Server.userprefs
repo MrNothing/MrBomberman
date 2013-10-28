@@ -1,6 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Core.cs">
+    <Files>
+      <File FileName="Assets\Scripts\Model\Channel.cs" Line="174" Column="34" />
+      <File FileName="Assets\Scripts\Core.cs" Line="334" Column="58" />
+      <File FileName="Assets\Scripts\Model\GameRoom.cs" Line="177" Column="33" />
+      <File FileName="Assets\Scripts\Model\ViewTile.cs" Line="57" Column="63" />
+      <File FileName="Assets\Scripts\Managers\ViewsTilesManager.cs" Line="36" Column="1" />
+      <File FileName="Assets\Scripts\Model\Entity.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\IA\PathFinder.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Model\EntityInfos.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Managers\IOManager.cs" Line="29" Column="2" />
+      <File FileName="Assets\Scripts\IA\Vector3.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Model\EntityStats.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Model\Lobby.cs" Line="17" Column="117" />
+      <File FileName="Assets\Scripts\Managers\HashMapSerializer.cs" Line="1" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

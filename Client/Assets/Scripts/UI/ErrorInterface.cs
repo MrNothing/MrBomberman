@@ -42,7 +42,7 @@ public class ErrorInterface : MonoBehaviour
 			closeButton.Visible = false;
 	}
 	
-	public void hide(int key)
+	public void hide(MGUIButton key)
 	{
 		bgImage.Visible = false;
 		textArea.Visible = false;

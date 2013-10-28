@@ -309,7 +309,7 @@ public class MGUIButton:MGUIText
 	
 	public GameObject _bgContainer;
 	
-	public delegate void ButtonPressed(int key);
+	public delegate void ButtonPressed(MGUIButton button);
 	public ButtonPressed OnButtonPressed;
 	
 	public MGUIButton(string id, Rect bounds, GameObject container, GameObject bgContainer, GameObject textContainer, string text, Texture2D normal, Texture2D onMouseOver, Texture2D onMouseDown):base(id, bounds, container, textContainer, text)
@@ -321,9 +321,9 @@ public class MGUIButton:MGUIText
 		_type = MGUIType.button;
 	}
 	
-	void raiseButtonPressed(int key)
+	void raiseButtonPressed(MGUIButton button)
 	{
-		OnButtonPressed(key);
+		OnButtonPressed(button);
 	}
 	
 	public void triggerNormalImage()
@@ -352,7 +352,7 @@ public class MGUIButton:MGUIText
 	{
 		if(activated)
 		{
-			raiseButtonPressed(button);
+			raiseButtonPressed(this);
 			_bgContainer.renderer.material.SetTexture("_MainTex", _onMouseDown);
 		}
 	}

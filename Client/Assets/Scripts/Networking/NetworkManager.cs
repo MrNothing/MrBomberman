@@ -33,7 +33,29 @@ public enum ServerEventType
 	//gamesList
 	gamesList = 9,
 	
-	roomInfos = 10
+	//roomInfos
+	roomInfos = 10,
+	
+	//createGame
+	createGame = 11,
+	
+	//unitInfos only works in game
+	unitInfos = 12,
+	
+	//gameMap only works in the game lobby
+	gameMap = 13,
+	
+	//playerTeam only works in the game lobby
+	playerTeam = 14,
+	
+	//channelOwner
+	channelOwner = 15,
+	
+	//startGame
+	gameStart = 16,
+	
+	//playersByTeam
+	playersByTeam = 17,
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -108,8 +130,35 @@ public class NetworkManager : MonoBehaviour
 			
 			string msg = "Joined the Channel: "+infos["name"];
 			
-			if(core.lobby.Visible)
-				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
+			print(msg);
+			
+			//game
+			if(infos["type"].Equals("game"))
+			{
+				//show ingame interface...
+			}
+			
+			//game lobby
+			if(infos["type"].Equals("lobby"))
+			{
+				if(!core.gameLobby.Visible)
+					core.gameLobby.Visible = true;
+				
+				core.errorInterface.showMessage("Success!", Color.green, true);
+				
+				if(core.lobby.Visible)
+					core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow); 
+			}
+			
+			//main lobby
+			if(infos["type"].Equals("chat"))
+			{
+				if(!core.lobby.Visible)
+					core.lobby.Visible = true;
+				
+				if(core.lobby.Visible)
+					core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 	
+			}
 		}
 		
 		if(eventType==(byte)ServerEventType.playerLeave)
@@ -173,6 +222,7 @@ public class NetworkManager : MonoBehaviour
 				core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
 			}
 		}
+		
 	}
 	
 	void OnFailedToConnect(NetworkConnectionError error) 

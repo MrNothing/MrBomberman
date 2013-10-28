@@ -62,22 +62,26 @@ public class MainInterface: MonoBehaviour
 				
 				GUI.Box(new Rect(Screen.width/2-100, 100, 200, 100), "Create a new Map");
 				
-				tmpMapName = GUI.TextField(new Rect(Screen.width/2-90, 170, 100, 25), tmpMapName);
+				tmpMapName = GUI.TextField(new Rect(Screen.width/2-90, 170, 110, 25), tmpMapName);
 				if(GUI.Button(new Rect(Screen.width/2+30, 170, 60, 25), "Create"))
 				{
 					worldEditor.mapName = tmpMapName;
 					worldEditor.drawEmptyMap(new Vector2(mapWidth, mapHeight));
 				}
 				
-				if(GUI.Button(new Rect(Screen.width/2+30, 140, 60, 25), "Load"))
+				if(GUI.Button(new Rect(5, 5, 60, 25), "Load"))
 				{
 					loadingInterface = true;
 				}
+				
+				GUI.Label(new Rect(Screen.width/2-90, 140, 60, 25), "Map Size:");
+				mapWidth = int.Parse(GUI.TextField(new Rect(Screen.width/2-25, 140, 30, 25), mapWidth.ToString()));
+				mapHeight = int.Parse(GUI.TextField(new Rect(Screen.width/2+10, 140, 30, 25), mapHeight.ToString()));
 			}
 			else
 			{
 				GUI.Box(new Rect(Screen.width/2-100, 100, 200, 100), "Load Map");
-				tmpMapName = GUI.TextField(new Rect(Screen.width/2-90, 170, 100, 25), tmpMapName);
+				tmpMapName = GUI.TextField(new Rect(Screen.width/2-90, 170, 110, 25), tmpMapName);
 				if(GUI.Button(new Rect(Screen.width/2+30, 170, 60, 25), "Load"))
 				{
 					worldEditor.mapName = tmpMapName;
@@ -85,7 +89,7 @@ public class MainInterface: MonoBehaviour
 					loadingInterface = false;
 				}
 				
-				if(GUI.Button(new Rect(Screen.width/2+30, 140, 60, 25), "Create"))
+				if(GUI.Button(new Rect(5, 5, 60, 25), "Create"))
 				{
 					loadingInterface = false;
 				}
@@ -514,6 +518,8 @@ public class MainInterface: MonoBehaviour
 						mapInfos.Add("team_"+i, mapInfosTeamsNames[i]);
 						mapInfos.Add("team_"+i+"_players", mapInfosTeamsPlayers[i]);
 					}
+					
+					worldEditor.mapInfos = mapInfos;
 				}
 				
 				mapInfosFogEnabled = GUILayout.Toggle(mapInfosFogEnabled, "Enable Fog ");	

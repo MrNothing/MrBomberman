@@ -35,7 +35,28 @@ public enum ServerEventType
 	gamesList = 9,
 	
 	//roomInfos
-	roomInfos = 10
+	roomInfos = 10,
+	
+	//createGame
+	createGame = 11,
+	
+	//unitInfos only works in game
+	unitInfos = 12,
+	
+	//gameMap only works in the game lobby
+	gameMap = 13,
+	
+	//playerTeam only works in the game lobby
+	playerTeam = 14,
+	
+	//channelOwner
+	channelOwner = 15,
+	
+	//startGame
+	gameStart = 16,
+	
+	//playersByTeam
+	playersByTeam = 17,
 }
 
 public class Core : MonoBehaviour 
@@ -53,11 +74,14 @@ public class Core : MonoBehaviour
 	//index channels to avoid having the same channel name in the server
 	Dictionary<string, int> channelsByName = new Dictionary<string, int>();
 	
-	//all active games are listed here:
-	public Dictionary<int, GameRoom> games = new Dictionary<int, GameRoom>();
+	//all non started games are listed here:
+	public Dictionary<int, Lobby> games = new Dictionary<int, Lobby>();
 	
 	//This is used for serialization
 	HashMapSerializer serializer = new HashMapSerializer();
+	
+	//This is used to load maps
+	public IOManager io = new IOManager();
 	
 	void Start () 
 	{
@@ -278,6 +302,106 @@ public class Core : MonoBehaviour
 			else
 			{
 				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Channel!"); 
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.createGame)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			bool allow = false;
+			
+			if(myPlayer.Name.Length>0)
+			{
+				if(myPlayer.Channel!=null)
+				{
+					if(myPlayer.Channel.Type==ChannelType.chat)
+					{
+						allow = true;
+					}
+					else
+					{
+						myPlayer.Send(ServerEventType.serverMessage, "You are already in a Game!");
+					}
+				}
+				else
+				{
+					allow = true;
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not logged in!");	
+			}
+			
+			if(allow)
+			{
+				Lobby newGame = new Lobby(this, infos["name"].ToString(), 12, (bool)infos["isPrivate"], infos["map"].ToString());
+				newGame.IsTemp = true;
+				newGame.ChannelOwner = myPlayer.Id;
+				
+				channels.Add(newGame.Id, newGame);
+				games.Add(newGame.Id, newGame);
+				
+				newGame.addPlayer(myPlayer);
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.playerTeam)
+		{
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.lobby)
+				{
+					((Lobby)myPlayer.Channel).setPlayerToTeam(myPlayer, int.Parse(data));
+				}
+				else
+				{
+					myPlayer.Send(ServerEventType.serverMessage, "You must be in a game lobby!");
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Game!");
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.gameStart)
+		{
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.lobby)
+				{
+					if(myPlayer.Channel.ChannelOwner==myPlayer.Id)
+					{
+						//destroy the lobby and join the new game
+						
+						Lobby gameLobby = (Lobby)myPlayer.Channel;
+						
+						GameRoom newGame = new GameRoom(this, gameLobby.Name, gameLobby.MaxPlayers, gameLobby.IsPrivate, gameLobby.Map, gameLobby.GameType);
+						newGame.IsTemp = true;
+							
+						List<Player> playersToMove = gameLobby.Players;
+						
+						//kickAllPlayers implicitely destroys the lobby channel
+						gameLobby.kickAllPlayers();
+						newGame.addPlayers(playersToMove);
+						
+						newGame.importTeams(gameLobby);
+					}
+					else
+					{
+						myPlayer.Send(ServerEventType.serverMessage, "You must be the room leader!");	
+					}
+				}
+				else
+				{
+					myPlayer.Send(ServerEventType.serverMessage, "You must be in a game lobby!");
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Game!");
 			}
 		}
 	}

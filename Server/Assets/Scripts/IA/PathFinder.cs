@@ -2,6 +2,7 @@
 * Author: Musarais Boris B4 A*Pathfinder, DO NOT USE THIS WITHOUT PERMISSION
 */
 
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,20 +22,27 @@ namespace B4
         Dictionary<String, bool> closedTiles;
 		
 		//walkable tiles...
-        Dictionary<String, Vector3> wayPoints;
+        Dictionary<String, UnityEngine.Vector3> wayPoints;
         
 		//path target
         Vector3 target;
 
-        public PathFinder(Dictionary<String, Vector3> _wayPoints, float _baseStep)
+        public PathFinder(Dictionary<String, UnityEngine.Vector3> _wayPoints, float _baseStep, float _maxCliffHeight)
         {
             openTiles = new SortedDictionary<float, Vector3>();
             closedTiles = new Dictionary<String, bool>();
             wayPoints = _wayPoints;
             baseStep = _baseStep;
+			maxCliffHeight = _maxCliffHeight;
         }
-
-        public List<Vector3> start(Vector3 start, Vector3 _target)
+		
+		public List<Vector3> start(Vector3 _start, Vector3 _target, float _maxCliffHeight)
+		{
+			maxCliffHeight = _maxCliffHeight;
+			return start(_start, _target);
+		}
+		
+        public List<Vector3> start(Vector3 _start, Vector3 _target)
         {
             if (wayPoints.Count > 0)
             {
@@ -46,7 +54,7 @@ namespace B4
 
                 bestPath = null;
 
-                search(start);
+                search(_start);
 
                 return result;
             }
@@ -82,7 +90,7 @@ namespace B4
                     String rangeId = newPoint.toPosRefId(baseStep);
 					
 					//if there is a walkable tile and I have not already visited this tile
-                    if ((hasIndexAt(wayPoints, rangeId) || wayPoints.Count==0) && !hasIndexAt(closedTiles, rangeId))
+                    if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && !hasIndexAt(closedTiles, rangeId))
                     {
                         closedTiles.Add(rangeId, true);
 
@@ -140,14 +148,33 @@ namespace B4
             while (lastPath.parent != null);
         }
 		
-		private bool hasIndexAt(Dictionary<string, Vector3> dictionary, string key)
+		private bool hasIndexAt(Dictionary<string, UnityEngine.Vector3> dictionary, string key)
 		{
 			try
 			{
 				if(dictionary[key]!=null)
 					return true;
-				else
-					return false;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+		
+		float maxCliffHeight = 0.5f;
+		
+		//this is used to determine if the path is walkable, if the cliff is too high it is not walkable.
+		private bool isNotTooHighIfExists(Dictionary<string, UnityEngine.Vector3> dictionary, string key, Vector3 currentPosition)
+		{
+			try
+			{
+				if(dictionary[key]!=null)
+				{
+					if(Mathf.Abs(dictionary[key].y-currentPosition.y)<maxCliffHeight)
+						return true;
+					else
+						return false;
+				}
 			}
 			catch
 			{

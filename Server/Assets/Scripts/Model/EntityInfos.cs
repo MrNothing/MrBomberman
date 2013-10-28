@@ -8,147 +8,59 @@ public class EntityInfos
 	
 	int _level;
 	
-	float _hp;
-	float _mp;
-	
-	float _strength;
-	float _agility;
-	float _intelligence;
-	
-	float _armor;
-	float _resistance;
-	float _spellPower;
-	float _damages;
-	
-	float _runSpeed;
+	float _hp=0;
+	float _mp=0;
+
+	EntityStats stats = new EntityStats();
+
 	//if the entity has any active buffs or items
-	EntityInfos bonuses = new EntityInfos(false);
+	EntityStats bonuses = new EntityStats();
+	
+	//if this is a hero, he will gain stats when he gains a level
+	EntityStats perLevelBonuses = new EntityStats();
+	
+	public EntityInfos(Hashtable infos)
+	{
+		_name = infos["name"].ToString();
+		_prefab = infos["prefab"].ToString();
+		_level = (int)infos["level"];
+		
+		stats = new EntityStats();
+		
+		stats.Hp = (float) infos["maxhp"];
+		stats.Mp = (float) infos["maxmp"];
+		stats.Armor = (float) infos["armor"];
+		stats.Damages = (float) infos["damage"];
+		stats.HpRegen = (float) infos["hpregen"];
+		stats.MpRegen = (float) infos["mpregen"];
+		stats.Resistance = (float) infos["resistance"];
+		stats.SpellPower = (float) infos["power"];
+		//a loaded unit cannot be wearing items when it is instanciated
+		bonuses = new EntityStats();
+	}
 	
 	public EntityInfos(EntityInfos infos)
 	{
 		_name = infos._name;
 		_prefab = infos._prefab;
 		_level = infos._level;
-		_hp = infos._hp;
-		_mp = infos._mp;
-		_strength = infos._strength;
-		_agility = infos._agility;
-		_intelligence = infos._intelligence;
-		_armor = infos._armor;
-		_resistance = infos._resistance;
-		_spellPower = infos._spellPower;
-		_damages = infos._damages;
-		_runSpeed = infos._runSpeed;
+		stats = new EntityStats(infos.Stats);
+		bonuses = new EntityStats(infos.Bonuses);
 	}
 	
-	public EntityInfos(bool fillWithDebug)
+	public Hashtable export()
 	{
-		if(fillWithDebug)
-		{
-			//fill debug values
-			_name = "Undefined";
-			_prefab = "test";
-			
-			_level = 0;
-			
-			_hp = 1;
-			_mp = 1;
-			
-			_strength = 1;
-			_agility = 1;
-			_intelligence = 1;
-			
-			_armor = 0;
-			_resistance = 0;
-			_spellPower = 0;
-			_damages = 0;
-			
-			_runSpeed = 200;
-	
-		}
-		else
-		{
-			//fill with empty values
-			_name = string.Empty;
-			_prefab = string.Empty;
-			
-			_level = 0;
-			
-			_hp = 0;
-			_mp = 0;
-			
-			_strength = 0;
-			_agility = 0;
-			_intelligence = 0;
-			
-			_armor = 0;
-			_resistance = 0;
-			_spellPower = 0;
-			_damages = 0;
-	
-			_runSpeed = 0;
-		}
+		Hashtable newEntity = new Hashtable();
+		newEntity.Add("name", Name);
+		newEntity.Add("prefab", Prefab);
+		newEntity.Add("level", Level);
+		newEntity.Add("stats", stats.export());
+		newEntity.Add("bonuses", bonuses.export());
+		
+		return newEntity;
 	}
 	
-	public float Agility 
-	{
-		get 
-		{
-			return this._agility;
-		}
-		set 
-		{
-			_agility = value;
-		}
-	}
-
-	public float Armor 
-	{
-		get 
-		{
-			return this._armor;
-		}
-		set 
-		{
-			_armor = value;
-		}
-	}
-
-	public float Damages 
-	{
-		get 
-		{
-			return this._damages;
-		}
-		set 
-		{
-			_damages = value;
-		}
-	}
-
-	public float Hp 
-	{
-		get 
-		{
-			return this._hp;
-		}
-		set 
-		{
-			_hp = value;
-		}
-	}
-
-	public float Intelligence 
-	{
-		get 
-		{
-			return this._intelligence;
-		}
-		set 
-		{
-			_intelligence = value;
-		}
-	}
+	
 
 	public int Level 
 	{
@@ -159,18 +71,6 @@ public class EntityInfos
 		set 
 		{
 			_level = value;
-		}
-	}
-
-	public float Mp 
-	{
-		get 
-		{
-			return this._mp;
-		}
-		set 
-		{
-			_mp = value;
 		}
 	}
 
@@ -198,55 +98,19 @@ public class EntityInfos
 		}
 	}
 
-	public float Resistance 
+	public EntityStats Stats 
 	{
 		get 
 		{
-			return this._resistance;
+			return this.stats;
 		}
 		set 
 		{
-			_resistance = value;
+			stats = value;
 		}
 	}
-
-	public float RunSpeed 
-	{
-		get 
-		{
-			return this._runSpeed;
-		}
-		set 
-		{
-			_runSpeed = value;
-		}
-	}
-
-	public float SpellPower 
-	{
-		get 
-		{
-			return this._spellPower;
-		}
-		set 
-		{
-			_spellPower = value;
-		}
-	}
-
-	public float Strength 
-	{
-		get 
-		{
-			return this._strength;
-		}
-		set 
-		{
-			_strength = value;
-		}
-	}
-
-	public EntityInfos Bonuses 
+	
+	public EntityStats Bonuses
 	{
 		get 
 		{
@@ -256,5 +120,30 @@ public class EntityInfos
 		{
 			bonuses = value;
 		}
+	}
+	
+	public float Hp 
+	{
+		get 
+		{
+			return this._hp;
+		}
+		set 
+		{
+			_hp = value;
+		}
+	}
+
+	public float Mp 
+	{
+		get 
+		{
+			return this._mp;
+		}
+		set 
+		{
+			_mp = value;
+		}
 	}	
+	
 }

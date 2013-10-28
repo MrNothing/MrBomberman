@@ -52,7 +52,7 @@ public class StartScreen : MonoBehaviour
 	
 	}
 	
-	void OnConnectButton(int key)
+	void OnConnectButton(MGUIButton key)
 	{
 		if((gui.getElement("server") as MGUITextfield).Text.Length>0)
 		{

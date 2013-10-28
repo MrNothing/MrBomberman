@@ -9,10 +9,14 @@ public class UICore : MonoBehaviour
 	
 	public MGUI gui;
 	public NetworkManager networkManager;
+	public IOManager io = new IOManager();
 	
 	public ErrorInterface errorInterface;
 	public StartScreen startScreen;
 	public MainLobby lobby;
+	public GameCreator gameCreator;
+	public GamesList gamesList;
+	public GameLobby gameLobby;
 	
 	public Font normalFont;
 	public Texture2D ButtonNormal;
