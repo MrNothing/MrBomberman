@@ -76,6 +76,7 @@ public class Entity
 		_infos = infos;
 		
 		position = new B4.Vector3(_position.x, _position.y, _position.z);
+		destination = new B4.Vector3(position);
 		
 		_team = team;
 		
@@ -94,7 +95,24 @@ public class Entity
 		Hashtable infos = _infos.export();
 		infos.Add("type", _type);
 		infos.Add("immortal", immortal);
+		infos.Add("x", position.x);
+		infos.Add("y", position.y);
+		infos.Add("z", position.z);
+		infos.Add("dx", destination.x);
+		infos.Add("dy", destination.y);
+		infos.Add("dz", destination.z);
 		return infos;
+	}
+	
+	void sendMovement()
+	{
+		Hashtable infos = new Hashtable();
+		infos.Add("y", position.y);
+		infos.Add("z", position.z);
+		infos.Add("dx", destination.x);
+		infos.Add("dy", destination.y);
+		infos.Add("dz", destination.z);
+		
 	}
 	
 	int passiveRegenerationCounter=0;

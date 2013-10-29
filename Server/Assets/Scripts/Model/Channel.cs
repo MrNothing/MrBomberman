@@ -116,6 +116,13 @@ public class Channel
 			roomInfos.Add("type", Type);
 			roomInfos.Add("owner", ChannelOwner);
 			roomInfos.Add("players", playersList);
+			
+			if(_type==ChannelType.lobby)
+				roomInfos.Add("map", ((Lobby)this).Map);
+			
+			if(_type==ChannelType.game)
+				roomInfos.Add("map", ((GameRoom)this).Map);
+			
 			player.Send(ServerEventType.roomInfos, serializer.hashMapToData(roomInfos));
 			
 			//if this is a game room, we call the game specific functions
@@ -129,6 +136,10 @@ public class Channel
 	
 	public void removePlayer(Player player)
 	{
+		_players.Remove(player);
+		
+		player.Channel = null;
+		
 		if(_players.Count>0)
 		{
 			//we need to notify everyone that this player has left...
@@ -166,10 +177,6 @@ public class Channel
 			}
 		}
 		
-		_players.Remove(player);
-		
-		player.Channel = null;
-		
 		if(_type==ChannelType.game)
 			((GameRoom)this).onPlayerLeave(player);
 		
@@ -195,7 +202,8 @@ public class Channel
 	//also destroys the room if it is temp
 	public void kickAllPlayers()
 	{
-		foreach(Player p in _players)
+		List<Player> playersClone = new List<Player>(_players);
+		foreach(Player p in playersClone)
 			removePlayer(p);
 	}
 	

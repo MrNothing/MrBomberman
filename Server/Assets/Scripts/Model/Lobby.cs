@@ -36,9 +36,25 @@ public class Lobby : Channel {
 		//set the teams
 		for(int i=0; i<12; i++)
 		{
-			teams.Add(new List<string>());
-			teamPlayersPair.Add(i, (int)mapInfos["team_"+i+"_players"]);
-			MaxPlayers += (int)mapInfos["team_"+i+"_players"];
+			try
+			{
+				teams.Add(new List<string>());
+				teamPlayersPair.Add(i, (int)mapInfos["team_"+i+"_players"]);
+				MaxPlayers += (int)mapInfos["team_"+i+"_players"];
+			}
+			catch
+			{
+				teams.Add(new List<string>());
+				teamPlayersPair.Add(i, 0);
+				MaxPlayers += 0;
+			}
+		}
+		
+		if(MaxPlayers == 0)
+		{
+			teamPlayersPair[0] = 1;
+			teamPlayersPair[1] = 1;
+			MaxPlayers = 2;
 		}
 	}
 	
@@ -50,27 +66,34 @@ public class Lobby : Channel {
 			return;
 		}
 		
-		try
+		if(teams[team].Count<teamPlayersPair[team])
 		{
-			int lastTeam = playerTeamPair[player.Name];
-			teams[lastTeam].Remove(player.Name);
-			playerTeamPair.Remove(player.Name);
+			try
+			{
+				int lastTeam = playerTeamPair[player.Name];
+				teams[lastTeam].Remove(player.Name);
+				playerTeamPair.Remove(player.Name);
+			}
+			catch
+			{
+				//i was not in a team, proceed...
+			}
+			
+			playerTeamPair.Add(player.Name, team);
+			teams[team].Add(player.Name);
+			
+			Hashtable infos = new Hashtable();
+			infos.Add("player", player.Name);
+			infos.Add("id", player.Id);
+			infos.Add("team", team);
+			
+			HashMapSerializer serializer = new HashMapSerializer();
+			Send(ServerEventType.playerTeam, serializer.hashMapToData(infos));
 		}
-		catch
+		else
 		{
-			//i was not in a team, proceed...
+			player.Send(ServerEventType.serverMessage, "The team is full!");
 		}
-		
-		playerTeamPair.Add(player.Name, team);
-		teams[team].Add(player.Name);
-		
-		Hashtable infos = new Hashtable();
-		infos.Add("player", player.Name);
-		infos.Add("id", player.Id);
-		infos.Add("team", team);
-		
-		HashMapSerializer serializer = new HashMapSerializer();
-		Send(ServerEventType.playerTeam, serializer.hashMapToData(infos));
 	}
 	
 	void removePlayerFromTeams(Player player)
@@ -93,6 +116,7 @@ public class Lobby : Channel {
 		for(int i=0; i<teams.Count; i++)
 		{
 			List<string> team = teams[i];
+			
 			if(team.Count<teamPlayersPair[i])
 			{
 				//there is a place in this game join it

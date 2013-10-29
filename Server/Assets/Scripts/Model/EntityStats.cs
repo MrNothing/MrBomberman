@@ -62,7 +62,7 @@ public class EntityStats
 	{
 		Hashtable newEntity = new Hashtable();
 		newEntity.Add("hp", Hp);
-		newEntity.Add("hp", Mp);
+		newEntity.Add("mp", Mp);
 		newEntity.Add("damage", Damages);
 		newEntity.Add("power", SpellPower);
 		newEntity.Add("armor", Armor);

@@ -10,6 +10,7 @@ public enum GameTypes
 public class GameRoom : Channel
 {
 	string _map;
+
 	GameTypes _gameType;
 	
 	//walkable paths are determined with this dictionary
@@ -65,41 +66,8 @@ public class GameRoom : Channel
 		
 	}
 	
-	//a player's team cannot change during the game for now, (maybe layer? could be an interesting concept)
-	public void setPlayerToTeam(Player player, int team)
-	{
-		playerTeamPair.Add(player.Name, team);
-		teams[team].Add(player.Name);
-	}
-	
-	void removePlayerFromTeams(Player player)
-	{
-		try
-		{
-			int lastTeam = playerTeamPair[player.Name];
-			teams[lastTeam].Remove(player.Name);
-			playerTeamPair.Remove(player.Name);
-		}
-		catch
-		{
-			//i was not in a team, proceed...
-		}
-	}
-	
 	public void onPlayerJoin(Player player)
 	{
-		//we need to determine if there is place in a team
-		for(int i=0; i<teams.Count; i++)
-		{
-			List<string> team = teams[i];
-			if(team.Count<teamPlayersPair[i])
-			{
-				//there is a place in this game join it
-				setPlayerToTeam(player, i);
-				break;
-			}
-		}
-		
 		sendPlayersByTeam(player);
 		
 		//when the player joins a game, he needs to get all the entities in his client as fast as possible 	
@@ -108,11 +76,12 @@ public class GameRoom : Channel
 	
 	public void onPlayerLeave(Player player)
 	{
-		removePlayerFromTeams(player);
+		
 	}
 	
 	public void addEntity(string entity, string owner, Vector3 position, int team, bool notifyPlayers)
 	{
+		Debug.Log("Entity loaded: "+entity);
 		//we clone entityinfos to avoid unexpected stuff
 		EntityInfos newEntityInfos = new EntityInfos(entitiesInfos[entity]);
 		
@@ -134,7 +103,18 @@ public class GameRoom : Channel
 		foreach(string s in entitiesData.Keys)
 		{
 			Hashtable elementInfos = (Hashtable)entitiesData[s];
-			addEntity(elementInfos["name"].ToString(), "", new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), (int)elementInfos["team"], false);
+			int tmpTeam;
+			
+			try
+			{
+				tmpTeam = (int)elementInfos["team"];	
+			}
+			catch
+			{
+				tmpTeam = 0;
+			}
+			
+			addEntity(elementInfos["name"].ToString(), "", new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), tmpTeam, false);
 		}
 	}
 	
@@ -228,8 +208,16 @@ public class GameRoom : Channel
 	
 	public void importTeams(Lobby lobby)
 	{
-		teams = lobby.Teams;
-		playerTeamPair = lobby.PlayerTeamPair;
-		teamPlayersPair = lobby.TeamPlayersPair;
+		teams = new List<List<string>>(lobby.Teams);
+		playerTeamPair = new Dictionary<string, int>(lobby.PlayerTeamPair);
+		teamPlayersPair = new Dictionary<int, int>(lobby.TeamPlayersPair);
+	}
+	
+	public string Map 
+	{
+		get 
+		{
+			return this._map;
+		}
 	}
 }

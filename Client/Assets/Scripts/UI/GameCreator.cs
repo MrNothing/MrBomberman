@@ -63,6 +63,8 @@ public class GameCreator : MonoBehaviour
 			maps[i].OnButtonPressed += new MGUIButton.ButtonPressed(onMapButtonPressed);
 		}
 		
+		selectedMap = maps[0].Text;
+		
 		Visible = false;
 	}
 	

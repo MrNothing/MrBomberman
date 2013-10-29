@@ -341,6 +341,8 @@ public class Core : MonoBehaviour
 				newGame.ChannelOwner = myPlayer.Id;
 				
 				channels.Add(newGame.Id, newGame);
+				channelsByName.Add(newGame.Name, newGame.Id);
+				
 				games.Add(newGame.Id, newGame);
 				
 				newGame.addPlayer(myPlayer);
@@ -381,13 +383,16 @@ public class Core : MonoBehaviour
 						GameRoom newGame = new GameRoom(this, gameLobby.Name, gameLobby.MaxPlayers, gameLobby.IsPrivate, gameLobby.Map, gameLobby.GameType);
 						newGame.IsTemp = true;
 							
-						List<Player> playersToMove = gameLobby.Players;
+						newGame.importTeams(gameLobby);
+						
+						List<Player> playersToMove = new List<Player>(gameLobby.Players);
 						
 						//kickAllPlayers implicitely destroys the lobby channel
 						gameLobby.kickAllPlayers();
+						
 						newGame.addPlayers(playersToMove);
 						
-						newGame.importTeams(gameLobby);
+						channels.Add(newGame.Id, newGame);
 					}
 					else
 					{
@@ -408,10 +413,15 @@ public class Core : MonoBehaviour
 	
 	public void DestroyChannel(Channel channel)
 	{
-		channelsByName.Remove(channel.Name);
+		print("destroying channel: "+channel.Name);
+		
 		channels.Remove(channel.Id);
 		
-		if(channel.Type==ChannelType.game)
+		if(channel.Type==ChannelType.lobby)
 			games.Remove(channel.Id);
+		
+		if(channel.Type==ChannelType.chat || channel.Type==ChannelType.lobby)
+			channelsByName.Remove(channel.Name);
+		
 	}
 }

@@ -23,7 +23,15 @@ public class EntityInfos
 	{
 		_name = infos["name"].ToString();
 		_prefab = infos["prefab"].ToString();
-		_level = (int)infos["level"];
+		
+		try
+		{
+			_level = (int)infos["level"];
+		}
+		catch
+		{
+			_level = 1;
+		}
 		
 		stats = new EntityStats();
 		
@@ -31,8 +39,25 @@ public class EntityInfos
 		stats.Mp = (float) infos["maxmp"];
 		stats.Armor = (float) infos["armor"];
 		stats.Damages = (float) infos["damage"];
-		stats.HpRegen = (float) infos["hpregen"];
-		stats.MpRegen = (float) infos["mpregen"];
+		
+		try
+		{
+			stats.HpRegen = (float) infos["hpregen"];
+		}
+		catch
+		{
+			stats.HpRegen = 0;
+		}
+		
+		try
+		{
+			stats.MpRegen = (float) infos["mpregen"];
+		}
+		catch
+		{
+			stats.MpRegen = 0;
+		}
+		
 		stats.Resistance = (float) infos["resistance"];
 		stats.SpellPower = (float) infos["power"];
 		//a loaded unit cannot be wearing items when it is instanciated

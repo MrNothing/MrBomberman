@@ -63,7 +63,7 @@ public class MainLobby : MonoBehaviour {
 		{
 			if(textField.Text.Length>0 && !textField.Text.Equals(" "))
 			{
-				parseCommands(textField.Text);
+				parseCommands(textField.Text, textArea);
 				textField.Text = "";
 			}
 		}
@@ -73,7 +73,7 @@ public class MainLobby : MonoBehaviour {
 	{
 		if(textField.Text.Length>0)
 		{
-			parseCommands(textField.Text);
+			parseCommands(textField.Text, textArea);
 			textField.Text = "";
 		}
 	}
@@ -90,7 +90,7 @@ public class MainLobby : MonoBehaviour {
 		core.gamesList.Visible = true;
 	}
 	
-	void parseCommands(string command)
+	public void parseCommands(string command, MGUITextArea textArea)
 	{
 		if(command.IndexOf("/")==0)
 		{

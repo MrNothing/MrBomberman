@@ -11,7 +11,7 @@ Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Client\Build\Clie
 Loading C:\Users\Boris\Documents\GitHub\MrBomberman\Client\Build\Client_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Client\Build\Client_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading C:\Users\Boris\Documents\GitHub\MrBomberman\Client\Build\Client_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.112 seconds
+- Completed reload, in  0.115 seconds
 desktop: 1366x768 59Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
@@ -27,11 +27,39 @@ Connected to server
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-map selected: Untitled
+Joined the Channel: newGame_571356
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Joined the Channel: newGame_424445
+Joined the Channel: newGame_571356
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
+
+ArgumentException: The prefab you want to instantiate is null.
+  at UnityEngine.Object.CheckNullArgument (System.Object arg, System.String message) [0x00000] in <filename unknown>:0 
+  at UnityEngine.Object.Instantiate (UnityEngine.Object original, Vector3 position, Quaternion rotation) [0x00000] in <filename unknown>:0 
+  at NetworkManager.OnServerEvent (Int32 eventTypeInt, System.String data) [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+ArgumentException: The prefab you want to instantiate is null.
+  at UnityEngine.Object.CheckNullArgument (System.Object arg, System.String message) [0x00000] in <filename unknown>:0 
+  at UnityEngine.Object.Instantiate (UnityEngine.Object original, Vector3 position, Quaternion rotation) [0x00000] in <filename unknown>:0 
+  at NetworkManager.OnServerEvent (Int32 eventTypeInt, System.String data) [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+ArgumentException: The prefab you want to instantiate is null.
+  at UnityEngine.Object.CheckNullArgument (System.Object arg, System.String message) [0x00000] in <filename unknown>:0 
+  at UnityEngine.Object.Instantiate (UnityEngine.Object original, Vector3 position, Quaternion rotation) [0x00000] in <filename unknown>:0 
+  at NetworkManager.OnServerEvent (Int32 eventTypeInt, System.String data) [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+ArgumentException: The prefab you want to instantiate is null.
+  at UnityEngine.Object.CheckNullArgument (System.Object arg, System.String message) [0x00000] in <filename unknown>:0 
+  at UnityEngine.Object.Instantiate (UnityEngine.Object original, Vector3 position, Quaternion rotation) [0x00000] in <filename unknown>:0 
+  at NetworkManager.OnServerEvent (Int32 eventTypeInt, System.String data) [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
 

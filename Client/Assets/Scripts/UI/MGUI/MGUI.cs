@@ -23,7 +23,10 @@ public class MGUIElement
 	public GameObject _container;
 	Rect _bounds;
 	bool _visible = true;
-
+	
+	//a custom container, usefull sometimes...
+	public System.Object custom;
+	
 	public MGUIElement(string id, Rect bounds, GameObject container)
 	{
 		_id = id;
@@ -76,7 +79,7 @@ public class MGUIElement
 		}
 		set 
 		{
-			Container.transform.localPosition = new Vector3(value.x, value.y, 1);
+			Container.transform.localPosition = new Vector3(value.x, value.y, Container.transform.position.z);
 			_bounds = value;
 		}
 	}
@@ -122,7 +125,17 @@ public class MGUIElement
 	
 	public void setDepth(float depth)
 	{
-		_container.transform.position = _container.transform.position+new Vector3(0, 0, depth);
+		_container.transform.localPosition = _container.transform.localPosition+new Vector3(0, 0, depth);
+	}
+	
+	public void setPosition(float x, float y)
+	{
+		setPosition(new Vector2(x, y));
+	}
+	
+	public void setPosition(Vector2 position)
+	{
+		_container.transform.localPosition = new Vector3(position.x, position.y, _container.transform.localPosition.z);
 	}
 }
 

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public enum ServerEventType
 {
@@ -110,6 +111,10 @@ public class NetworkManager : MonoBehaviour
 		{
 			if(core.lobby.Visible)
 				core.gui.insertText(core.lobby.textArea.id, data, core.normalFont, Color.red); 
+			else if(core.gameLobby.Visible)
+				core.gui.insertText(core.gameLobby.textArea.id, data, core.normalFont, Color.red);
+			else if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, data, core.normalFont, Color.red); 	
 			else
 				core.errorInterface.showMessage(data, Color.red, true);
 		}
@@ -121,7 +126,12 @@ public class NetworkManager : MonoBehaviour
 			string msg = infos["name"]+" has joined the Channel";
 			
 			if(core.lobby.Visible)
-				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow);
+			if(core.gameLobby.Visible)
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow);
+			if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
+				
 		}
 		
 		if(eventType==(byte)ServerEventType.roomInfos)
@@ -136,28 +146,40 @@ public class NetworkManager : MonoBehaviour
 			if(infos["type"].Equals("game"))
 			{
 				//show ingame interface...
+				core.gamesList.Visible = false;
+				core.gameLobby.Visible = false;
+				core.lobby.Visible = false;
+				core.inGame.Visible = true;
+				core.gameManager.mapName = infos["map"].ToString();
+				core.gameManager.loadMap(Application.dataPath+"/Maps/"+infos["map"].ToString()+"/mainData");
+				core.inGame.textArea.clear();
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
 			}
 			
 			//game lobby
 			if(infos["type"].Equals("lobby"))
 			{
-				if(!core.gameLobby.Visible)
-					core.gameLobby.Visible = true;
+				core.gamesList.Visible = false;
+				core.lobby.Visible = false;
+				core.gameLobby.Visible = true;
+				core.inGame.Visible = false;
 				
 				core.errorInterface.showMessage("Success!", Color.green, true);
 				
-				if(core.lobby.Visible)
-					core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow); 
+				core.gameLobby.map = infos["map"].ToString();
+				core.gameLobby.textArea.clear();
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow); 
 			}
 			
 			//main lobby
 			if(infos["type"].Equals("chat"))
 			{
-				if(!core.lobby.Visible)
-					core.lobby.Visible = true;
+				core.gameLobby.Visible = false;
+				core.gamesList.Visible = false;
+				core.lobby.Visible = true;
+				core.inGame.Visible = false;
 				
-				if(core.lobby.Visible)
-					core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 	
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 	
 			}
 		}
 		
@@ -169,6 +191,13 @@ public class NetworkManager : MonoBehaviour
 			
 			if(core.lobby.Visible)
 				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
+			if(core.gameLobby.Visible)
+			{
+				core.gameLobby.removePlayerFromTeam(infos["name"].ToString());
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow);
+			}
+			if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
 		}
 		
 		if(eventType==(byte)ServerEventType.position)
@@ -184,6 +213,11 @@ public class NetworkManager : MonoBehaviour
 			
 			if(core.lobby.Visible)
 				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.white); 
+			if(core.gameLobby.Visible)
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.white);
+			if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.white); 	
+				
 		}
 		
 		if(eventType==(byte)ServerEventType.pm)
@@ -195,18 +229,26 @@ public class NetworkManager : MonoBehaviour
 			
 			if(core.lobby.Visible)
 				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.green);
+			if(core.gameLobby.Visible)
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.green);
+			if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.green); 	
+				
 		}
 		
 		if(eventType==(byte)ServerEventType.channelsList)
 		{
 			Hashtable infos = serializer.dataToHashMap(data);
-				
-			core.gui.insertText(core.lobby.textArea.id, "Channels:", core.normalFont, Color.cyan);
 			
-			foreach(string s in infos.Keys)
+			if(core.lobby.Visible)
 			{
-				Hashtable channel = (Hashtable) infos[s];
-				core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+				core.gui.insertText(core.lobby.textArea.id, "Channels:", core.normalFont, Color.cyan);
+				
+				foreach(string s in infos.Keys)
+				{
+					Hashtable channel = (Hashtable) infos[s];
+					core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+				}
 			}
 		}
 		
@@ -214,15 +256,72 @@ public class NetworkManager : MonoBehaviour
 		{
 			Hashtable infos = serializer.dataToHashMap(data);
 				
-			core.gui.insertText(core.lobby.textArea.id, "Games:", core.normalFont, Color.cyan);
-			
-			foreach(string s in infos.Keys)
+			if(core.lobby.Visible)
 			{
-				Hashtable channel = (Hashtable) infos[s];
-				core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+				core.gui.insertText(core.lobby.textArea.id, "Games:", core.normalFont, Color.cyan);
+				
+				foreach(string s in infos.Keys)
+				{
+					Hashtable channel = (Hashtable) infos[s];
+					core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
+				}
 			}
 		}
 		
+		if(eventType==(byte)ServerEventType.channelOwner)
+		{
+			string msg = data+" is now the owner of this channel";
+			
+			if(core.lobby.Visible)
+				core.gui.insertText(core.lobby.textArea.id, msg, core.normalFont, Color.yellow); 
+			if(core.gameLobby.Visible)
+				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow);
+			if(core.inGame.Visible)
+				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
+				
+		}
+		
+		if(eventType==(byte)ServerEventType.playerTeam)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			if(core.gameLobby.Visible)
+				core.gameLobby.setPlayerToTeam(infos["player"].ToString(), (int)infos["team"]);
+		}
+		
+		if(eventType==(byte)ServerEventType.playersByTeam)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			Dictionary<string, int> playerTeamPair = new Dictionary<string, int>();
+			foreach(string player in infos.Keys)
+			{
+				playerTeamPair.Add(player, (int)infos[player]);
+			}
+			
+			if(core.gameLobby.Visible)
+				core.gameLobby.applyTeams(playerTeamPair);
+			
+			if(core.inGame.Visible)
+				core.inGame.applyTeams(playerTeamPair);
+		}
+		
+		if(eventType==(byte)ServerEventType.unitInfos)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			Hashtable entityInfos = (Hashtable)infos["infos"];
+			
+			print("prefab: "+entityInfos["prefab"]);
+			
+			GameObject newEntity = (GameObject) Instantiate(Resources.Load("Entities/"+entityInfos["prefab"], typeof(GameObject)), new Vector3((float)entityInfos["x"], (float)entityInfos["y"], (float)entityInfos["z"]), Quaternion.identity);
+			Entity entityScript = newEntity.GetComponent<Entity>();
+			entityScript.id = (int)infos["id"];
+			entityScript.owner = infos["owner"].ToString();
+			entityScript.infos = entityInfos;
+			entityScript.destination = new Vector3((float)entityInfos["dx"], (float)entityInfos["dy"], (float)entityInfos["dz"]);
+			core.gameManager.entities.Add(entityScript.id, entityScript);
+		}
 	}
 	
 	void OnFailedToConnect(NetworkConnectionError error) 

@@ -18,12 +18,17 @@ public class UICore : MonoBehaviour
 	public GamesList gamesList;
 	public GameLobby gameLobby;
 	
+	public InGame inGame;
+	
+	public GameManager gameManager;
+	
 	public Font normalFont;
 	public Texture2D ButtonNormal;
 	public Texture2D ButtonHover;
 	public Texture2D ButtonDown;
 	
 	public Texture2D blackAlphaBg;
+	public Texture2D whiteAlphaBg;
 	
 	/*
 	 *  These are just tests for the MGUI class
