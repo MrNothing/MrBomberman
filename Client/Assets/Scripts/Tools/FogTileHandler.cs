@@ -6,6 +6,42 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+public class TerrainPoint
+{
+	byte fogAlpha;
+	float verticeHeight;
+	
+	public TerrainPoint(byte _fogAlpha, float _vertHeight)
+	{
+		fogAlpha = _fogAlpha;
+		verticeHeight = _vertHeight;
+	}
+	
+	public byte FogAlpha 
+	{
+		get 
+		{
+			return this.fogAlpha;
+		}
+		set 
+		{
+			fogAlpha = value;
+		}
+	}
+
+	public float VerticeHeight 
+	{
+		get 
+		{
+			return this.verticeHeight;
+		}
+		set 
+		{
+			verticeHeight = value;
+		}
+	}
+}
+
 public class FogTileHandler : MonoBehaviour 
 {
 	
@@ -34,18 +70,26 @@ public class FogTileHandler : MonoBehaviour
 	
 	//Update is disabled if there is no transparent vertex
 	List<int> modifiedVertexes = new List<int>();
+	Dictionary<int, float> timeToWaitPerVertex = new Dictionary<int, float>();
 	void Update()
 	{
 		List<int> modifiedVertexesClone = new List<int>(modifiedVertexes);
 		foreach(int i in modifiedVertexesClone)
 		{
-			if(colors[i].a<defaultAlpha)
+			if(timeToWaitPerVertex[i]<0)
 			{
-				colors[i] = normalizeAlpha(colors[i], defaultAlpha, 1);
+				if(colors[i].a!=defaultAlpha)
+				{
+					colors[i] = normalizeAlpha(colors[i], defaultAlpha, 1);
+				}
+				else
+				{
+					modifiedVertexes.Remove(i);
+				}
 			}
 			else
 			{
-				modifiedVertexes.Remove(i);
+				timeToWaitPerVertex[i]-=Time.deltaTime;
 			}
 		}
 		
@@ -89,16 +133,7 @@ public class FogTileHandler : MonoBehaviour
 			{
 				colors[i] = new Color32(0, 0, 0, 0);
 				
-				try
-				{
-					modifiedVertexes.Remove(i);
-				}
-				catch
-				{
-					
-				}
-				modifiedVertexes.Add(i);
-				enabled = true;
+				updateModifiedVertices(i);
 			}
 		}
 		
@@ -131,16 +166,7 @@ public class FogTileHandler : MonoBehaviour
 						
 						colors[i] = new Color32(0, 0, 0, (byte)alpha);	
 						
-						try
-						{
-							modifiedVertexes.Remove(i);
-						}
-						catch
-						{
-							
-						}
-						modifiedVertexes.Add(i);
-						enabled = true;
+						updateModifiedVertices(i);
 					}
 				}
 			}
@@ -153,16 +179,7 @@ public class FogTileHandler : MonoBehaviour
 				{
 					colors[i] = new Color32(0, 0, 0, 0);
 					
-					try
-					{
-						modifiedVertexes.Remove(i);
-					}
-					catch
-					{
-						
-					}
-					modifiedVertexes.Add(i);
-					enabled = true;
+					updateModifiedVertices(i);
 				}
 			}
 		}
@@ -179,7 +196,7 @@ public class FogTileHandler : MonoBehaviour
 			Vector3 vert = vertices[i];
 			Vector3 vertWorldPosition = transform.TransformPoint(new Vector3(vert.x, vert.y, vert.z));
 			//float distance = Vector3.Distance(vertWorldPosition, point);
-			float distanceY = Mathf.Abs(vertWorldPosition.y-point.y);
+			float distanceY = (vertWorldPosition.y-point.y);
 			
 			if(distanceY>maxStep)
 			{
@@ -188,5 +205,71 @@ public class FogTileHandler : MonoBehaviour
 			
 		}
 		return colliders;
+	}
+	
+	public int getNearestVertice(Vector3 point)
+	{
+		float lastRange = float.MaxValue;
+		int chosenVertice=-1;
+		for(int i=0; i<vertices.Length; i++)
+		{
+			float distance = Vector3.Distance(transform.TransformPoint(vertices[i]), point);
+			if(distance<lastRange)
+			{
+				lastRange = distance;
+				chosenVertice = i;
+			}
+		}
+		return chosenVertice;
+	}
+	
+	//same principle as getNearestVertice but we convert Vector3 coords to Vector2.
+	public int getNearestPlanarVertice(Vector3 worldPoint)
+	{
+		Vector2 point = new Vector2(worldPoint.x, worldPoint.z);
+		float lastRange = float.MaxValue;
+		int chosenVertice=-1;
+		for(int i=0; i<vertices.Length; i++)
+		{
+			Vector2 planarWorldVerticePoint = new Vector2(transform.TransformPoint(vertices[i]).x, transform.TransformPoint(vertices[i]).z);
+			float distance = Vector2.Distance(planarWorldVerticePoint, point);
+			if(distance<lastRange)
+			{
+				lastRange = distance;
+				chosenVertice = i;
+			}
+		}
+		return chosenVertice;
+	}
+	
+	public TerrainPoint getNearestTerrainPoint(Vector3 point)
+	{
+		int nearestVertice = getNearestPlanarVertice(point);
+		return new TerrainPoint(colors[nearestVertice].a, transform.position.y+vertices[nearestVertice].y);
+	}
+	
+	void updateModifiedVertices(int i)
+	{
+		try
+		{
+			modifiedVertexes.Remove(i);
+		}
+		catch
+		{
+			
+		}
+		
+		modifiedVertexes.Add(i);
+		
+		try
+		{
+			timeToWaitPerVertex[i] = 1;
+		}
+		catch
+		{
+			timeToWaitPerVertex.Add(i, 1);	
+		}
+		
+		enabled = true;
 	}
 }

@@ -9,7 +9,7 @@ using System;
 public class HashMapSerializer {
 	
 	//converts a string to a HashMap if the string was serialized with the Eternity protocol.
-	public Hashtable dataToHashMap(String data)
+	public static Hashtable dataToHashMap(String data)
     {
         int solveDoublesParams = 0; //in case there is many params with the same name.
 
@@ -20,7 +20,7 @@ public class HashMapSerializer {
             {
                 String param_Name = data.Substring(data.IndexOf("{") + 1, data.IndexOf("=") - (data.IndexOf("{") + 1));
                 String param_Data = data.Substring(data.IndexOf("=") + 1, data.IndexOf("}") - (data.IndexOf("=") + 1));
-
+				
                 if (param_Name.Equals("sub"))
                 {
                     Hashtable subHashMap;
@@ -29,21 +29,21 @@ public class HashMapSerializer {
                     String lastString = "{endsub=" + param_Data + "}";
 
                     String sub_raw_data = data.Substring(data.IndexOf(firstString) + firstString.Length, data.IndexOf(lastString) - (data.IndexOf(firstString) + firstString.Length));
-                    data = data.Replace("{sub=" + param_Data + "}" + sub_raw_data + "{endsub=" + param_Data + "}", "");
+                    data = ReplaceFirst(data, "{sub=" + param_Data + "}" + sub_raw_data + "{endsub=" + param_Data + "}", "");
                     subHashMap = (Hashtable)dataToHashMap(sub_raw_data);
 
                     params1.Add(param_Data, subHashMap);
                 }
                 else
                 {
-                    data = data.Replace("{" + param_Name + "=" + param_Data + "}", "");
+                    data = ReplaceFirst(data, "{" + param_Name + "=" + param_Data + "}", "");
 
                     String dataType = "";
 
                     if (param_Name.IndexOf("~") != -1)
                     {
                         dataType = param_Name.Substring(param_Name.IndexOf("~") + 1, param_Name.Length - (param_Name.IndexOf("~") + 1));
-                        param_Name = param_Name.Replace("~" + dataType, "");
+                        param_Name = ReplaceFirst(param_Name, "~" + dataType, "");
                     }
 
                     param_Name = param_Name.Replace("*ti*", "~");
@@ -95,7 +95,7 @@ public class HashMapSerializer {
      *
      *  data Structure: "{param1=value}{param2=value}..."
      */
-    public String hashMapToData(Hashtable params1)
+    public static String hashMapToData(Hashtable params1)
     {
 
         String data = "";
@@ -117,7 +117,7 @@ public class HashMapSerializer {
                 }
                 else
                 {
-                    param = param.Replace("~", "*ti*");
+                    param = ReplaceFirst(param, "~", "*ti*");
 
                     //bool known = false;
                     System.Object paramValue = params1[param];
@@ -158,4 +158,14 @@ public class HashMapSerializer {
 
         return data;
     }
+	
+	public static string ReplaceFirst(string text, string search, string replace)
+	{
+		int pos = text.IndexOf(search);
+		if (pos < 0)
+		{
+			return text;
+		}
+		return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+	}
 }

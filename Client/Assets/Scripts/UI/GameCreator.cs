@@ -63,7 +63,8 @@ public class GameCreator : MonoBehaviour
 			maps[i].OnButtonPressed += new MGUIButton.ButtonPressed(onMapButtonPressed);
 		}
 		
-		selectedMap = maps[0].Text;
+		if(maps.Count>0)
+			selectedMap = maps[0].Text;
 		
 		Visible = false;
 	}
@@ -86,9 +87,7 @@ public class GameCreator : MonoBehaviour
 			data.Add("map", selectedMap);
 			data.Add("isPrivate", false);
 			
-			HashMapSerializer serializer = new HashMapSerializer();
-			
-			core.networkManager.send(ServerEventType.createGame, serializer.hashMapToData(data));
+			core.networkManager.send(ServerEventType.createGame, HashMapSerializer.hashMapToData(data));
 		}
 		else
 		{

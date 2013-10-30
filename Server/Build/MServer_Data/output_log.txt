@@ -11,554 +11,57 @@ Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MSer
 Loading C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Managed\UnityEngine.dll into Unity Child Domain
 Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Managed\Assembly-CSharp.dll (this message is harmless)
 Loading C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-- Completed reload, in  0.125 seconds
+- Completed reload, in  0.100 seconds
 desktop: 1366x768 59Hz; virtual: 1366x768 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
 Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Managed\System.dll (this message is harmless)
-Entity loaded: Bomber
+destroying channel: newGame_204337
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
+destroying channel: newGame_204337
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
+destroying channel: newGame_265558
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-destroying channel: newGame_155938
+destroying channel: newGame_265558
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-destroying channel: newGame_155938
+destroying channel: newGame_183463
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-Entity loaded: Bomber
+destroying channel: newGame_183463
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
+destroying channel: newGame_825614
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
+destroying channel: newGame_825614
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
+destroying channel: newGame_301406
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-destroying channel: newGame_888998
+Platform assembly: C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Managed\System.Core.dll (this message is harmless)
+destroying channel: newGame_301406
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-destroying channel: newGame_888998
+destroying channel: newGame_976531
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-destroying channel: newGame_15625
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-destroying channel: newGame_15625
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-IOException: Sharing violation on path C:\Users\Boris\Documents\GitHub\MrBomberman\Server\Build\MServer_Data\Maps\Untitled\mainData
-  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) [0x00000] in <filename unknown>:0 
-  at System.IO.FileStream..ctor (System.String path, FileMode mode) [0x00000] in <filename unknown>:0 
-  at IOManager.readHashtable (System.String path) [0x00000] in <filename unknown>:0 
-  at IOManager.loadMapInfos (System.String path) [0x00000] in <filename unknown>:0 
-  at GameRoom..ctor (.Core core, System.String name, Int32 maxPlayers, Boolean isPrivate, System.String map, GameTypes type) [0x00000] in <filename unknown>:0 
-  at Core.OnClientEvent (Int32 eventTypeInt, System.String data, NetworkMessageInfo senderInfos) [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-Entity loaded: Bomber
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-destroying channel: newGame_975271
- 
-(Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
-
-destroying channel: newGame_975271
+destroying channel: newGame_976531
  
 (Filename: C:/BuildAgent/work/812c4f5049264fad/Runtime/ExportGenerated/StandalonePlayer/UnityEngineDebug.cpp Line: 43)
 

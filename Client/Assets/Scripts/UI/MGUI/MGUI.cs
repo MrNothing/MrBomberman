@@ -744,7 +744,7 @@ public class MGUI : MonoBehaviour
 		//container.layer = guiLayers.value;
 		
 		container.AddComponent<MeshRenderer>();
-		container.renderer.material = new Material (Shader.Find("Transparent/Diffuse"));
+		container.renderer.material = new Material (Shader.Find("Transparent/VertexLit"));
 		container.renderer.material.SetTexture("_MainTex", image);
 		//container.renderer.material.mainTextureOffset = offset;
 		
@@ -761,7 +761,7 @@ public class MGUI : MonoBehaviour
 		//imageContainer.layer = guiLayers.value;
 		
 		imageContainer.AddComponent<MeshRenderer>();
-		imageContainer.renderer.material = new Material (Shader.Find("Transparent/Diffuse"));
+		imageContainer.renderer.material = new Material (Shader.Find("Transparent/VertexLit"));
 		imageContainer.renderer.material.SetTexture("_MainTex", normal);
 		imageContainer.renderer.material.mainTextureOffset = offset;
 		
@@ -803,7 +803,7 @@ public class MGUI : MonoBehaviour
 		//imageContainer.layer = guiLayers.value;
 		
 		imageContainer.AddComponent<MeshRenderer>();
-		imageContainer.renderer.material = new Material (Shader.Find("Transparent/Diffuse"));
+		imageContainer.renderer.material = new Material (Shader.Find("Transparent/VertexLit"));
 		imageContainer.renderer.material.SetTexture("_MainTex", normal);
 		imageContainer.renderer.material.mainTextureOffset = offset;
 		

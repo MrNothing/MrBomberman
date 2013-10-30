@@ -19,18 +19,18 @@ namespace B4
 		//open tiles are sorted by distance the closest one will always be picked first
 		SortedDictionary<float, Vector3> openTiles;
 		
-        Dictionary<String, bool> closedTiles;
+        Hashtable closedTiles;
 		
 		//walkable tiles...
-        Dictionary<String, UnityEngine.Vector3> wayPoints;
+        Dictionary<String, float> wayPoints;
         
 		//path target
         Vector3 target;
 
-        public PathFinder(Dictionary<String, UnityEngine.Vector3> _wayPoints, float _baseStep, float _maxCliffHeight)
+        public PathFinder(Dictionary<String, float> _wayPoints, float _baseStep, float _maxCliffHeight)
         {
             openTiles = new SortedDictionary<float, Vector3>();
-            closedTiles = new Dictionary<String, bool>();
+            closedTiles = new Hashtable();
             wayPoints = _wayPoints;
             baseStep = _baseStep;
 			maxCliffHeight = _maxCliffHeight;
@@ -48,7 +48,7 @@ namespace B4
             {
                 target = _target;
                 openTiles = new SortedDictionary<float, Vector3>();
-                closedTiles = new Dictionary<String, bool>();
+                closedTiles = new Hashtable();
 
                 result = new List<Vector3>();
 
@@ -82,56 +82,80 @@ namespace B4
         private void search(Vector3 lastPoint)
         { 
             //Check around lastPoint...
-            for (int i = -checkRange; i < checkRange; i++)
+            
+			for (int i = -checkRange; i <= checkRange; i++)
             {
-                for (int j = -checkRange; j < checkRange; j++)
+				for (int j = -checkRange; j <= checkRange; j++)
                 {
-                    Vector3 newPoint = lastPoint.Add(new Vector3(i * baseStep, 0, j * baseStep));
+					Vector3 newPoint = lastPoint.Add(new Vector3(i * baseStep, 0, j * baseStep));
                     String rangeId = newPoint.toPosRefId(baseStep);
 					
 					//if there is a walkable tile and I have not already visited this tile
-                    if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && !hasIndexAt(closedTiles, rangeId))
+                    if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && closedTiles[rangeId]==null)
                     {
                         closedTiles.Add(rangeId, true);
-
-                        //if i am closer than the last point to the target
+						
+						//if i am closer than the last point to the target
                         if ((lastPoint.Substract(target)).Magnitude() > newPoint.Substract(target).Magnitude())
                         {
-                            newPoint.parent = lastPoint;
-                            openTiles.Add(newPoint.Substract(target).Magnitude(), newPoint);
-                        }
+							try
+							{
+                        		openTiles.Add(newPoint.Substract(target).Magnitude(), newPoint);
+							}
+							catch
+							{
+								
+							}
+							
+							newPoint.parent = lastPoint;
+						}
                     }
                 }
             }
-
-            //if i have ways left...
+			
+			 //if i have ways left...
             if (openTiles.Count > 0)
             {
                 float minKey = openTiles.Keys.First();
+                
+				if(bestPath!=null)
+				{
+					//if the new chosen path is closer than the last best path, we choose it as the new best path
+					if(bestPath.Substract(target).Magnitude()>openTiles[minKey].Substract(target).Magnitude())
+						bestPath = openTiles[minKey];
+				}
+				else
+				{
+					bestPath = openTiles[minKey];
+				}
+				
                 openTiles.Remove(minKey);
-
-                bestPath = openTiles[minKey];
-
-                search(bestPath);
+				
+				search(bestPath);
             }
             else 
             {
                 if (bestPath != null)
                 {
-                    if (bestPath.Substract(target).Magnitude() == 0)
+                    if (Math.Floor(bestPath.Substract(target).Magnitude()/baseStep) == 0)
                     {
                         //Path found!
                         end();
+						
+						//Debug.Log("Path found!");
                     }
                     else
                     { 
                         //The destination path was not found, but a closer path was found.
                         end();
+						
+						//Debug.Log("Approximative Path found!");
                     }
                 }
                 else
                 { 
                     //no path was found!
+					//Debug.Log("Path not found!");
                 }
             }
         }
@@ -148,7 +172,7 @@ namespace B4
             while (lastPath.parent != null);
         }
 		
-		private bool hasIndexAt(Dictionary<string, UnityEngine.Vector3> dictionary, string key)
+		private bool hasIndexAt(Dictionary<string, float> dictionary, string key)
 		{
 			try
 			{
@@ -164,13 +188,13 @@ namespace B4
 		float maxCliffHeight = 0.5f;
 		
 		//this is used to determine if the path is walkable, if the cliff is too high it is not walkable.
-		private bool isNotTooHighIfExists(Dictionary<string, UnityEngine.Vector3> dictionary, string key, Vector3 currentPosition)
+		private bool isNotTooHighIfExists(Dictionary<string, float> dictionary, string key, Vector3 currentPosition)
 		{
 			try
 			{
 				if(dictionary[key]!=null)
 				{
-					if(Mathf.Abs(dictionary[key].y-currentPosition.y)<maxCliffHeight)
+					if(Mathf.Abs(dictionary[key]-currentPosition.y)<maxCliffHeight)
 						return true;
 					else
 						return false;

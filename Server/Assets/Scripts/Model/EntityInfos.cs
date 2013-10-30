@@ -19,10 +19,20 @@ public class EntityInfos
 	//if this is a hero, he will gain stats when he gains a level
 	EntityStats perLevelBonuses = new EntityStats();
 	
+	public bool controllable = false;
+	public string spells = string.Empty;
+	
 	public EntityInfos(Hashtable infos)
 	{
 		_name = infos["name"].ToString();
 		_prefab = infos["prefab"].ToString();
+		spells = infos["spells"].ToString();
+		
+		if(spells.Length>0 && spells.IndexOf(",")<0)
+			spells+=",";
+		
+		controllable = (bool)infos["controllable"];
+		
 		
 		try
 		{
@@ -35,8 +45,17 @@ public class EntityInfos
 		
 		stats = new EntityStats();
 		
+		_hp = (float) infos["hp"];
+		_mp = (float) infos["mp"];
 		stats.Hp = (float) infos["maxhp"];
 		stats.Mp = (float) infos["maxmp"];
+		
+		if((float)infos["maxhp"]==0)
+		{
+			_hp = 1;
+			stats.Hp = 1;
+		}
+		
 		stats.Armor = (float) infos["armor"];
 		stats.Damages = (float) infos["damage"];
 		
@@ -60,6 +79,8 @@ public class EntityInfos
 		
 		stats.Resistance = (float) infos["resistance"];
 		stats.SpellPower = (float) infos["power"];
+		stats.RunSpeed = (float) infos["speed"];
+		
 		//a loaded unit cannot be wearing items when it is instanciated
 		bonuses = new EntityStats();
 	}
@@ -69,6 +90,10 @@ public class EntityInfos
 		_name = infos._name;
 		_prefab = infos._prefab;
 		_level = infos._level;
+		spells = infos.spells;
+		_hp = infos.Hp;
+		_mp = infos.Mp;
+		controllable = infos.controllable;
 		stats = new EntityStats(infos.Stats);
 		bonuses = new EntityStats(infos.Bonuses);
 	}
@@ -80,8 +105,10 @@ public class EntityInfos
 		newEntity.Add("prefab", Prefab);
 		newEntity.Add("level", Level);
 		newEntity.Add("stats", stats.export());
+		newEntity.Add("hp", _hp);
+		newEntity.Add("mp", _mp);
 		newEntity.Add("bonuses", bonuses.export());
-		
+		newEntity.Add("spells", spells);
 		return newEntity;
 	}
 	

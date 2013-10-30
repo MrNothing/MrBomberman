@@ -13,13 +13,15 @@ public class Lobby : Channel {
 	Dictionary<int, int> teamPlayersPair = new Dictionary<int, int>();
 	//what team is each player assigned to
 	Dictionary<string, int> playerTeamPair = new Dictionary<string, int>();
+	
+	public Hashtable rawMap;
 
 	public Lobby(Core core, string name, int maxPlayers, bool isPrivate, string map):base(core, name, ChannelType.lobby, maxPlayers, isPrivate)
 	{
 		_map = map;
 		
 		//map infos
-		Hashtable rawMap = core.io.loadMapInfos(Application.dataPath+"/Maps/"+map+"/mainData");
+		rawMap = core.io.loadMapInfos(Application.dataPath+"/Maps/"+map+"/mainData");
 	
 		Hashtable mapInfos = (Hashtable)rawMap["mapInfos"];
 		

@@ -157,7 +157,12 @@ public class MainInterface: MonoBehaviour
 							
 							GUILayout.BeginHorizontal();
 							GUILayout.Label("Team: ");
-							GUILayout.TextField("");
+							
+							if(infos["team"]!=null)
+								infos["team"] = int.Parse(GUILayout.TextField(infos["team"].ToString()));
+							else
+								infos.Add("team", 0);
+						
 							GUILayout.EndHorizontal();
 						
 							if(GUILayout.Button("Destroy"))
@@ -350,9 +355,11 @@ public class MainInterface: MonoBehaviour
 						{
 							Hashtable infos = worldEditor.entityInfos[currentEntity];
 							newEntityName = infos["name"].ToString();
+							newEntitySpells = infos["spells"].ToString();
 							newEntityPrefab = infos["prefab"].ToString();
 							newEntityIsHero = (bool)infos["hero"];
 							newEntityIsImmortal = (bool)infos["immortal"];
+							newEntityIsControllable = (bool)infos["controllable"];
 							newEntityMaxHp = (float)infos["maxhp"];
 							newEntityHp = (float)infos["hp"];
 							newEntityMaxMp = (float)infos["maxmp"];
@@ -424,6 +431,12 @@ public class MainInterface: MonoBehaviour
 					GUILayout.BeginHorizontal();
 					newEntityIsHero = GUILayout.Toggle(newEntityIsHero, "Hero ");	
 					newEntityIsImmortal = GUILayout.Toggle(newEntityIsImmortal, "Immortal ");	
+					newEntityIsControllable = GUILayout.Toggle(newEntityIsControllable, "Controllable ");	
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("spells: ");
+					newEntitySpells = GUILayout.TextField(newEntitySpells);
 					GUILayout.EndHorizontal();
 					
 					GUILayout.BeginHorizontal();
@@ -434,8 +447,10 @@ public class MainInterface: MonoBehaviour
 					{
 						Hashtable newEntity = new Hashtable();
 						newEntity.Add("name", newEntityName);
+						newEntity.Add("spells", newEntitySpells);
 						newEntity.Add("hero", newEntityIsHero);
 						newEntity.Add("immortal", newEntityIsImmortal);
+						newEntity.Add("controllable", newEntityIsControllable);
 						newEntity.Add("prefab", newEntityPrefab);
 						newEntity.Add("maxhp", newEntityMaxHp);
 						newEntity.Add("hp", newEntityHp);
@@ -466,6 +481,113 @@ public class MainInterface: MonoBehaviour
 			if(worldEditor.brushType==BrushType.skills)
 			{
 				//skills informations are defined in the editor
+				
+				
+				if(createSpell)
+				{
+					//spell creation interface...
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Icon: ");
+					spellIcon = GUILayout.TextField(spellIcon);
+					
+					GUILayout.Label("Name: ");
+					spellName = GUILayout.TextField(spellName);
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Description: ");
+					spellDescription = GUILayout.TextField(spellDescription);
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Projectile: ");
+					spellProjectileModel = GUILayout.TextField(spellProjectileModel.ToString());
+					GUILayout.Label("Incant Model: ");
+					spellIncantModel = GUILayout.TextField(spellIncantModel.ToString());
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Mana: ");
+					spellMana = float.Parse(GUILayout.TextField(spellMana.ToString()));
+					GUILayout.Label("CoolDown: ");
+					spellCd = float.Parse(GUILayout.TextField(spellCd.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("Usage: ");
+					spellUsage = float.Parse(GUILayout.TextField(spellUsage.ToString()));
+					GUILayout.Label("Spell Type: ");
+					spellType = GUILayout.TextField(spellType.ToString());
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					GUILayout.Label("effect 1: ");
+					spellEffect1Value = float.Parse(GUILayout.TextField(spellEffect1Value.ToString()));
+					GUILayout.Label("effect 2: ");
+					spellEffect2Value = float.Parse(GUILayout.TextField(spellEffect2Value.ToString()));
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
+					if(GUILayout.Button("Cancel"))
+						createSpell = false;
+					
+					if(GUILayout.Button("Save"))
+					{
+						Hashtable newEntity = new Hashtable();
+						newEntity.Add("name", spellName);
+						newEntity.Add("icon", spellIcon);
+						newEntity.Add("description", spellDescription);
+						newEntity.Add("projectile", spellProjectileModel);
+						newEntity.Add("incantModel", spellIncantModel);
+						newEntity.Add("mana", spellMana);
+						newEntity.Add("coolDown", spellCd);
+						newEntity.Add("usage", spellUsage);
+						newEntity.Add("type", spellType);
+						newEntity.Add("effect1", spellEffect1Value);
+						newEntity.Add("effect2", spellEffect2Value);
+						
+						if(worldEditor.skills[spellName]!=null)
+						{
+							worldEditor.skills.Remove(worldEditor.skills[spellName] as Hashtable);
+						}
+						
+						worldEditor.skills.Add(spellName, newEntity);
+						
+						createSpell = false;
+					}
+					
+					GUILayout.EndHorizontal();
+				}
+				else
+				{
+					if(GUILayout.Button("Create new Skill"))
+						createSpell = true;
+					
+					foreach(string s in worldEditor.skills.Keys)
+					{
+						GUILayout.BeginHorizontal();
+						GUILayout.Label(((Hashtable)worldEditor.skills[s])["name"].ToString());
+						
+						if(GUILayout.Button("Edit"))
+						{
+							Hashtable infos = (Hashtable)worldEditor.skills[s];
+							spellName = infos["name"]+"";
+							spellIcon = infos["icon"]+"";
+							spellDescription = infos["description"]+"";
+							spellProjectileModel = infos["projectile"]+"";
+							spellIncantModel = infos["incantModel"]+"";
+							spellMana = (float)infos["mana"];
+							spellCd = (float)infos["coolDown"];
+							spellUsage = (float)infos["usage"];
+							spellType = infos["type"]+"";
+							spellEffect1Value = (float)infos["effect1"];
+							spellEffect2Value = (float)infos["effect2"];
+							createSpell = true;
+						}
+						
+						GUILayout.EndHorizontal();
+					}
+				}
 			}
 			
 			if(worldEditor.brushType==BrushType.items)
@@ -550,6 +672,21 @@ public class MainInterface: MonoBehaviour
 		}
 	}
 	
+	//spell editor vars
+	bool createSpell = false;
+	
+	string spellName = "";
+	string spellDescription = "";
+	string spellIcon = "";
+	string spellProjectileModel = "";
+	string spellIncantModel = "";
+	float spellCd = 0;
+	float spellMana = 0;
+	float spellUsage = 0;
+	string spellType = "";
+	float spellEffect1Value = 0;
+	float spellEffect2Value = 0;
+	
 	//temp map infos are stored here
 	bool mapInfosFogEnabled = false;
 	int[] mapInfosTeamsPlayers = new int[12];
@@ -558,6 +695,7 @@ public class MainInterface: MonoBehaviour
 	//we temporarly store the new unit's stats
 	string newEntityPrefab = "";
 	string newEntityName = "";
+	string newEntitySpells = "";
 	float newEntityLevel = 0;
 	float newEntityHp = 0;
 	float newEntityMaxHp = 0;
@@ -570,4 +708,5 @@ public class MainInterface: MonoBehaviour
 	float newEntitySpeed = 0;
 	bool newEntityIsHero = false;
 	bool newEntityIsImmortal = false;
+	bool newEntityIsControllable = false;
 }

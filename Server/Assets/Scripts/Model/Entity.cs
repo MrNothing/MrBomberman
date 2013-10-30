@@ -26,6 +26,8 @@ public class Entity
 
 	string owner = string.Empty;
 	
+	public bool controlledByPlayer = true;
+	
 	//a pet will follow its master
 	int master = 0;
 	
@@ -40,6 +42,7 @@ public class Entity
 	
 	B4.PathFinder pathfinder;
 	List<B4.Vector3> paths = new List<B4.Vector3>();
+
 	#endregion
 	
 	public EntityStatus status = EntityStatus.idle;
@@ -107,12 +110,15 @@ public class Entity
 	void sendMovement()
 	{
 		Hashtable infos = new Hashtable();
+		infos.Add("id", Id);
+		infos.Add("x", position.x);
 		infos.Add("y", position.y);
 		infos.Add("z", position.z);
 		infos.Add("dx", destination.x);
 		infos.Add("dy", destination.y);
 		infos.Add("dz", destination.z);
-		
+		HashMapSerializer serializer = new HashMapSerializer();
+		myGame.Send(ServerEventType.position, serializer.hashMapToData(infos));
 	}
 	
 	int passiveRegenerationCounter=0;
@@ -142,10 +148,12 @@ public class Entity
 	
 	public void updateDestination()
 	{
-	 	if (isSynchronized() && paths.Count > 0)
+		if (isSynchronized() && paths.Count > 0)
         {
             destination = paths[paths.Count - 1];
             paths.RemoveAt(paths.Count - 1);
+			
+			sendMovement();
         }
 	}
 	
@@ -187,7 +195,7 @@ public class Entity
 	
 	float getFrameSpeed()
 	{
-		return (_infos.Stats.RunSpeed+_infos.Bonuses.RunSpeed)/400f;
+		return (_infos.Stats.RunSpeed+_infos.Bonuses.RunSpeed)/3000f;
 	}
 	
 	//called every 100 ms
@@ -195,8 +203,8 @@ public class Entity
 	{
 		if (!isSynchronized())
         {
-            status = EntityStatus.walking;
-           
+			status = EntityStatus.walking;
+			
             float calculatedSpeed = getFrameSpeed();
 
             if (position.x < destination.x)
@@ -240,6 +248,14 @@ public class Entity
         //tmpPos.y = destination.y;
         return !(tmpPos.Substract(destination).Magnitude() > getFrameSpeed() && !destination.isZero());
     }
+	
+	public void findPath(Vector2 point)
+	{
+		paths = pathfinder.start(position, new B4.Vector3(point.x, position.y, point.y));
+		
+		if(paths.Count>0)
+			destination = paths[paths.Count-1];
+	}
 	
 	public int Id 
 	{
@@ -315,4 +331,16 @@ public class Entity
 			_team = value;
 		}
 	}	
+	
+	public EntityInfos Infos
+	{
+		get 
+		{
+			return this._infos;
+		}
+		set 
+		{
+			_infos = value;
+		}
+	}
 }

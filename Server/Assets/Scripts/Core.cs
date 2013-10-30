@@ -77,6 +77,8 @@ public class Core : MonoBehaviour
 	//all non started games are listed here:
 	public Dictionary<int, Lobby> games = new Dictionary<int, Lobby>();
 	
+	public Dictionary<int, GameRoom> startedGames = new Dictionary<int, GameRoom>();
+	
 	//This is used for serialization
 	HashMapSerializer serializer = new HashMapSerializer();
 	
@@ -84,7 +86,7 @@ public class Core : MonoBehaviour
 	public IOManager io = new IOManager();
 	
 	void Start () 
-	{
+	{	
 		Network.InitializeSecurity();
 		Network.InitializeServer(100, 6600, true);
 		
@@ -92,6 +94,16 @@ public class Core : MonoBehaviour
 		Channel defaultChannel = new Channel(this, "Public", ChannelType.chat, 100, false);
 		channels.Add(defaultChannel.Id, defaultChannel);
 		channelsByName.Add(defaultChannel.Name, defaultChannel.Id);
+		
+		InvokeRepeating("run", 0.1f, 0.1f);
+	}
+	
+	void run()
+	{
+		foreach(int i in startedGames.Keys)
+		{
+			startedGames[i].run();
+		}
 	}
 	
 	//send a message to all players in the server
@@ -115,6 +127,8 @@ public class Core : MonoBehaviour
 		Network.RemoveRPCs(player);
         //Network.DestroyPlayerObjects(player);
 		Player myPlayer = players[player.GetHashCode()];
+		
+		players.Remove(myPlayer.Id);
 		
 		//if i am logged
 		if(myPlayer.Name.Length>0)
@@ -380,7 +394,7 @@ public class Core : MonoBehaviour
 						
 						Lobby gameLobby = (Lobby)myPlayer.Channel;
 						
-						GameRoom newGame = new GameRoom(this, gameLobby.Name, gameLobby.MaxPlayers, gameLobby.IsPrivate, gameLobby.Map, gameLobby.GameType);
+						GameRoom newGame = new GameRoom(this, gameLobby.Name, gameLobby.MaxPlayers, gameLobby.IsPrivate, gameLobby.Map, gameLobby.GameType, gameLobby.rawMap);
 						newGame.IsTemp = true;
 							
 						newGame.importTeams(gameLobby);
@@ -393,6 +407,7 @@ public class Core : MonoBehaviour
 						newGame.addPlayers(playersToMove);
 						
 						channels.Add(newGame.Id, newGame);
+						startedGames.Add(newGame.Id, newGame);
 					}
 					else
 					{
@@ -409,6 +424,19 @@ public class Core : MonoBehaviour
 				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Game!");
 			}
 		}
+		
+		if(eventType==(byte)ServerEventType.position)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.game)
+				{
+					((GameRoom)myPlayer.Channel).setPath((int)infos["id"], (float) infos["x"], (float) infos["z"]);
+				}
+			}
+		}
 	}
 	
 	public void DestroyChannel(Channel channel)
@@ -419,6 +447,9 @@ public class Core : MonoBehaviour
 		
 		if(channel.Type==ChannelType.lobby)
 			games.Remove(channel.Id);
+		
+		if(channel.Type==ChannelType.game)
+			startedGames.Remove(channel.Id);
 		
 		if(channel.Type==ChannelType.chat || channel.Type==ChannelType.lobby)
 			channelsByName.Remove(channel.Name);

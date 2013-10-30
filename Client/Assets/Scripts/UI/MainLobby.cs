@@ -149,9 +149,7 @@ public class MainLobby : MonoBehaviour {
 				message.Add("target", target);
 				message.Add("msg", msg);
 				
-				HashMapSerializer serializer = new HashMapSerializer();
-				
-				core.networkManager.send(ServerEventType.pm, serializer.hashMapToData(message));
+				core.networkManager.send(ServerEventType.pm, HashMapSerializer.hashMapToData(message));
 				return;
 			}
 			
@@ -162,9 +160,7 @@ public class MainLobby : MonoBehaviour {
 				Hashtable roomRequest = new Hashtable();
 				roomRequest.Add("name", command);
 				
-				HashMapSerializer serializer = new HashMapSerializer();
-				
-				core.networkManager.send(ServerEventType.playerJoin, serializer.hashMapToData(roomRequest));
+				core.networkManager.send(ServerEventType.playerJoin, HashMapSerializer.hashMapToData(roomRequest));
 				return;
 			}
 			

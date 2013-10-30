@@ -2,13 +2,16 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour 
+{
 	
 	public string mapName;
 	
 	public UICore core;
 	
 	public Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
+	
+	public GameObject selectionCircle;
 	
 	public GameObject defaultTextureTile;
 	public GameObject defaultFogTile;
@@ -33,7 +36,8 @@ public class GameManager : MonoBehaviour {
 	public Hashtable mapInfos = new Hashtable();
 	
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		//we need to index the doodads for map loading.
 		foreach(GameObject go in doodads)
 		{
@@ -42,8 +46,38 @@ public class GameManager : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
 	
+	}
+	
+	public void clearFog(Vector3 point, float brushSize)
+	{
+		int checkRadius = (int)Mathf.Ceil(brushSize*3);
+		if(checkRadius<3)
+			checkRadius = 3;
+		
+		List<string> testBrush = getTilesAroundPoint(point, checkRadius);
+		foreach(string s in testBrush)
+		{
+			if(Vector3.Distance(((GameObject)((Hashtable)world[s])["textureTile"]).transform.position, point)<brushSize*DEFAULT_TILE_STEP)
+			{
+				FogTileHandler fog = ((GameObject)((Hashtable)world[s])["fogTile"]).GetComponent<FogTileHandler>();
+				
+				Dictionary<int, float> colliders = fog.findColliders(point, brushSize, 0.1f);
+				
+				fog.clearFog(point, brushSize, colliders, 1);		
+			}
+		}
+	}
+	
+	public void enableFog()
+	{
+		foreach(string s in tiles)
+		{
+			Hashtable tile = (Hashtable)world[s];
+			(tile["fogTile"] as GameObject).GetComponent<FogTileHandler>().setDefaultFog(new Color32(0, 0, 0, 255));
+		}
 	}
 	
 	public void loadMap(string path)
@@ -122,6 +156,16 @@ public class GameManager : MonoBehaviour {
 				fogVerticlesIndexer.updateVertices();	
 			}
 		}
+		
+		if(mapInfos["fog"]!=null)
+		{
+			//if((bool) mapInfos["fog"])
+			Invoke("enableFog", 1);
+		}
+		else
+		{
+			Invoke("enableFog", 1);
+		}
 	}
 	
 	public Hashtable addTile(Vector3 position)
@@ -146,6 +190,7 @@ public class GameManager : MonoBehaviour {
 			tileInfos.Add("textureTile", textureTile);
 			tileInfos.Add("fogTile", fogTile);
 			tileInfos.Add("verticlesIndexer", textureTile.GetComponent<VerticlesIndexer>());
+			tileInfos.Add("FogTileHandler", fogTile.GetComponent<FogTileHandler>());
 			
 			world.Add(id, tileInfos);
 			tiles.Add(id);
@@ -190,6 +235,42 @@ public class GameManager : MonoBehaviour {
 	{
 		
 	}
+	
+	public List<string> getTilesAroundPoint(Vector3 point, int radius)
+	{
+		List<string> tiles = new List<string>();
+		//to avoid looping around every tile in the maps, we use the indexed ids
+		for(int i=-radius; i<radius; i++)
+		{
+			for(int j=-radius; j<radius; j++)
+			{
+				Vector3 tmpTilePosition = point+new Vector3(i*DEFAULT_TILE_STEP, 0, j*DEFAULT_TILE_STEP);
+				string tmpId = getIdWithPosition(tmpTilePosition, DEFAULT_TILE_STEP);
+				
+				if(world[tmpId]!=null)
+				{
+					//tile exists, add it to the list...
+					tiles.Add(tmpId);
+				}
+			}	
+		}
+		
+		return tiles;
+	}
+	
+	public string getNearestTile(Vector3 point)
+	{
+		Vector3 tmpTilePosition = point+new Vector3(DEFAULT_TILE_STEP, 0, DEFAULT_TILE_STEP);
+		string tmpId = getIdWithPosition(tmpTilePosition, DEFAULT_TILE_STEP);
+		
+		if(world[tmpId]!=null)
+		{
+			return tmpId;
+		}
+		else
+			return string.Empty;
+	}
+	
 	public string getIdWithPosition(Vector3 position, float defaultStep)
 	{
 		return smash(position, defaultStep).ToString();
@@ -197,12 +278,12 @@ public class GameManager : MonoBehaviour {
 
     public Vector3 smash(Vector3 position, float factor)
     {
-        return new Vector3((float)Mathf.Round(position.x / factor) * factor, (float)Mathf.Round(position.y / factor) * factor, (float)Mathf.Round(position.z / factor) * factor);
+        return new Vector3((float)Mathf.Floor(position.x / factor) * factor, (float)Mathf.Floor(position.y / factor) * factor, (float)Mathf.Floor(position.z / factor) * factor);
     }
 
     public Vector3 smash(Vector3 position, Vector3 factorAsVector)
     {
-        return new Vector3((float)Mathf.Round(position.x / factorAsVector.x) * factorAsVector.x, (float)Mathf.Round(position.y / factorAsVector.y) * factorAsVector.y, (float)Mathf.Round(position.z / factorAsVector.z) * factorAsVector.z);
+        return new Vector3((float)Mathf.Floor(position.x / factorAsVector.x) * factorAsVector.x, (float)Mathf.Floor(position.y / factorAsVector.y) * factorAsVector.y, (float)Mathf.Floor(position.z / factorAsVector.z) * factorAsVector.z);
     }
 	
 	public IEnumerator loadTexture(string url, GameObject target)

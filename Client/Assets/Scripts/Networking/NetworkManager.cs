@@ -63,7 +63,8 @@ public class NetworkManager : MonoBehaviour
 {
 	public UICore core;
 	
-	HashMapSerializer serializer = new HashMapSerializer();
+	public string username = string.Empty;
+	public int currentTeam = 0;
 	
 	public void Start()
 	{
@@ -103,7 +104,8 @@ public class NetworkManager : MonoBehaviour
 		byte eventType = (byte)eventTypeInt;
 		if(eventType==(byte)ServerEventType.login)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			username = infos["name"].ToString();
 			core.errorInterface.showMessage("Logged in as: "+infos["name"]+"!", Color.green, true);
 		}
 		
@@ -121,7 +123,7 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.playerJoin)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = infos["name"]+" has joined the Channel";
 			
@@ -131,16 +133,13 @@ public class NetworkManager : MonoBehaviour
 				core.gui.insertText(core.gameLobby.textArea.id, msg, core.normalFont, Color.yellow);
 			if(core.inGame.Visible)
 				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
-				
 		}
 		
 		if(eventType==(byte)ServerEventType.roomInfos)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = "Joined the Channel: "+infos["name"];
-			
-			print(msg);
 			
 			//game
 			if(infos["type"].Equals("game"))
@@ -185,7 +184,7 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.playerLeave)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = infos["name"]+" has left the Channel";
 			
@@ -200,14 +199,9 @@ public class NetworkManager : MonoBehaviour
 				core.gui.insertText(core.inGame.textArea.id, msg, core.normalFont, Color.yellow); 	
 		}
 		
-		if(eventType==(byte)ServerEventType.position)
-		{
-			
-		}
-		
 		if(eventType==(byte)ServerEventType.chat)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = infos["sender"]+": "+infos["msg"];
 			
@@ -223,7 +217,7 @@ public class NetworkManager : MonoBehaviour
 		if(eventType==(byte)ServerEventType.pm)
 		{
 			
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = infos["sender"]+" whispers: "+infos["msg"];
 			
@@ -238,7 +232,7 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.channelsList)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			if(core.lobby.Visible)
 			{
@@ -254,7 +248,7 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.gamesList)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 				
 			if(core.lobby.Visible)
 			{
@@ -283,15 +277,20 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.playerTeam)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			if(core.gameLobby.Visible)
 				core.gameLobby.setPlayerToTeam(infos["player"].ToString(), (int)infos["team"]);
+			
+			if(infos["player"].Equals(username))
+			{
+				currentTeam = (int) infos["team"];
+			}
 		}
 		
 		if(eventType==(byte)ServerEventType.playersByTeam)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			Dictionary<string, int> playerTeamPair = new Dictionary<string, int>();
 			foreach(string player in infos.Keys)
@@ -308,19 +307,30 @@ public class NetworkManager : MonoBehaviour
 		
 		if(eventType==(byte)ServerEventType.unitInfos)
 		{
-			Hashtable infos = serializer.dataToHashMap(data);
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			Hashtable entityInfos = (Hashtable)infos["infos"];
-			
-			print("prefab: "+entityInfos["prefab"]);
 			
 			GameObject newEntity = (GameObject) Instantiate(Resources.Load("Entities/"+entityInfos["prefab"], typeof(GameObject)), new Vector3((float)entityInfos["x"], (float)entityInfos["y"], (float)entityInfos["z"]), Quaternion.identity);
 			Entity entityScript = newEntity.GetComponent<Entity>();
 			entityScript.id = (int)infos["id"];
 			entityScript.owner = infos["owner"].ToString();
+			entityScript.team = (int)infos["team"];
+			entityScript.spells = (Hashtable) infos["spells"];
 			entityScript.infos = entityInfos;
 			entityScript.destination = new Vector3((float)entityInfos["dx"], (float)entityInfos["dy"], (float)entityInfos["dz"]);
 			core.gameManager.entities.Add(entityScript.id, entityScript);
+			
+		}
+		
+		if(eventType==(byte)ServerEventType.position)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			
+			//TODO find a smoother way to set direct position.
+			core.gameManager.entities[(int)infos["id"]].syncedPosition = new Vector3((float)infos["x"], (float)infos["y"], (float)infos["z"]);
+			core.gameManager.entities[(int)infos["id"]].forceHighSync = Vector3.Distance(core.gameManager.entities[(int)infos["id"]].syncedPosition, core.gameManager.entities[(int)infos["id"]].transform.position)*2;
+			core.gameManager.entities[(int)infos["id"]].destination = new Vector3((float)infos["dx"], (float)infos["dy"], (float)infos["dz"]);
 		}
 	}
 	

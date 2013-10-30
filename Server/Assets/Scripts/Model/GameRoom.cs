@@ -14,7 +14,7 @@ public class GameRoom : Channel
 	GameTypes _gameType;
 	
 	//walkable paths are determined with this dictionary
-	public Dictionary<string, Vector3> mapVertices = new Dictionary<string, Vector3>();
+	public Dictionary<string, float> mapVertices = new Dictionary<string, float>();
 	
 	//all units present in the game are listed here
 	Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
@@ -37,13 +37,13 @@ public class GameRoom : Channel
 	//this is the default step size for the pathfinder
 	public float baseStep = 0.5f;
 	
-	public GameRoom(Core core, string name, int maxPlayers, bool isPrivate, string map, GameTypes type):base(core, name, ChannelType.game, maxPlayers, isPrivate)
+	//spell infos
+	public Hashtable skills;
+	
+	public GameRoom(Core core, string name, int maxPlayers, bool isPrivate, string map, GameTypes type, Hashtable rawMap):base(core, name, ChannelType.game, maxPlayers, isPrivate)
 	{
 		_map = map;
 		_gameType = type;
-		
-		//Load the specific map informations
-		Hashtable rawMap = core.io.loadMapInfos(Application.dataPath+"/Maps/"+map+"/mainData");
 	
 		Hashtable mapInfos = (Hashtable)rawMap["mapInfos"];
 		
@@ -52,7 +52,7 @@ public class GameRoom : Channel
 		Hashtable entityInfosByName = (Hashtable)rawMap["entityInfos"];
 		Hashtable entitiesData = (Hashtable)rawMap["entities"];
 		
-		Hashtable skills = (Hashtable)rawMap["skills"];
+		skills = (Hashtable)rawMap["skills"];
 		Hashtable items = (Hashtable)rawMap["items"];
 		
 		rebuildIndexedVertices(mapData);
@@ -63,7 +63,10 @@ public class GameRoom : Channel
 	//main loop for game Rooms, this is where all the recursive game logic is handled (IA moves, stats etc)
 	public void run()
 	{
-		
+		foreach(int i in entities.Keys)
+		{
+			entities[i].run();
+		}
 	}
 	
 	public void onPlayerJoin(Player player)
@@ -81,11 +84,12 @@ public class GameRoom : Channel
 	
 	public void addEntity(string entity, string owner, Vector3 position, int team, bool notifyPlayers)
 	{
-		Debug.Log("Entity loaded: "+entity);
 		//we clone entityinfos to avoid unexpected stuff
 		EntityInfos newEntityInfos = new EntityInfos(entitiesInfos[entity]);
 		
 		Entity newEntity = new Entity(this, owner, newEntityInfos, position, team);
+		
+		//newEntity.controlledByPlayer = newEntityInfos.controllable;
 		
 		entities.Add(newEntity.Id, newEntity);
 		
@@ -133,7 +137,19 @@ public class GameRoom : Channel
 		Hashtable data = new Hashtable();
 		data.Add("id", entity.Id);
 		data.Add("owner", entity.Owner);
+		data.Add("team", entity.team);
 		data.Add("infos", entity.export());
+		
+		string tmpSpellString = entity.Infos.spells;
+		Hashtable spells = new Hashtable();
+		while(tmpSpellString.IndexOf(",")!=-1)
+		{
+			string tmpSpell = tmpSpellString.Substring(0, tmpSpellString.IndexOf(","));
+			tmpSpellString = tmpSpellString.Substring(tmpSpell.Length+1, tmpSpellString.Length-tmpSpell.Length-1);
+			spells.Add(spells, skills[spells]);
+		}
+		
+		data.Add("spells", spells);
 		
 		HashMapSerializer serializer = new HashMapSerializer();
 		
@@ -145,24 +161,43 @@ public class GameRoom : Channel
 		Hashtable data = new Hashtable();
 		data.Add("id", entity.Id);
 		data.Add("owner", entity.Owner);
+		data.Add("team", entity.team);
 		data.Add("infos", entity.export());
 		
-		HashMapSerializer serializer = new HashMapSerializer();
+		string tmpSpellString = entity.Infos.spells;
+		Hashtable spells = new Hashtable();
+		while(tmpSpellString.IndexOf(",")!=-1)
+		{
+			string tmpSpell = tmpSpellString.Substring(0, tmpSpellString.IndexOf(","));
+			tmpSpellString = tmpSpellString.Substring(tmpSpell.Length+1, tmpSpellString.Length-tmpSpell.Length-1);
+			spells.Add(tmpSpell, skills[tmpSpell]);
+		}
 		
+		data.Add("spells", spells);
+		
+		HashMapSerializer serializer = new HashMapSerializer();
 		player.Send(ServerEventType.unitInfos, serializer.hashMapToData(data)); 
 	}
 	
 	void sendAllEntities(Player player)	
 	{
+		bool foundStartUnit = false;
 		foreach(int i in entities.Keys)
 		{
+			if(entities[i].team==playerTeamPair[player.Name] && entities[i].controlledByPlayer && !foundStartUnit)
+			{
+				entities[i].Owner = player.Name;
+				entities[i].controlledByPlayer = false;
+				foundStartUnit = true;
+			}
+			
 			sendEntityInfos(entities[i], player);
 		}
 	}
 	
 	void rebuildIndexedVertices(Hashtable mapData)
 	{
-		mapVertices = new Dictionary<string, Vector3>();
+		mapVertices = new Dictionary<string, float>();
 		
 		foreach(string s in mapData.Keys)
 		{
@@ -179,13 +214,35 @@ public class GameRoom : Channel
 				{
 					Hashtable vertInfos = (Hashtable) vertices[i];
 					Vector3 worldVertice = tilePosition + new Vector3((float)vertInfos["x"], (float)vertInfos["y"], (float)vertInfos["z"]);
+					Vector3 worldVertice2D = new Vector3(worldVertice.x, 0, worldVertice.z);
+						
 					try
 					{
-						mapVertices.Add(B4.Vector3Tools.toPosRefId(worldVertice, baseStep), worldVertice);
+						mapVertices.Add(B4.Vector3Tools.toPosRefId(worldVertice2D, baseStep), worldVertice.y);
 					}
 					catch
 					{
 						//this vertice was already placed there, nothing to do...
+					}
+					
+					//we set the 8 surrounding blocs to allow the pathfinder to work properly
+					
+					for(int k=-1; k<=1; k++)
+					{
+						for(int l=-1; l<=1; l++)
+						{
+							worldVertice = tilePosition + new Vector3((float)vertInfos["x"], (float)vertInfos["y"], (float)vertInfos["z"]);
+							worldVertice2D = new Vector3(worldVertice.x+k*baseStep, 0, worldVertice.z+l*baseStep);
+						
+							try
+							{
+								mapVertices.Add(B4.Vector3Tools.toPosRefId(worldVertice2D, baseStep), worldVertice.y);
+							}
+							catch
+							{
+								//this vertice was already placed there, nothing to do...
+							}
+						}
 					}
 				}
 				
@@ -211,6 +268,11 @@ public class GameRoom : Channel
 		teams = new List<List<string>>(lobby.Teams);
 		playerTeamPair = new Dictionary<string, int>(lobby.PlayerTeamPair);
 		teamPlayersPair = new Dictionary<int, int>(lobby.TeamPlayersPair);
+	}
+	
+	public void setPath(int tId, float x, float z)
+	{
+		entities[tId].findPath(new Vector2(x, z));
 	}
 	
 	public string Map 

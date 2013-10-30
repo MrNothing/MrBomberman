@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Entity : MonoBehaviour {
 	
@@ -9,14 +10,29 @@ public class Entity : MonoBehaviour {
 	
 	public GameObject Main;
 	
+	public bool agressive = false;
+	
+	#region position synchronisation
 	public Vector3 destination;
 	Vector3 lastPosition = Vector3.zero;
 	Vector3 lastRealPosition = Vector3.zero;
 	
-	public float hp = 1;
-	public float mp = 0;
+	float desiredY = 0;
+	
+	[HideInInspector]
+	public float forceHighSync = 0;
+	[HideInInspector]
+	public Vector3 syncedPosition;
+	[HideInInspector]
+	public float syncSmoothRate = 8;
 	
 	public float runSpeed = 10;
+	#endregion
+	
+	public float viewRange = 2.5f;
+	
+	public float hp = 1;
+	public float mp = 0;
 	
 	public Hashtable infos;
 	
@@ -54,18 +70,74 @@ public class Entity : MonoBehaviour {
 	bool dead = false;
 	bool moving = false;
 	
+	public Hashtable spells;
+	public List<Spell> _spells = new List<Spell>();
 	UICore core;
 	// Use this for initialization
 	void Start () 
 	{
 		GameObject GO = (GameObject)GameObject.Find("GUI Camera");
 		core = GO.GetComponent<UICore>();
+		
+		foreach(string s in spells.Keys)
+		{
+			_spells.Add(new Spell((Hashtable)spells[s]));
+		}
 	}
+	
+	float fogCounter = 0;
+	float terrainPointCounter = 0;
 	
 	// Update is called once per frame
 	void Update () 
 	{
+		//if this entity is in the player's team, clear the fog
+		if(core.networkManager.currentTeam==team)
+		{
+			if(fogCounter<=0)
+			{
+				core.gameManager.clearFog(transform.position, viewRange);
+				fogCounter = 1;
+			}
+			else
+				fogCounter-=Time.deltaTime*2;
+		}
+		
 		synchronizePosition(destination);
+		
+		if(terrainPointCounter<=0)
+		{
+			try
+			{
+				TerrainPoint currentPoint = ((FogTileHandler)((Hashtable)core.gameManager.world[core.gameManager.getNearestTile(transform.position)])["FogTileHandler"]).getNearestTerrainPoint(transform.position);
+				desiredY = currentPoint.VerticeHeight;
+				
+				if(currentPoint.FogAlpha>=255)
+				{
+					if(visible)
+					{
+						hideAllChildrens();
+						visible = false;
+					}
+				}
+				else
+				{
+					if(!visible)
+					{
+						showAllChildrens();
+						visible = true;
+					}
+				}
+			}
+			catch
+			{
+				desiredY = 0;
+			}
+			
+			terrainPointCounter = 0.5f;
+		}
+		else
+			terrainPointCounter-=Time.deltaTime*2;
 		
 		if(hp<=0)
 		{
@@ -98,7 +170,7 @@ public class Entity : MonoBehaviour {
 		Vector3 tmpTrans = transform.localPosition;
 		Vector3 tmpPos = transform.position;
 		
-		if((Mathf.Abs(tmpTrans.x-lastPosition.x)>0.01f || Mathf.Abs(tmpTrans.z-lastPosition.z)>0.01f))
+		if((Mathf.Abs(tmpTrans.x-lastPosition.x)>0 || Mathf.Abs(tmpTrans.z-lastPosition.z)>0))
 		{
 			moving = true;
 			
@@ -110,8 +182,8 @@ public class Entity : MonoBehaviour {
 			
 			//swimIRot = 180*Mathf.Atan(deltaZ)/Mathf.PI;
 			
-			if((tmpTrans-lastPosition).magnitude>0.05f)
-				iRotation = turnAngle;
+			//if((tmpTrans-lastPosition).magnitude>0.05f)
+			iRotation = turnAngle;
 			
 			float animSpeed = ((tmpTrans-lastPosition).magnitude/0.2f);
 			
@@ -194,11 +266,60 @@ public class Entity : MonoBehaviour {
 	
 	void synchronizePosition(Vector3 destination)
 	{
-		//print("dir: "+Vector3.Normalize(transform.position-destination));
-		if(Vector3.Distance(transform.position,destination)>Time.deltaTime*runSpeed)
-	 		transform.Translate(Vector3.Normalize(destination-transform.position)*Time.deltaTime*runSpeed);
+		Vector3 tmpPos = transform.position;
+		
+		if(tmpPos.y<desiredY)
+			tmpPos.y+=Mathf.Abs(tmpPos.y-desiredY)/8;
+		
+		if(tmpPos.y>desiredY)
+			tmpPos.y-=Mathf.Abs(tmpPos.y-desiredY)/8;
+		
+		if(Mathf.Abs(tmpPos.y-desiredY)<0.01f)
+			tmpPos.y = desiredY;
+		
+		if(forceHighSync<=0)
+		{
+			/*if(Vector3.Distance(transform.position,destination)>Time.deltaTime*runSpeed)
+		 		transform.Translate(Vector3.Normalize(destination-transform.position)*Time.deltaTime*runSpeed);
+			else
+				transform.position = destination;*/
+			
+			if(tmpPos.x<destination.x)
+				tmpPos.x+=runSpeed*Time.deltaTime;
+			
+			if(tmpPos.x>destination.x)
+				tmpPos.x-=runSpeed*Time.deltaTime;
+			
+			if(tmpPos.z<destination.z)
+				tmpPos.z+=runSpeed*Time.deltaTime;
+			
+			if(tmpPos.z>destination.z)
+				tmpPos.z-=runSpeed*Time.deltaTime;
+			
+			if(Mathf.Abs(tmpPos.x-destination.x)<runSpeed*Time.deltaTime)
+				tmpPos.x = destination.x;
+			
+			if(Mathf.Abs(tmpPos.z-destination.z)<runSpeed*Time.deltaTime)
+				tmpPos.z = destination.z;
+		}
 		else
-			transform.position = destination;
+		{
+			if(tmpPos.x<syncedPosition.x)
+				tmpPos.x+=Mathf.Abs(tmpPos.x-syncedPosition.x)/syncSmoothRate;
+			
+			if(tmpPos.x>syncedPosition.x)
+				tmpPos.x-=Mathf.Abs(tmpPos.x-syncedPosition.x)/syncSmoothRate;
+			
+			if(tmpPos.z<syncedPosition.z)
+				tmpPos.z+=Mathf.Abs(tmpPos.z-syncedPosition.z)/syncSmoothRate;
+			
+			if(tmpPos.z>syncedPosition.z)
+				tmpPos.z-=Mathf.Abs(tmpPos.z-syncedPosition.z)/syncSmoothRate;
+			
+			forceHighSync--;
+		}
+		
+		transform.position = tmpPos;
 	}
 	
 	[HideInInspector]
@@ -234,5 +355,35 @@ public class Entity : MonoBehaviour {
 		{
 			target = null;
 		}
+	}
+	
+	public string getName()
+	{
+		return infos["name"].ToString();
+	}
+	
+	public int getLevel()
+	{
+		return (int)infos["level"];
+	}
+	
+	public float getMaxHp()
+	{
+		print ("stats: "+infos["stats"]+" bonuses: "+infos["bonuses"]);
+		
+		Hashtable stats = (Hashtable) infos["stats"];
+		Hashtable bonuses = (Hashtable) infos["bonuses"];
+		
+		foreach(string s in stats.Keys)
+			print("stat: "+s+"="+stats[s]);
+		//print("hp:"+stats["hp"]);
+		//print("hp+:"+bonuses["hp"]);
+		
+		return ((float)(((Hashtable)infos["stats"])["hp"]))+((float)(((Hashtable)infos["bonuses"])["hp"]));
+	}
+	
+	public float getMaxMp()
+	{
+		return ((float)(((Hashtable)infos["stats"])["mp"]))+((float)(((Hashtable)infos["bonuses"])["mp"]));
 	}
 }
