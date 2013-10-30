@@ -316,6 +316,7 @@ public class MGUIButton:MGUIText
 {
 	public bool activated = true;
 	public bool mouseOver = false;
+	public bool captureMouseOver = false;
 	Texture2D _normal;
 	Texture2D _onMouseOver;
 	Texture2D _onMouseDown;
@@ -323,7 +324,11 @@ public class MGUIButton:MGUIText
 	public GameObject _bgContainer;
 	
 	public delegate void ButtonPressed(MGUIButton button);
+	public delegate void MouseOver(MGUIButton button);
+	public delegate void MouseOut(MGUIButton button);
 	public ButtonPressed OnButtonPressed;
+	public MouseOver OnMouseOver;
+	public MouseOut OnMouseOut;
 	
 	public MGUIButton(string id, Rect bounds, GameObject container, GameObject bgContainer, GameObject textContainer, string text, Texture2D normal, Texture2D onMouseOver, Texture2D onMouseDown):base(id, bounds, container, textContainer, text)
 	{	
@@ -339,6 +344,16 @@ public class MGUIButton:MGUIText
 		OnButtonPressed(button);
 	}
 	
+	void raiseMouseOver(MGUIButton button)
+	{
+		OnMouseOver(button);
+	}
+	
+	void raiseMouseOut(MGUIButton button)
+	{
+		OnMouseOut(button);
+	}
+	
 	public void triggerNormalImage()
 	{
 		_bgContainer.renderer.material.SetTexture("_MainTex", _normal);
@@ -349,6 +364,12 @@ public class MGUIButton:MGUIText
 		if(activated)
 			_bgContainer.renderer.material.SetTexture("_MainTex", _onMouseOver);
 		
+		if(!mouseOver)
+		{
+			if(captureMouseOver)
+				raiseMouseOver(this);
+		}	
+		
 		mouseOver = true;
 	}
 	
@@ -356,6 +377,9 @@ public class MGUIButton:MGUIText
 	{
 		if(mouseOver)
 		{
+			if(captureMouseOver)
+				raiseMouseOut(this);
+			
 			triggerNormalImage();
 			mouseOver = false;
 		}

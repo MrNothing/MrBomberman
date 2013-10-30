@@ -57,6 +57,14 @@ public enum ServerEventType
 	
 	//playersByTeam
 	playersByTeam = 17,
+	
+	spell = 18,
+	
+	Zspell = 19,
+	
+	Tspell = 20,
+	
+	attack = 21,
 }
 
 public class Core : MonoBehaviour 
@@ -84,6 +92,8 @@ public class Core : MonoBehaviour
 	
 	//This is used to load maps
 	public IOManager io = new IOManager();
+	
+	SpellsManager spellManager = new SpellsManager();
 	
 	void Start () 
 	{	
@@ -434,6 +444,34 @@ public class Core : MonoBehaviour
 				if(myPlayer.Channel.Type==ChannelType.game)
 				{
 					((GameRoom)myPlayer.Channel).setPath((int)infos["id"], (float) infos["x"], (float) infos["z"]);
+				}
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.spell)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.game)
+				{
+					if((infos["target"]+"").Length<=0)
+						infos["target"] = "-1";
+						
+					Entity target = ((GameRoom)myPlayer.Channel).getEntity(int.Parse(infos["target"]+""));
+					Entity author = ((GameRoom)myPlayer.Channel).getEntity((int)infos["author"]);
+					
+					if(author.Infos.spells.IndexOf(infos["name"].ToString()+",")>=0)
+					{
+						Hashtable spell = ((GameRoom)myPlayer.Channel).getSpellWithName(infos["name"].ToString());
+						
+						spellManager.useSpell(spell, author, target, new Vector3((float)infos["x"], 0, (float)infos["z"])); 
+					}
+					else
+					{
+						myPlayer.Send(ServerEventType.serverMessage, "Spell not found");
+					}
 				}
 			}
 		}

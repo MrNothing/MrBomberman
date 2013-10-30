@@ -275,6 +275,23 @@ public class GameRoom : Channel
 		entities[tId].findPath(new Vector2(x, z));
 	}
 	
+	public Entity getEntity(int eId)
+	{
+		try
+		{
+			return entities[eId];
+		}
+		catch
+		{
+			return null;
+		}
+	}
+	
+	public Hashtable getSpellWithName(string spell)
+	{
+		return (Hashtable)skills[spell];
+	}
+	
 	public string Map 
 	{
 		get 

@@ -21,6 +21,7 @@ public class UICore : MonoBehaviour
 	public InGame inGame;
 	
 	public GameManager gameManager;
+	public SpellsManager spellsManager;
 	
 	public Font normalFont;
 	public Texture2D ButtonNormal;

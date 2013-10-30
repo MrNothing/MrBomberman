@@ -271,6 +271,11 @@ public class GameManager : MonoBehaviour
 			return string.Empty;
 	}
 	
+	public TerrainPoint getNearestTerrainPoint(Vector3 point)
+	{
+		return ((FogTileHandler)((Hashtable)world[getNearestTile(point)])["FogTileHandler"]).getNearestTerrainPoint(point);
+	}
+	
 	public string getIdWithPosition(Vector3 position, float defaultStep)
 	{
 		return smash(position, defaultStep).ToString();

@@ -39,6 +39,8 @@ public class InGame : MonoBehaviour
 			foreach(MGUIButton b in spells)
 				b.Visible = value;
 			
+			spellInfosHover.Visible = value;
+			
 			enabled = value;
 			_visible = value;
 		}
@@ -60,6 +62,8 @@ public class InGame : MonoBehaviour
 	public MGUIImage UnitAvatar;
 	MGUIImage UnitInfosBg;
 	MGUIImage UnitInfosSpellBg;
+	
+	MGUITextArea spellInfosHover;
 	
 	List<MGUIButton> spells = new List<MGUIButton>();
 	
@@ -89,9 +93,10 @@ public class InGame : MonoBehaviour
 		UnitInfosHp = (MGUIText) core.gui.setText("UnitInfosHp", new Rect(-25.42f, -16.9f, 0, 0), "9999/9999", core.normalFont, Color.green);
 		UnitInfosMp = (MGUIText) core.gui.setText("UnitInfosMp", new Rect(-25.42f, -18.5f, 0, 0), "9999/9999", core.normalFont, Color.blue);
 		
-		
 		UnitInfosSpellBg = (MGUIImage) core.gui.setImage("UnitInfosSpellBg", new Rect(25.2f, -14, 15, 9), Vector2.zero, unitSpellsBg);
 		UnitInfosSpellBg.setDepth(2);
+		
+		spellInfosHover = (MGUITextArea) core.gui.setTextArea("spellInfosHover", new Rect(10.6f, 1, 0, 0), 6, 15, "Spell infos", core.normalFont, Color.white);
 		
 		Visible = false;
 	}
@@ -136,9 +141,12 @@ public class InGame : MonoBehaviour
 					foreach(Spell s in selectedEntity._spells)
 					{
 						MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX+14.13f,counterY-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
-						tmpSpell.custom = s.Name;
+						tmpSpell.custom = s;
 						tmpSpell.setDepth(1);
 						tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
+						tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
+						tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
+						tmpSpell.captureMouseOver = true;
 						spells.Add(tmpSpell);
 						counterX++;
 					}
@@ -183,6 +191,19 @@ public class InGame : MonoBehaviour
 	
 	void onSpellPressed(MGUIButton button)
 	{
-		print("casting spell: "+button.custom);
+		core.spellsManager.activateSpell((Spell)button.custom);
+	}
+	
+	void onMouseOverSpell(MGUIButton button)
+	{
+		spellInfosHover.clear();
+		Spell spell = (Spell)button.custom;
+		core.gui.insertText(spellInfosHover.id, spell.Name, core.normalFont, Color.white); 
+		core.gui.insertText(spellInfosHover.id, spell.Description, core.normalFont, Color.cyan); 
+	}
+	
+	void onMouseOutOfSpell(MGUIButton button)
+	{
+		spellInfosHover.clear();
 	}
 }

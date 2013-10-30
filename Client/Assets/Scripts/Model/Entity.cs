@@ -41,8 +41,11 @@ public class Entity : MonoBehaviour {
 	#region animation
 	[HideInInspector]
 	public string currentAnim;
+	[HideInInspector]
+	public string mixedAnim;
 	
-	float animationCounter = 0;
+	[HideInInspector]
+	public float animationCounter = 0;
 	
 	public string[] idleAnims = new string[3];
 	public string[] runAnims = new string[2]; //0=walk 1=run 
@@ -201,7 +204,10 @@ public class Entity : MonoBehaviour {
 			Main.animation[currentAnim].speed = 1;
 		}
 		
-		Main.animation.CrossFade(currentAnim);
+		if(animationCounter<=0)
+			Main.animation.CrossFade(currentAnim);
+		else
+			Main.animation.CrossFade(mixedAnim);
 		
 		lastPosition = transform.localPosition;
 		lastRealPosition = transform.position;
@@ -328,7 +334,8 @@ public class Entity : MonoBehaviour {
 	[HideInInspector]
 	public Vector3 targetPos = Vector3.zero;
 	
-	int forceLookAt = 0;
+	[HideInInspector]
+	public int forceLookAt = 0;
 	
 	public void lookAt()
 	{

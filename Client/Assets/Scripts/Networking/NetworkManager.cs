@@ -57,6 +57,11 @@ public enum ServerEventType
 	
 	//playersByTeam
 	playersByTeam = 17,
+	
+	spell = 18,
+	Zspell = 19,
+	Tspell = 20,
+	attack = 21
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -331,6 +336,53 @@ public class NetworkManager : MonoBehaviour
 			core.gameManager.entities[(int)infos["id"]].syncedPosition = new Vector3((float)infos["x"], (float)infos["y"], (float)infos["z"]);
 			core.gameManager.entities[(int)infos["id"]].forceHighSync = Vector3.Distance(core.gameManager.entities[(int)infos["id"]].syncedPosition, core.gameManager.entities[(int)infos["id"]].transform.position)*2;
 			core.gameManager.entities[(int)infos["id"]].destination = new Vector3((float)infos["dx"], (float)infos["dy"], (float)infos["dz"]);
+		}
+		
+		if(eventType==(byte)ServerEventType.Zspell)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			
+			Entity caster = core.gameManager.entities[(int)infos["author"]];
+			
+			Debug.Log(caster.attackAnims.Length+" "+caster.attackAnims[0]);
+			caster.mixedAnim = caster.attackAnims[0];
+			caster.animationCounter = 30;
+			
+			Vector3 spellPosition = new Vector3((float)infos["x"], 0, (float)infos["z"]);
+			spellPosition.y = core.gameManager.getNearestTerrainPoint(spellPosition).VerticeHeight;
+			GameObject spellModel = (GameObject)Instantiate(Resources.Load("Spells/"+infos["name"], typeof(GameObject)), spellPosition, Quaternion.identity);
+			caster.target = spellModel;
+			caster.forceLookAt = 15;
+			
+			if(caster.owner.Equals(username))
+			{
+				core.gameManager.clearFog(spellModel.transform.position, 1.4f);
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.Tspell)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			Entity caster = core.gameManager.entities[(int)infos["author"]];
+			
+			caster.currentAnim = caster.attackAnims[0];
+			caster.animationCounter = 30;
+			
+			Entity target = core.gameManager.entities[(int)infos["target"]];
+			
+			GameObject spellModel = (GameObject)Instantiate(Resources.Load("Spells/"+infos["name"], typeof(GameObject)), caster.transform.position, Quaternion.identity);
+			TranslateToPointAndDestroy spellScript = spellModel.GetComponent<TranslateToPointAndDestroy>();
+			spellScript.targetAsTransform = target.transform;
+		}	
+		
+		if(eventType==(byte)ServerEventType.attack)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			Entity caster = core.gameManager.entities[(int)infos["id"]];
+			
+			caster.currentAnim = caster.attackAnims[0];
+			caster.animationCounter = 30;
+			
 		}
 	}
 	

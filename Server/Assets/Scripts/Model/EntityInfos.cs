@@ -52,8 +52,8 @@ public class EntityInfos
 		
 		if((float)infos["maxhp"]==0)
 		{
-			_hp = 1;
-			stats.Hp = 1;
+			stats.Hp = _hp;
+			stats.Mp = _mp;
 		}
 		
 		stats.Armor = (float) infos["armor"];
