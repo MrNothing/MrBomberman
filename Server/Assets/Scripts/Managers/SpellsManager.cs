@@ -1,7 +1,10 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
 
-public class SpellsManager {
+public class SpellsManager 
+{
 	public void useSpell(Hashtable spell, Entity author, Entity target, Vector3 targetPoint)
 	{
 		if(author.Infos.Mp<(float)spell["mana"])
@@ -30,6 +33,16 @@ public class SpellsManager {
 			data.Add("name", "Bomb");
 			HashMapSerializer serializer = new HashMapSerializer();
 			author.myGame.Send(ServerEventType.Zspell, serializer.hashMapToData(data)); 
+			
+			Hashtable spellObject = new Hashtable();
+			spellObject.Add("type", "zoneSpell");
+			spellObject.Add("author", author);
+			spellObject.Add("damages", (float)100);
+			spellObject.Add("targetPoint", targetPoint);
+			spellObject.Add("range", (float)2);
+			spellObject.Add("time", 20);
+			
+			author.myGame.spellsQueue.Add(spellObject);
 		}
 	}
 }

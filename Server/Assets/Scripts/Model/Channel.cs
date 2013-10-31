@@ -27,7 +27,7 @@ public class Channel
 	
 	string _password;
 	
-	Core _core;
+	public Core _core;
 
 	public Channel(Core core, string name, ChannelType type, int maxPlayers, bool isPrivate)
 	{

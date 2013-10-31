@@ -68,6 +68,8 @@ public class Entity
 	public Hashtable visibleAllies = new Hashtable();
 	#endregion
 	
+	System.Random mainSeed = new System.Random();
+	
 	public Entity(GameRoom game, string _owner, EntityInfos infos, Vector3 _position, int team)
 	{
 		_myGame = game;
@@ -173,6 +175,124 @@ public class Entity
 			_infos.Mp = getMaxMp();
 	}
 	
+	public float physicShield = 0;
+    public void hitMeWithPhysic(Entity author, float dmg)
+    {
+        try
+        {
+            if (author.Id==Id)
+                return;
+
+            if (_infos.Hp > 0)
+            {
+                if (author.team.Equals(team))
+                    return;
+
+                bool crit = false;
+                if ((mainSeed).Next(0, 100) < author.Infos.Stats.Crit + author.Infos.Bonuses.Crit)
+                {
+                    dmg = dmg * (150f+0) / 100f;
+                    crit = true;
+                }
+
+                float armor = _infos.Stats.Armor + _infos.Bonuses.Armor;
+
+                if (armor < 0)
+                    armor = armor / 10;
+
+                if (armor < -99)
+                    armor = -99;
+
+                float division = (armor) + (float)100;
+                if (division <= 0)
+                    division = 1;
+                dmg = dmg * (100 / (division));
+
+                float AbsorbedValue = physicShield;
+                if (physicShield > dmg)
+                {
+                    physicShield = physicShield - dmg;
+                }
+                else
+                {
+                    physicShield = 0;
+                }
+
+                dmg -= AbsorbedValue;
+
+                if (dmg < 0)
+                    dmg = 0;
+				
+                _infos.Hp -= dmg;
+
+                sendHps();
+            }
+        }
+        catch(Exception e)
+        {
+            
+        }
+    }
+	
+	float magicShield = 0;
+    public void hitMeWithMagic(Entity author, float dmg)
+    {
+        try
+        {
+            if (author.Id==Id)
+                return;
+
+            if (_infos.Hp > 0)
+            {
+                if (author.team.Equals(team))
+                    return;
+
+                bool crit = false;
+                if ((mainSeed).Next(0, 100) < author.Infos.Stats.SpellCrit + author.Infos.Bonuses.SpellCrit)
+                {
+                    dmg = dmg * (150f+0) / 100f;
+                    crit = true;
+                }
+
+                float armor = _infos.Stats.Resistance + _infos.Bonuses.Resistance;
+
+                if (armor < 0)
+                    armor = armor / 10;
+
+                if (armor < -99)
+                    armor = -99;
+
+                float division = (armor) + (float)100;
+                if (division <= 0)
+                    division = 1;
+                dmg = dmg * (100 / (division));
+
+                float AbsorbedValue = magicShield;
+                if (magicShield > dmg)
+                {
+                    magicShield = magicShield - dmg;
+                }
+                else
+                {
+                    magicShield = 0;
+                }
+
+                dmg -= AbsorbedValue;
+
+                if (dmg < 0)
+                    dmg = 0;
+				
+                _infos.Hp -= dmg;
+
+                sendHps();
+            }
+        }
+        catch(Exception e)
+        {
+            
+        }
+    }
+	
 	float getMaxHp()
 	{
 		return _infos.Stats.Hp+_infos.Bonuses.Hp;
@@ -255,6 +375,33 @@ public class Entity
 		
 		if(paths.Count>0)
 			destination = paths[paths.Count-1];
+	}
+	
+	public void sendStats()
+	{
+		HashMapSerializer serializer = new HashMapSerializer();
+		Hashtable data = new Hashtable();
+		data.Add("id", Id);
+		data.Add("infos", _infos.export());
+		_myGame.Send(ServerEventType.stats, serializer.hashMapToData(data));
+	}
+	
+	public void sendHps()
+	{
+		HashMapSerializer serializer = new HashMapSerializer();
+		Hashtable data = new Hashtable();
+		data.Add("id", Id);
+		data.Add("v", _infos.Hp);
+		_myGame.Send(ServerEventType.hp, serializer.hashMapToData(data));
+	}
+	
+	public void sendMps()
+	{
+		HashMapSerializer serializer = new HashMapSerializer();
+		Hashtable data = new Hashtable();
+		data.Add("id", Id);
+		data.Add("v", _infos.Mp);
+		_myGame.Send(ServerEventType.mp, serializer.hashMapToData(data));
 	}
 	
 	public int Id 

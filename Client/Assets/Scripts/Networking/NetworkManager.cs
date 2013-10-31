@@ -61,7 +61,10 @@ public enum ServerEventType
 	spell = 18,
 	Zspell = 19,
 	Tspell = 20,
-	attack = 21
+	attack = 21,
+	stats = 22,
+	hp = 23,
+	mp = 24,
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -265,6 +268,11 @@ public class NetworkManager : MonoBehaviour
 					core.gui.insertText(core.lobby.textArea.id, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.cyan);
 				}
 			}
+			
+			if(core.gamesList.Visible)
+			{
+				core.gamesList.showGames(infos);
+			}
 		}
 		
 		if(eventType==(byte)ServerEventType.channelOwner)
@@ -323,6 +331,8 @@ public class NetworkManager : MonoBehaviour
 			entityScript.team = (int)infos["team"];
 			entityScript.spells = (Hashtable) infos["spells"];
 			entityScript.infos = entityInfos;
+			entityScript.hp = (float)entityInfos["hp"];
+			entityScript.mp = (float)entityInfos["mp"];
 			entityScript.destination = new Vector3((float)entityInfos["dx"], (float)entityInfos["dy"], (float)entityInfos["dz"]);
 			core.gameManager.entities.Add(entityScript.id, entityScript);
 			
@@ -381,8 +391,25 @@ public class NetworkManager : MonoBehaviour
 			Entity caster = core.gameManager.entities[(int)infos["id"]];
 			
 			caster.currentAnim = caster.attackAnims[0];
-			caster.animationCounter = 30;
-			
+			caster.animationCounter = 30;	
+		}
+		
+		if(eventType==(byte)ServerEventType.hp)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			core.gameManager.entities[(int)infos["id"]].setHps((float)infos["v"]);
+		}
+		
+		if(eventType==(byte)ServerEventType.mp)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			core.gameManager.entities[(int)infos["id"]].setMps((float)infos["v"]);
+		}
+		
+		if(eventType==(byte)ServerEventType.stats)
+		{
+			Hashtable infos = HashMapSerializer.dataToHashMap(data);
+			core.gameManager.entities[(int)infos["id"]].infos = (Hashtable)infos["infos"];
 		}
 	}
 	
@@ -400,5 +427,7 @@ public class NetworkManager : MonoBehaviour
 		
         Debug.Log("Connected to server");
 		core.errorInterface.showMessage("Success!", Color.green, true);
+		
+		core.networkManager.send(ServerEventType.login, username);
     }
 }

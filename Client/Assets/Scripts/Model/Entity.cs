@@ -376,21 +376,33 @@ public class Entity : MonoBehaviour {
 	
 	public float getMaxHp()
 	{
-		print ("stats: "+infos["stats"]+" bonuses: "+infos["bonuses"]);
-		
-		Hashtable stats = (Hashtable) infos["stats"];
-		Hashtable bonuses = (Hashtable) infos["bonuses"];
-		
-		foreach(string s in stats.Keys)
-			print("stat: "+s+"="+stats[s]);
-		//print("hp:"+stats["hp"]);
-		//print("hp+:"+bonuses["hp"]);
-		
 		return ((float)(((Hashtable)infos["stats"])["hp"]))+((float)(((Hashtable)infos["bonuses"])["hp"]));
 	}
 	
 	public float getMaxMp()
 	{
 		return ((float)(((Hashtable)infos["stats"])["mp"]))+((float)(((Hashtable)infos["bonuses"])["mp"]));
+	}
+	
+	public float getHps()
+	{
+		return (float) infos["hp"];
+	}
+	
+	public float getMps()
+	{
+		return (float) infos["mp"];
+	}
+	
+	public void setHps(float _value)
+	{
+		hp = _value;
+		infos["hp"] = _value;
+	}
+	
+	public void setMps(float _value)
+	{
+		mp = _value;
+		infos["mp"] = _value;
 	}
 }

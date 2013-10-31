@@ -65,6 +65,12 @@ public enum ServerEventType
 	Tspell = 20,
 	
 	attack = 21,
+	
+	stats = 22, 
+	
+	hp = 23,
+	
+	mp = 24,
 }
 
 public class Core : MonoBehaviour 

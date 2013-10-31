@@ -14,6 +14,7 @@ public class StartScreen : MonoBehaviour
 	
 	MGUIText title;
 	MGUITextfield serverTextField;
+	MGUITextfield usernameTextField;
 	//MGUITextfield localportTextField;
 	//MGUIButton startServerButton;
 	MGUIButton connectButton;
@@ -31,6 +32,9 @@ public class StartScreen : MonoBehaviour
 		//server string
 		//localportTextField = (MGUITextfield) gui.setTextField("localServerPort", new Rect(-10, -5, 10, 1.5f), new Vector3(0, 0), "6600", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
 		
+		//username
+		usernameTextField = (MGUITextfield) gui.setTextField("usernameTextField", new Rect(-10, -5, 10, 1.5f), new Vector3(0, 0), "Guest_"+UnityEngine.Random.Range(0, 99999), core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
+		
 		//Play Button
 		connectButton = (MGUIButton)gui.setButton("playBut", new Rect(10, 0, 7, 2.5f), new Vector2(0, 0), "Connect", core.normalFont, Color.green, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
 		connectButton.OnButtonPressed += new MGUIButton.ButtonPressed(OnConnectButton);
@@ -41,6 +45,7 @@ public class StartScreen : MonoBehaviour
 		startServerButton.OnButtonPressed += new MGUIButton.ButtonPressed(OnCreateServerButton);
 		*/
 		
+		usernameTextField.setDepth(10);
 		serverTextField.setDepth(10);
 		connectButton.setDepth(10);
 		//startServerButton.setDepth(10);
@@ -63,13 +68,20 @@ public class StartScreen : MonoBehaviour
 				
 				Debug.Log("server: "+server+" port: "+port);
 				
-				core.networkManager.connect(server, port);
-				
-				//hide interface, once I have connected, go to lobby
-				hide();
-				
-				core.errorInterface.showMessage("Connecting...", Color.cyan, false);
-				Debug.Log("Connecting...");
+				if(usernameTextField.Text.Length>0)
+				{
+					core.networkManager.username = usernameTextField.Text;
+					core.networkManager.connect(server, port);
+					
+					//hide interface, once I have connected, go to lobby
+					hide();
+					
+					core.errorInterface.showMessage("Connecting...", Color.cyan, false);
+					Debug.Log("Connecting...");
+				}
+				else
+					core.errorInterface.showMessage("Your username cannot be empty!", Color.cyan, false);
+					
 			}
 			catch(Exception e)
 			{
@@ -107,6 +119,7 @@ public class StartScreen : MonoBehaviour
 		connectButton.Visible = false;
 		//startServerButton.Visible = false;
 		title.Visible = false;
+		usernameTextField.Visible = false;
 	}
 	
 	public void show()
@@ -116,5 +129,6 @@ public class StartScreen : MonoBehaviour
 		connectButton.Visible = true;
 		//startServerButton.Visible = true;
 		title.Visible = true;
+		usernameTextField.Visible = true;
 	}
 }

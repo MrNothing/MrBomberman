@@ -63,6 +63,13 @@ namespace B4
 			z = vector.z;
 		}
 		
+		public Vector3 (UnityEngine.Vector3 vector)
+		{
+			x = vector.x;
+			y = vector.y;
+			z = vector.z;
+		}
+		
 		public Vector3 Add(Vector3 tmpVect)
 		{
 			return new Vector3(x+tmpVect.x, y+tmpVect.y, z+tmpVect.z);

@@ -31,6 +31,9 @@ public class GameRoom : Channel
 	//what team is each player assigned to
 	Dictionary<string, int> playerTeamPair = new Dictionary<string, int>();
 	
+	//every active spell effect is listed here
+	public List<Hashtable> spellsQueue = new List<Hashtable>();
+	
 	//this is the default size of a "bloc" containing a viewTile.
 	public float baseRefSize=5;
 	
@@ -66,6 +69,39 @@ public class GameRoom : Channel
 		foreach(int i in entities.Keys)
 		{
 			entities[i].run();
+		}
+		
+		foreach(Hashtable spell in spellsQueue)
+		{
+			if((int)spell["time"]>0)
+			{
+				spell["time"] = ((int) spell["time"]) - 1;
+			}
+			else
+			{
+				spellsQueue.Remove(spell);
+				
+				if(spell["type"].Equals("zoneSpell"))
+					hitZoneWithMagic(spell);
+			}
+		}
+	}
+	
+	void hitZoneWithMagic(object state)
+	{
+		Entity author = (Entity)((Hashtable) state)["author"];
+		float damages = (float)((Hashtable) state)["damages"];
+		Vector3 targetPoint = (Vector3)((Hashtable) state)["targetPoint"]; 
+		float range = (float)((Hashtable) state)["range"];
+		
+		List<Entity> closeEntities = getEntities(new B4.Vector3(targetPoint), range);
+		
+		foreach(Entity e in closeEntities)
+		{
+			if(e.team!=author.team)
+			{
+				e.hitMeWithMagic(author, damages);
+			}
 		}
 	}
 	
@@ -285,6 +321,46 @@ public class GameRoom : Channel
 		{
 			return null;
 		}
+	}
+	
+	public List<Entity> getEntities (B4.Vector3 point, float range)
+	{
+		List<Entity> nearEntities = new List<Entity>();
+		
+		for(int i=-1; i<=1; i++)
+		{
+			for(int j=-1; j<=1; j++)
+			{
+               	B4.Vector3 positionToCheck = point.smash(baseRefSize).Add(new B4.Vector3(i*baseRefSize, 0, j*baseRefSize));
+				
+				try
+                {
+                    B4.ViewTile tile = worldSpace[positionToCheck.toString()];
+                    foreach(string s in tile.entities.Keys)
+					{
+						if((tile.entities[s].position.Substract(point)).SqrMagnitude()<=range)
+						{
+							//we make sure the entity is only added once.
+							try
+							{
+								nearEntities.Remove(tile.entities[s]);
+							}
+							catch
+							{
+								
+							}
+							nearEntities.Add(tile.entities[s]);
+						}
+					}
+                }
+                catch
+                { 
+                    //this tile was not created!
+                }
+			}
+		}
+		
+		return nearEntities;
 	}
 	
 	public Hashtable getSpellWithName(string spell)

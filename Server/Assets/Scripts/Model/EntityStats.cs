@@ -21,6 +21,9 @@ public class EntityStats
 	
 	float _runSpeed=0;
 	
+	float _crit=0;
+	float _spellCrit=0;
+	
 	public EntityStats()
 	{
 		
@@ -176,6 +179,30 @@ public class EntityStats
 		set 
 		{
 			_spellPower = value;
+		}
+	}
+	
+	public float Crit
+	{
+		get 
+		{
+			return this._crit;
+		}
+		set 
+		{
+			_crit = value;
+		}
+	}
+	
+	public float SpellCrit
+	{
+		get 
+		{
+			return this._spellCrit;
+		}
+		set 
+		{
+			_spellCrit = value;
 		}
 	}
 
