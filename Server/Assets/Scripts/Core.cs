@@ -449,7 +449,14 @@ public class Core : MonoBehaviour
 			{
 				if(myPlayer.Channel.Type==ChannelType.game)
 				{
-					((GameRoom)myPlayer.Channel).setPath((int)infos["id"], (float) infos["x"], (float) infos["z"]);
+					Entity myEntity = ((GameRoom)myPlayer.Channel).getEntity((int)infos["id"]);
+					
+					//if this is my entity and it is not already calculating a path...
+					if(myEntity.Owner.Equals(myPlayer.Name))
+					{
+						if(myEntity.getFinalDestination().Substract(new B4.Vector3((float) infos["x"], 0, (float) infos["z"])).Magnitude()>myEntity.myGame.baseStep)
+							myEntity.findPath(new Vector2((float) infos["x"], (float) infos["z"]));
+					}
 				}
 			}
 		}

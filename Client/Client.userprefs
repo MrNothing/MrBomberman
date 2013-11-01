@@ -1,16 +1,6 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UI\GamesList.cs">
-    <Files>
-      <File FileName="Assets\Scripts\Model\Entity.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Networking\NetworkManager.cs" Line="269" Column="6" />
-      <File FileName="Assets\Scripts\UI\InGame.cs" Line="127" Column="39" />
-      <File FileName="Assets\Scripts\UI\GamesList.cs" Line="72" Column="2" />
-      <File FileName="Assets\Scripts\UI\MainLobby.cs" Line="125" Column="5" />
-      <File FileName="Assets\Scripts\UI\StartScreen.cs" Line="69" Column="1" />
-      <File FileName="Assets\Scripts\UI\MGUI\MGUI.cs" Line="107" Column="1" />
-    </Files>
-  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace />
+  <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

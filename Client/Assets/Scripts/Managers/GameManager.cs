@@ -43,6 +43,9 @@ public class GameManager : MonoBehaviour
 		{
 			doodadsByName.Add(go.name, go);
 		}
+		
+		mapContainer = new GameObject();
+		mapContainer.name = "Terrain";
 	}
 	
 	// Update is called once per frame
@@ -84,9 +87,6 @@ public class GameManager : MonoBehaviour
 	{
 		//clear the previous map Elements
 		removeAllMapElements();
-		
-		world.Clear();
-		tiles.Clear();
 		
 		entityInfos = new List<Hashtable>();
 		entityInfosByName = new Hashtable();
@@ -178,6 +178,9 @@ public class GameManager : MonoBehaviour
 			GameObject textureTile = (GameObject) Instantiate(defaultTextureTile, position, Quaternion.identity);
 			GameObject fogTile = (GameObject) Instantiate(defaultFogTile, position+new Vector3(0, 0.02f, 0), Quaternion.identity);
 			
+			textureTile.transform.parent = mapContainer.transform;
+			fogTile.transform.parent = mapContainer.transform;
+			
 			textureTile.GetComponent<VerticlesIndexer>().Id = id;
 			
 			Hashtable tileInfos = new Hashtable();
@@ -213,6 +216,8 @@ public class GameManager : MonoBehaviour
 			
 			tmpDoodad.transform.position = tmpDoodad.transform.position;
 		
+			tmpDoodad.transform.parent = mapContainer.transform;
+			
 			Hashtable tileInfos = new Hashtable();
 			tileInfos.Add("id", id);
 			tileInfos.Add("x", tmpDoodad.transform.position.x);
@@ -231,9 +236,17 @@ public class GameManager : MonoBehaviour
 		}
 	}
 	
+	public GameObject mapContainer;
+	
 	void removeAllMapElements()
 	{
+		world.Clear();
+		tiles.Clear();
+		entities.Clear();
 		
+		Destroy(mapContainer);
+		mapContainer = new GameObject();
+		mapContainer.name = "Terrain";
 	}
 	
 	public List<string> getTilesAroundPoint(Vector3 point, int radius)

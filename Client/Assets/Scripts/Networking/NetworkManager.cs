@@ -325,6 +325,8 @@ public class NetworkManager : MonoBehaviour
 			Hashtable entityInfos = (Hashtable)infos["infos"];
 			
 			GameObject newEntity = (GameObject) Instantiate(Resources.Load("Entities/"+entityInfos["prefab"], typeof(GameObject)), new Vector3((float)entityInfos["x"], (float)entityInfos["y"], (float)entityInfos["z"]), Quaternion.identity);
+			newEntity.transform.parent = core.gameManager.mapContainer.transform;
+			
 			Entity entityScript = newEntity.GetComponent<Entity>();
 			entityScript.id = (int)infos["id"];
 			entityScript.owner = infos["owner"].ToString();

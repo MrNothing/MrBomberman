@@ -127,6 +127,8 @@ public class GameRoom : Channel
 		
 		//newEntity.controlledByPlayer = newEntityInfos.controllable;
 		
+		newEntity.position.y = 0;
+		
 		entities.Add(newEntity.Id, newEntity);
 		
 		newEntity.view.onMove();

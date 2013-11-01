@@ -41,6 +41,7 @@ public class Entity
 	public B4.Vector3 destination;
 	
 	B4.PathFinder pathfinder;
+	
 	List<B4.Vector3> paths = new List<B4.Vector3>();
 
 	#endregion
@@ -88,6 +89,8 @@ public class Entity
 		owner = _owner;
 		
 		pathfinder = new B4.PathFinder(_myGame.mapVertices, _myGame.baseStep, 0.5f);
+		
+		pathfinder.OnPathFound += new B4.PathFinder.PathFound(onPathFound);
 		
 		view = new B4.ViewsTilesManager(this, position.smash(myGame.baseRefSize));
 		
@@ -369,9 +372,15 @@ public class Entity
         return !(tmpPos.Substract(destination).Magnitude() > getFrameSpeed() && !destination.isZero());
     }
 	
+	public bool thinking = false;
 	public void findPath(Vector2 point)
 	{
-		paths = pathfinder.start(position, new B4.Vector3(point.x, position.y, point.y));
+		pathfinder.initializeSearch(position.smash(myGame.baseStep), new B4.Vector3(point.x, position.y, point.y), 0.5f);
+	}
+	
+	public void onPathFound(List<B4.Vector3> _paths)
+	{
+		paths = _paths;
 		
 		if(paths.Count>0)
 			destination = paths[paths.Count-1];
@@ -402,6 +411,14 @@ public class Entity
 		data.Add("id", Id);
 		data.Add("v", _infos.Mp);
 		_myGame.Send(ServerEventType.mp, serializer.hashMapToData(data));
+	}
+	
+	public B4.Vector3 getFinalDestination()
+	{
+		if(paths.Count>0)
+			return paths[0];
+		else
+			return position;
 	}
 	
 	public int Id 

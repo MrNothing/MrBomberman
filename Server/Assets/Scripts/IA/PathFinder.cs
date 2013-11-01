@@ -26,7 +26,18 @@ namespace B4
         
 		//path target
         Vector3 target;
-
+		
+		//starting point
+		Vector3 startPoint;
+		
+		public delegate void PathFound(List<Vector3> _paths);
+		public PathFound OnPathFound;
+		
+		delegate void StartPathFinder();
+		StartPathFinder OnPathFinderStart;
+		
+		System.Threading.Thread currentThread;
+		
         public PathFinder(Dictionary<String, float> _wayPoints, float _baseStep, float _maxCliffHeight)
         {
             openTiles = new SortedDictionary<float, Vector3>();
@@ -34,7 +45,24 @@ namespace B4
             wayPoints = _wayPoints;
             baseStep = _baseStep;
 			maxCliffHeight = _maxCliffHeight;
+			
+			OnPathFinderStart = new StartPathFinder(start);
         }
+		
+		//delegate stuff
+		void raisePathFound(List<Vector3> _paths)
+		{
+			OnPathFound(_paths);
+		}
+		
+		public void initializeSearch(Vector3 _start, Vector3 _target, float _maxCliffHeight)
+		{
+			maxCliffHeight = _maxCliffHeight;
+			target = _target;
+            startPoint = _start;
+			
+			OnPathFinderStart.BeginInvoke(null, null);
+		}
 		
 		public List<Vector3> start(Vector3 _start, Vector3 _target, float _maxCliffHeight)
 		{
@@ -46,6 +74,7 @@ namespace B4
         {
             if (wayPoints.Count > 0)
             {
+				startPoint = _start;
                 target = _target;
                 openTiles = new SortedDictionary<float, Vector3>();
                 closedTiles = new Hashtable();
@@ -63,6 +92,26 @@ namespace B4
                 List<Vector3> tmpRes = new List<Vector3>();
                 tmpRes.Add(_target);
                 return tmpRes;
+            }
+        }
+		
+		public void start()
+        {
+            if (wayPoints.Count > 0)
+            {
+                openTiles = new SortedDictionary<float, Vector3>();
+                closedTiles = new Hashtable();
+
+                result = new List<Vector3>();
+
+                bestPath = null;
+
+                search(startPoint);
+            }
+            else
+            {
+                List<Vector3> tmpRes = new List<Vector3>();
+                tmpRes.Add(target);
             }
         }
 		
@@ -170,6 +219,8 @@ namespace B4
                 lastPath = lastPath.parent;
             }
             while (lastPath.parent != null);
+			
+			raisePathFound(result);
         }
 		
 		private bool hasIndexAt(Dictionary<string, float> dictionary, string key)
@@ -182,6 +233,18 @@ namespace B4
 			catch
 			{
 				return false;
+			}
+		}
+		
+		private float getIndexHeight(Dictionary<string, float> dictionary, string key)
+		{
+			try
+			{
+				return dictionary[key];
+			}
+			catch
+			{
+				return -58380;
 			}
 		}
 		
@@ -206,17 +269,9 @@ namespace B4
 			}
 		}
 		
-		private bool hasIndexAt(Dictionary<string, bool> dictionary, string key)
+		public string getInfos()
 		{
-			try
-			{
-				//this is always true
-				return dictionary[key]!=null;
-			}
-			catch
-			{
-				return false;
-			}
+			return "ways: "+wayPoints.Count;
 		}
 	}
 }
