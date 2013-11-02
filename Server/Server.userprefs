@@ -1,20 +1,20 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\IA\PathFinder.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Model\GameRoom.cs">
     <Files>
-      <File FileName="Assets\Scripts\Core.cs" Line="117" Column="3" />
+      <File FileName="Assets\Scripts\Core.cs" Line="559" Column="24" />
       <File FileName="Assets\Scripts\Model\EntityInfos.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Managers\IOManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Model\EntityStats.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Model\Entity.cs" Line="345" Column="16" />
+      <File FileName="Assets\Scripts\Model\Entity.cs" Line="379" Column="1" />
       <File FileName="Assets\Scripts\UI\ServerInterface.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Managers\GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Managers\SpellsManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Managers\ViewsTilesManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\IA\Vector3.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Model\GameRoom.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Model\GameRoom.cs" Line="171" Column="5" />
       <File FileName="Assets\Scripts\Model\Channel.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\IA\PathFinder.cs" Line="132" Column="5" />
+      <File FileName="Assets\Scripts\IA\PathFinder.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

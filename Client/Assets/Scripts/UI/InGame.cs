@@ -127,8 +127,6 @@ public class InGame : MonoBehaviour
 				UnitInfosHp.Text = selectedEntity.hp+"/"+selectedEntity.getMaxHp();
 				UnitInfosMp.Text = selectedEntity.mp+"/"+selectedEntity.getMaxMp();
 				
-				print("spells: "+selectedEntity._spells.Count);
-				
 				foreach(MGUIButton b in spells)
 					core.gui.removeElement(b.id);
 				

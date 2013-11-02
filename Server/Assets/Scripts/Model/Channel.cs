@@ -82,6 +82,11 @@ public class Channel
 		{
 			_players.Add(player);
 			
+			if(player.Channel!=null)
+			{
+				player.Channel.removePlayer(player);
+			}
+			
 			player.Channel = this;
 			
 			//we need to notify everyone that this player has joined and inform the player that he is in this room...
@@ -136,9 +141,17 @@ public class Channel
 	
 	public void removePlayer(Player player)
 	{
-		_players.Remove(player);
+		//sometimes, the player is being removed from higher levels, we avoid unwanted exceptions
+		try
+		{
+			_players.Remove(player);
 		
-		player.Channel = null;
+			player.Channel = null;
+		}
+		catch
+		{
+			
+		}
 		
 		if(_players.Count>0)
 		{

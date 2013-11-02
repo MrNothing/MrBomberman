@@ -434,6 +434,10 @@ public class MGUI : MonoBehaviour
 	
 	}
 	
+	int wait = 0;
+	int waitLater = 0;
+	
+	//we choose lateUpdate because we do not want MGUI to be a hindrance to other regular Update actions.
 	void LateUpdate()
 	{
 		//if the feature is enabled, check if mouse is over any button
@@ -465,16 +469,26 @@ public class MGUI : MonoBehaviour
 					{
 						if(Input.GetKey(KeyCode.Backspace))
 						{
-							if(focusedField.Text.Length>0)
+							if(focusedField.Text.Length>0 && (wait<=0 || waitLater>30))
+							{
 								focusedField.Text = focusedField.Text.Remove(focusedField.Text.Length-1);
+							}
+							
+							wait = 5;
+							waitLater++;
 						}
 						else
 						{
 							if(Input.inputString.Length>0 && !Input.GetKey(KeyCode.Return))
 								focusedField.Text+=Input.inputString;
+							
+							waitLater = 0;
 						}
 					}
 				}
+				
+				if(wait>0)
+					wait--;
 				
 				if(focusedElement.Type==MGUIType.button)
 				{

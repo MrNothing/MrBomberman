@@ -71,6 +71,11 @@ public enum ServerEventType
 	hp = 23,
 	
 	mp = 24,
+	
+	//sent when my name is still recorded in an active game
+	joinActiveGame = 25,
+	
+	declineActiveGame = 26,
 }
 
 public class Core : MonoBehaviour 
@@ -98,6 +103,10 @@ public class Core : MonoBehaviour
 	
 	//This is used to load maps
 	public IOManager io = new IOManager();
+	
+	//players that have been disconnected from a game they were in are stored here until the game is destroyed
+	public Dictionary<string, int> disconnectedPlayersByGame = new Dictionary<string, int>();
+	public Dictionary<int, List<string>> gamesByDisconnectedPlayersList = new Dictionary<int, List<string>>();
 	
 	SpellsManager spellManager = new SpellsManager();
 	
@@ -186,8 +195,25 @@ public class Core : MonoBehaviour
 		
 		//if my player has a channel
 		if(myPlayer.Channel!=null)
+		{
+			if(myPlayer.Channel.Type==ChannelType.game)
+			{
+				disconnectedPlayersByGame.Add(myPlayer.Name, myPlayer.Channel.Id);
+				
+				try
+				{
+					gamesByDisconnectedPlayersList[myPlayer.Channel.Id].Add(myPlayer.Name);
+				}
+				catch
+				{
+					List<string> disconnectedPlayerInMyGame = new List<string>();
+					disconnectedPlayerInMyGame.Add(myPlayer.Name);
+					gamesByDisconnectedPlayersList.Add(myPlayer.Channel.Id, disconnectedPlayerInMyGame);
+				}
+			}
+			
 			myPlayer.Channel.removePlayer(myPlayer);
-		
+		}
     }
 	
 	//used for compatibility
@@ -233,6 +259,21 @@ public class Core : MonoBehaviour
 					playerInfos.Add("id", myPlayer.Id);
 					
 					myPlayer.Send(ServerEventType.login, serializer.hashMapToData(playerInfos));	
+				
+					try
+					{
+						//i know this is messed up... if you know a better way to test if a key exists in a dictionary i'm all ears
+						if(disconnectedPlayersByGame[myPlayer.Name]!=int.MaxValue)
+						{
+							Debug.Log("Player "+myPlayer.Name+" was in a game!!");
+							myPlayer.Send(ServerEventType.joinActiveGame, string.Empty);
+							myPlayer.Send(ServerEventType.serverMessage, "You were in the game "+channels[disconnectedPlayersByGame[myPlayer.Name]].Name);
+						}
+					}
+					catch
+					{
+						Debug.Log("Player "+myPlayer.Name+" was not in a game...");	
+					}
 				}
 			}
 			else
@@ -283,6 +324,32 @@ public class Core : MonoBehaviour
 				{
 					myPlayer.Send(ServerEventType.serverMessage, "Channel not found!");
 				}
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.joinActiveGame)
+		{
+			try
+			{
+				channels[disconnectedPlayersByGame[myPlayer.Name]].addPlayer(myPlayer);
+			}
+			catch
+			{
+				
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.declineActiveGame)
+		{
+			try
+			{
+				gamesByDisconnectedPlayersList[disconnectedPlayersByGame[myPlayer.Name]].Remove(myPlayer.Name);
+				channels[disconnectedPlayersByGame[myPlayer.Name]].Send(ServerEventType.serverMessage, myPlayer.Name+" has left the game!");
+				disconnectedPlayersByGame.Remove(myPlayer.Name);
+			}
+			catch
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "Your name was not found in the index!");
 			}
 		}
 		
@@ -539,5 +606,24 @@ public class Core : MonoBehaviour
 		if(channel.Type==ChannelType.chat || channel.Type==ChannelType.lobby)
 			channelsByName.Remove(channel.Name);
 		
+		try
+		{
+			List<string> disconnectedPlayersInThisGame = gamesByDisconnectedPlayersList[channel.Id];
+			foreach(string s in disconnectedPlayersInThisGame)
+			{
+				try
+				{
+					disconnectedPlayersByGame.Remove(s);
+				}
+				catch
+				{
+					
+				}
+			}
+		}
+		catch
+		{
+			
+		}
 	}
 }

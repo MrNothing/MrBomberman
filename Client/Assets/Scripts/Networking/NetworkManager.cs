@@ -65,6 +65,11 @@ public enum ServerEventType
 	stats = 22,
 	hp = 23,
 	mp = 24,
+	
+	//sent when my name is still recorded in an active game
+	joinActiveGame = 25,
+	
+	declineActiveGame = 26,
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -356,7 +361,6 @@ public class NetworkManager : MonoBehaviour
 			
 			Entity caster = core.gameManager.entities[(int)infos["author"]];
 			
-			Debug.Log(caster.attackAnims.Length+" "+caster.attackAnims[0]);
 			caster.mixedAnim = caster.attackAnims[0];
 			caster.animationCounter = 30;
 			
@@ -412,6 +416,17 @@ public class NetworkManager : MonoBehaviour
 		{
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].infos = (Hashtable)infos["infos"];
+		}
+		
+		if(eventType==(byte)ServerEventType.joinActiveGame)
+		{
+			DialogOption[] options = new DialogOption[]
+			{
+				new DialogOption("Join", DialogAction.joinActiveGame, null),
+				new DialogOption("Leave", DialogAction.declineActiveGame, null)
+			};
+			
+			core.errorInterface.showMessage("You had a game in progress, join it?", Color.cyan, options);
 		}
 	}
 	

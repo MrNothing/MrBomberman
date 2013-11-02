@@ -60,7 +60,10 @@ public class GamesList : MonoBehaviour
 			Hashtable channel = (Hashtable) infos[s];
 			MGUIButton but1 = (MGUIButton)core.gui.setButton("gameRoom_"+s, new Rect(-10, 10-counter*2, 30, 2), Vector2.zero, channel["name"]+" ["+channel["players"]+"/"+channel["maxPlayers"]+"]", core.normalFont, Color.white, core.blackAlphaBg, core.blackAlphaBg, core.blackAlphaBg);
 			but1.setDepth(1);
+			but1.custom = channel["name"];
+			but1.OnButtonPressed+=new MGUIButton.ButtonPressed(joinGamePressed);
 			gamesListBg.Add(but1);
+			
 			MGUIButton but2 = (MGUIButton)core.gui.setButton("gameRoom_"+s+"_b", new Rect(20, 10-counter*2, 5, 1.5f), Vector2.zero, "Join", core.normalFont, Color.white, core.ButtonNormal, core.ButtonDown, core.ButtonHover);
 			but2.custom = channel["name"];
 			but2.OnButtonPressed+=new MGUIButton.ButtonPressed(joinGamePressed);

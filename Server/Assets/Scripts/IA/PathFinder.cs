@@ -226,7 +226,9 @@ namespace B4
 		{
 			try
 			{
-				if(dictionary[key]!=null)
+				if(dictionary[key]!=float.MaxValue)
+					return true;
+				else
 					return true;
 			}
 			catch
@@ -254,13 +256,15 @@ namespace B4
 		{
 			try
 			{
-				if(dictionary[key]!=null)
+				if(dictionary[key]!=float.MaxValue)
 				{
 					if(Mathf.Abs(dictionary[key]-currentPosition.y)<maxCliffHeight)
 						return true;
 					else
 						return false;
 				}
+				else
+					return false;
 			}
 			catch
 			{

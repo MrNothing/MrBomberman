@@ -111,6 +111,26 @@ public class GameRoom : Channel
 		
 		//when the player joins a game, he needs to get all the entities in his client as fast as possible 	
 		sendAllEntities(player);
+		
+		
+		//if the player has reconnected, remove him from the disconnected players index.
+		try
+		{
+			_core.disconnectedPlayersByGame.Remove(player.Name);
+		}
+		catch
+		{
+			
+		}
+		
+		try
+		{
+			_core.gamesByDisconnectedPlayersList[Id].Remove(player.Name);
+		}
+		catch
+		{
+			
+		}
 	}
 	
 	public void onPlayerLeave(Player player)

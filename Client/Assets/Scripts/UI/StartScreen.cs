@@ -51,12 +51,6 @@ public class StartScreen : MonoBehaviour
 		//startServerButton.setDepth(10);
 	}
 	
-	// Update is called once per frame
-	void Update () 
-	{
-	
-	}
-	
 	void OnConnectButton(MGUIButton key)
 	{
 		if((gui.getElement("server") as MGUITextfield).Text.Length>0)
