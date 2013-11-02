@@ -422,6 +422,25 @@ public class NetworkManager : MonoBehaviour
 	    core.errorInterface.showMessage("Connection failed: " + error, Color.red, true);
     }
 	
+	void OnDisconnectedFromServer(NetworkDisconnection info)
+	{	
+		core.gameLobby.Visible = false;
+		core.gamesList.Visible = false;
+		core.lobby.Visible = false;
+		core.inGame.Visible = false;
+		core.startScreen.show();
+		
+	  	if (info == NetworkDisconnection.LostConnection)
+		{
+            core.errorInterface.showMessage("Lost connection to the server", Color.red, true);		
+		}
+		else
+		{
+            core.errorInterface.showMessage("Successfully diconnected from the server", Color.green, true);
+		}
+	}
+	
+	
 	void OnConnectedToServer() 
 	{
 		core.startScreen.hide();

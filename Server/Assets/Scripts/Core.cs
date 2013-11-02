@@ -112,7 +112,41 @@ public class Core : MonoBehaviour
 		channelsByName.Add(defaultChannel.Name, defaultChannel.Id);
 		
 		InvokeRepeating("run", 0.1f, 0.1f);
+		
+		/*
+		GameObject origin = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		origin.name = "origin";
+		
+		GameObject target = GameObject.Find("target");
+		
+		for(int i=0; i<8; i++)
+		{
+			GameObject satellite = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+			satellite.name = i+"_satellite";
+			satellite.transform.parent = origin.transform;
+			
+			spheres.Add(satellite);
+		}*/
 	}
+	/*List<GameObject> spheres = new List<GameObject>();
+	
+	void Update()
+	{
+		GameObject target = GameObject.Find("target");
+		GameObject origin = GameObject.Find("origin");
+		float angle = Mathf.Atan2(target.transform.position.x-origin.transform.position.x, target.transform.position.z-origin.transform.position.z);
+		float rayon = 1;
+		
+		for(int i=0; i<8; i++)
+		{
+			float x = Mathf.Sin(angle)*rayon;
+			float y = Mathf.Cos(angle)*rayon;
+			
+			GameObject satellite = spheres[i];
+			satellite.transform.position = new Vector3(x, 0, y);
+			angle+=Mathf.PI/4;
+		}
+	}*/
 	
 	void run()
 	{

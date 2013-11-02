@@ -112,7 +112,8 @@ public class Entity
 		return infos;
 	}
 	
-	void sendMovement()
+	bool sendMovement = false;
+	void _sendMovement()
 	{
 		Hashtable infos = new Hashtable();
 		infos.Add("id", Id);
@@ -124,6 +125,8 @@ public class Entity
 		infos.Add("dz", destination.z);
 		HashMapSerializer serializer = new HashMapSerializer();
 		myGame.Send(ServerEventType.position, serializer.hashMapToData(infos));
+		
+		sendMovement = false;
 	}
 	
 	int passiveRegenerationCounter=0;
@@ -149,6 +152,9 @@ public class Entity
 		}
 		else
 			status = EntityStatus.dead;
+		
+		if(sendMovement)
+			_sendMovement();
 	}
 	
 	public void updateDestination()
@@ -158,7 +164,7 @@ public class Entity
             destination = paths[paths.Count - 1];
             paths.RemoveAt(paths.Count - 1);
 			
-			sendMovement();
+			sendMovement = true;
         }
 	}
 	
@@ -329,22 +335,15 @@ public class Entity
 			status = EntityStatus.walking;
 			
             float calculatedSpeed = getFrameSpeed();
-
-            if (position.x < destination.x)
-                position.x += calculatedSpeed;
-            if (position.x > destination.x)
-                position.x -= calculatedSpeed;
-
-            if (position.y < destination.y)
-                position.y += calculatedSpeed;
-            if (position.y > destination.y)
-                position.y -= calculatedSpeed;
-
-            if (position.z < destination.z)
-                position.z += calculatedSpeed;
-            if (position.z > destination.z)
-                position.z -= calculatedSpeed;
-
+			
+			float angle = Mathf.Atan2(destination.x-position.x, destination.z-position.z);
+			
+			float speedx = Mathf.Sin(angle)*calculatedSpeed;
+			float speedy = Mathf.Cos(angle)*calculatedSpeed;
+			
+			position.x += speedx;
+			position.z += speedy;
+			
             if (Math.Abs(position.z - destination.z) <= calculatedSpeed)
             {
                 position.z = destination.z;
@@ -383,7 +382,10 @@ public class Entity
 		paths = _paths;
 		
 		if(paths.Count>0)
+		{
 			destination = paths[paths.Count-1];
+			sendMovement = true;
+		}
 	}
 	
 	public void sendStats()

@@ -290,23 +290,20 @@ public class Entity : MonoBehaviour {
 			else
 				transform.position = destination;*/
 			
-			if(tmpPos.x<destination.x)
-				tmpPos.x+=runSpeed*Time.deltaTime;
 			
-			if(tmpPos.x>destination.x)
-				tmpPos.x-=runSpeed*Time.deltaTime;
+			float angle = Mathf.Atan2(destination.x-transform.position.x, destination.z-transform.position.z);
 			
-			if(tmpPos.z<destination.z)
-				tmpPos.z+=runSpeed*Time.deltaTime;
+			float speedx = Mathf.Sin(angle)*runSpeed*Time.deltaTime;
+			float speedy = Mathf.Cos(angle)*runSpeed*Time.deltaTime;
 			
-			if(tmpPos.z>destination.z)
-				tmpPos.z-=runSpeed*Time.deltaTime;
-			
-			if(Mathf.Abs(tmpPos.x-destination.x)<runSpeed*Time.deltaTime)
+			tmpPos.x+=speedx;
+			tmpPos.z+=speedy;
+				
+			if(Vector3.Distance(transform.position, new Vector3(destination.x, transform.position.y, destination.z))<runSpeed*Time.deltaTime)
+			{
 				tmpPos.x = destination.x;
-			
-			if(Mathf.Abs(tmpPos.z-destination.z)<runSpeed*Time.deltaTime)
 				tmpPos.z = destination.z;
+			}
 		}
 		else
 		{

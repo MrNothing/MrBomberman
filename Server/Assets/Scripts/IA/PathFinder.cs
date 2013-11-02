@@ -115,15 +115,9 @@ namespace B4
             }
         }
 		
-		//not recommented to increase this, may have some weird (funny?) results...
-        int checkRange = 1; 
-        /*    
-               Checkrange example for 1:
-               
-               XXX
-               X X
-               XXX
-        */
+		//I recommend not to tweak these values, at best this will change nothing, at worst you will lose performance or precision
+        int checkRange = 8; 
+        float checkAngleStep = Mathf.PI/4;
 		
 		//in case the path was not found, we use this one.
         private Vector3 bestPath=null;
@@ -132,34 +126,39 @@ namespace B4
         { 
             //Check around lastPoint...
             
-			for (int i = -checkRange; i <= checkRange; i++)
-            {
-				for (int j = -checkRange; j <= checkRange; j++)
+			float angle = Mathf.Atan2(target.x-lastPoint.x, target.z-lastPoint.z);
+			
+			for(int i=0; i<checkRange; i++)
+			{
+				float x = Mathf.Sin(angle)*baseStep;
+				float y = Mathf.Cos(angle)*baseStep;
+			
+				Vector3 newPoint = lastPoint.Add(new Vector3(x, 0, y));
+                String rangeId = newPoint.toPosRefId(baseStep);
+				
+				//if there is a walkable tile and I have not already visited this tile
+                if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && closedTiles[rangeId]==null)
                 {
-					Vector3 newPoint = lastPoint.Add(new Vector3(i * baseStep, 0, j * baseStep));
-                    String rangeId = newPoint.toPosRefId(baseStep);
+                    closedTiles.Add(rangeId, true);
 					
-					//if there is a walkable tile and I have not already visited this tile
-                    if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && closedTiles[rangeId]==null)
+					//if i am closer than the last point to the target
+                    if ((lastPoint.Substract(target)).Magnitude() > newPoint.Substract(target).Magnitude())
                     {
-                        closedTiles.Add(rangeId, true);
-						
-						//if i am closer than the last point to the target
-                        if ((lastPoint.Substract(target)).Magnitude() > newPoint.Substract(target).Magnitude())
-                        {
-							try
-							{
-                        		openTiles.Add(newPoint.Substract(target).Magnitude(), newPoint);
-							}
-							catch
-							{
-								
-							}
-							
-							newPoint.parent = lastPoint;
+						try
+						{
+                    		openTiles.Add(newPoint.Substract(target).Magnitude(), newPoint);
 						}
-                    }
-                }
+						catch
+						{
+							
+						}
+						
+						newPoint.parent = lastPoint;
+					
+                	}
+            	}
+				
+				angle+=checkAngleStep;
             }
 			
 			 //if i have ways left...
