@@ -37,7 +37,7 @@ public class MainInterface: MonoBehaviour
 	
 	string tmpMapName = "Untitled";
 	
-	bool loadingInterface = false;
+	public bool loadingInterface = false;
 	
 	bool createEntity = false;
 	
@@ -105,7 +105,7 @@ public class MainInterface: MonoBehaviour
 			
 			if(GUILayout.Button("Save"))
 			{
-				worldEditor.ioManager.saveMap(Application.dataPath+"/Maps/"+worldEditor.mapName+"/", worldEditor.World, worldEditor.entities, worldEditor.entityInfosByName, worldEditor.teamsInfos, worldEditor.mapInfos, worldEditor.skills, worldEditor.items);
+				worldEditor.ioManager.saveMap(Application.dataPath+"/Maps/"+worldEditor.mapName+"/", worldEditor.world, worldEditor.entities, worldEditor.entityInfosByName, worldEditor.teamsInfos, worldEditor.mapInfos, worldEditor.skills, worldEditor.items);
 			}
 			
 			if(GUILayout.Button("Load"))
@@ -350,7 +350,7 @@ public class MainInterface: MonoBehaviour
 							if(currentEntity>0)
 								currentEntity--;
 						}
-						GUILayout.Label("Entity "+currentEntity);
+						GUILayout.Label("Entity: "+((Hashtable)worldEditor.entityInfos[currentEntity])["name"]);
 						if(GUILayout.Button("Edit"))
 						{
 							Hashtable infos = worldEditor.entityInfos[currentEntity];
@@ -360,6 +360,14 @@ public class MainInterface: MonoBehaviour
 							newEntityIsHero = (bool)infos["hero"];
 							newEntityIsImmortal = (bool)infos["immortal"];
 							newEntityIsControllable = (bool)infos["controllable"];
+							try
+							{
+								newEntityIsBuilding = (bool) infos["building"];
+							}
+							catch
+							{
+								newEntityIsBuilding = false;
+							}
 							newEntityMaxHp = (float)infos["maxhp"];
 							newEntityHp = (float)infos["hp"];
 							newEntityMaxMp = (float)infos["maxmp"];
@@ -369,6 +377,17 @@ public class MainInterface: MonoBehaviour
 							newEntityArmor = (float)infos["armor"];
 							newEntityResistance = (float)infos["resistance"];
 							newEntitySpeed = (float)infos["speed"];
+							
+							try
+							{
+								newEntityAttackSpeed = (float)infos["attackSpeed"];
+								newEntityAttackRange = (float)infos["range"];
+							}
+							catch
+							{
+								newEntityAttackSpeed = 1;
+								newEntityAttackRange = 1;
+							}
 							
 							createEntity = true;
 						}
@@ -429,9 +448,18 @@ public class MainInterface: MonoBehaviour
 					GUILayout.EndHorizontal();
 					
 					GUILayout.BeginHorizontal();
+					GUILayout.Label("attack speed: ");
+					newEntityAttackSpeed = float.Parse(GUILayout.TextField(newEntityAttackSpeed.ToString()));
+					GUILayout.Label("attack range: ");
+					newEntityAttackRange = float.Parse(GUILayout.TextField(newEntityAttackRange.ToString()));
+					
+					GUILayout.EndHorizontal();
+					
+					GUILayout.BeginHorizontal();
 					newEntityIsHero = GUILayout.Toggle(newEntityIsHero, "Hero ");	
 					newEntityIsImmortal = GUILayout.Toggle(newEntityIsImmortal, "Immortal ");	
 					newEntityIsControllable = GUILayout.Toggle(newEntityIsControllable, "Controllable ");	
+					newEntityIsBuilding = GUILayout.Toggle(newEntityIsBuilding, "Building ");	
 					GUILayout.EndHorizontal();
 					
 					GUILayout.BeginHorizontal();
@@ -451,6 +479,7 @@ public class MainInterface: MonoBehaviour
 						newEntity.Add("hero", newEntityIsHero);
 						newEntity.Add("immortal", newEntityIsImmortal);
 						newEntity.Add("controllable", newEntityIsControllable);
+						newEntity.Add("building", newEntityIsBuilding);
 						newEntity.Add("prefab", newEntityPrefab);
 						newEntity.Add("maxhp", newEntityMaxHp);
 						newEntity.Add("hp", newEntityHp);
@@ -461,6 +490,8 @@ public class MainInterface: MonoBehaviour
 						newEntity.Add("armor", newEntityArmor);
 						newEntity.Add("resistance", newEntityResistance);
 						newEntity.Add("speed", newEntitySpeed);
+						newEntity.Add("attackSpeed", newEntityAttackSpeed);
+						newEntity.Add("range", newEntityAttackRange);
 						
 						if(worldEditor.entityInfosByName[newEntityName]!=null)
 						{
@@ -531,6 +562,12 @@ public class MainInterface: MonoBehaviour
 					if(GUILayout.Button("Cancel"))
 						createSpell = false;
 					
+					if(GUILayout.Button("Delete"))
+					{	
+						worldEditor.skills.Remove(spellName);
+						createSpell = false;
+					}
+					
 					if(GUILayout.Button("Save"))
 					{
 						Hashtable newEntity = new Hashtable();
@@ -548,7 +585,7 @@ public class MainInterface: MonoBehaviour
 						
 						if(worldEditor.skills[spellName]!=null)
 						{
-							worldEditor.skills.Remove(worldEditor.skills[spellName] as Hashtable);
+							worldEditor.skills.Remove(spellName);
 						}
 						
 						worldEditor.skills.Add(spellName, newEntity);
@@ -706,7 +743,10 @@ public class MainInterface: MonoBehaviour
 	float newEntityArmor = 0;
 	float newEntityResistance = 0;
 	float newEntitySpeed = 0;
+	float newEntityAttackSpeed = 0;
+	float newEntityAttackRange = 0;
 	bool newEntityIsHero = false;
 	bool newEntityIsImmortal = false;
 	bool newEntityIsControllable = false;
+	bool newEntityIsBuilding = false;
 }

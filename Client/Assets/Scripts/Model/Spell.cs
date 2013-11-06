@@ -11,7 +11,20 @@ public class Spell
 	float _mana=0;
 	string _description="No description loaded";
 	int _usage = 0;
+	string _type;
 
+	public string Type 
+	{
+		get 
+		{
+			return this._type;
+		}
+		set
+		{
+			_type = value;
+		}
+	}
+	
 	public float CoolDown 
 	{
 		get 
@@ -107,6 +120,18 @@ public class Spell
 			_usage = value;
 		}
 	}	
+	
+	public Spell (string icon, string name, string description, SpellUsage spellUsage)
+	{
+		_icon = (Texture2D)Resources.Load("Icons/"+icon);
+		_name = name;
+		_description = description;
+		_usage = (int)spellUsage;
+		_currentCoolDown = 0;
+		_coolDown = 0;
+		_mana = 0;
+	}
+	
 	public Spell(Hashtable spellInfos)
 	{
 		_icon = (Texture2D)Resources.Load("Icons/"+spellInfos["icon"]);
@@ -123,6 +148,7 @@ public class Spell
 		_coolDown = (float)spellInfos["coolDown"];
 		_mana = (float)spellInfos["mana"];
 		_usage = int.Parse(spellInfos["usage"]+"");
+		_type = spellInfos["type"].ToString();
 	}
 	
 	public Hashtable export()

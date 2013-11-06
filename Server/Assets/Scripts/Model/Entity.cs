@@ -32,9 +32,15 @@ public class Entity
 	int master = 0;
 	
 	int _team = 0;
-
-	//when should the unit attack if it is agressive
-    public float viewRange = 5;
+	
+	public bool beingBuilt = false;
+	
+	
+	/// <summary>
+	/// The view range.
+	/// when should the unit attack if it is agressive
+	/// </summary>
+    float viewRange = 5;
 	
 	#region pathfinding
 	public B4.Vector3 position;
@@ -46,6 +52,16 @@ public class Entity
 
 	#endregion
 	
+	#region IA
+	/// <summary>
+	/// The basic auto control system.
+	/// </summary>
+	public EntityAutoControl basicAutoControl;
+	#endregion
+	
+	/// <summary>
+	/// The status of this Entity.
+	/// </summary>
 	public EntityStatus status = EntityStatus.idle;
 	
 	#region stats
@@ -56,21 +72,54 @@ public class Entity
 	GameRoom _myGame;
 	
 	#region entitiy awareness
-	//This defines the amount of viewtiles to check
+	
+	/// <summary>
+	/// The check range.
+	/// This defines the amount of viewtiles to check
+	/// </summary>
 	public Vector3 checkRange = new Vector3(2,1,2);
 	
 	
 	public B4.ViewsTilesManager view;
 	
-	//the unit's visible entities are stored here.
+	/// <summary>
+	/// The visible heroes this Entity can see.
+	/// </summary>
 	public Hashtable visibleHeroes = new Hashtable();
+	/// <summary>
+	/// The visible units this Entity can see.
+	/// </summary>
 	public Hashtable visibleUnits = new Hashtable();
+	/// <summary>
+	/// The visible enemies this Entity can see.
+	/// </summary>
 	public Hashtable visibleEnemies = new Hashtable();
+	/// <summary>
+	/// The visible allies this Entity can see.
+	/// </summary>
 	public Hashtable visibleAllies = new Hashtable();
 	#endregion
 	
 	System.Random mainSeed = new System.Random();
 	
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Entity"/> class.
+	/// </summary>
+	/// <param name='game'>
+	/// Game.
+	/// </param>
+	/// <param name='_owner'>
+	/// _owner.
+	/// </param>
+	/// <param name='infos'>
+	/// Infos.
+	/// </param>
+	/// <param name='_position'>
+	/// _position.
+	/// </param>
+	/// <param name='team'>
+	/// Team.
+	/// </param>
 	public Entity(GameRoom game, string _owner, EntityInfos infos, Vector3 _position, int team)
 	{
 		_myGame = game;
@@ -94,8 +143,12 @@ public class Entity
 		
 		view = new B4.ViewsTilesManager(this, position.smash(myGame.baseRefSize));
 		
+		basicAutoControl = new EntityAutoControl(this, IABehaviourType.agressive);
+		
 		//it is recommended to call onMove() once the entity has been indexed to avoid unexpected behaviour
 		//view.onMove();
+		
+		getCurrentTimeInMs();
 	}
 	
 	public Hashtable export()
@@ -109,6 +162,7 @@ public class Entity
 		infos.Add("dx", destination.x);
 		infos.Add("dy", destination.y);
 		infos.Add("dz", destination.z);
+		infos.Add("built", beingBuilt);
 		return infos;
 	}
 	
@@ -130,8 +184,13 @@ public class Entity
 	}
 	
 	int passiveRegenerationCounter=0;
+	B4.Vector3 lastMappedMovement=new B4.Vector3();
 	
-	//main routine called every 100 ms
+	
+	/// <summary>
+	/// Run this instance.
+	/// main routine called every 100 ms
+	/// </summary>
 	public void run()
 	{
 		if(_infos.Hp>0)
@@ -155,6 +214,17 @@ public class Entity
 		
 		if(sendMovement)
 			_sendMovement();
+		
+		if(lastMappedMovement.Substract(position).Magnitude()>myGame.baseStep*2)
+		{
+			view.onMove();
+			lastMappedMovement = position.getNewInstance();
+		}
+		
+		if(owner.Length>0 && basicAutoControl.Behaviour!=IABehaviourType.none)
+			basicAutoControl.Behaviour = IABehaviourType.none;
+		
+		basicAutoControl.processThinking();
 	}
 	
 	public void updateDestination()
@@ -168,23 +238,121 @@ public class Entity
         }
 	}
 	
-	//usually called every second
+	
+	/// <summary>
+	/// Applies the passive regeneration.
+	/// usually called every second
+	/// </summary>
 	void applyPassiveRegeneration()
 	{
-		if(_infos.Hp<getMaxHp())
-			_infos.Hp+=getHpRegen();
-		
-		if(_infos.Mp<getMaxMp())
-			_infos.Mp+=getMpRegen();
-		
-		if(_infos.Hp>getMaxHp())
-			_infos.Hp=getMaxHp();
+		if(beingBuilt)
+		{
+			if(_infos.Hp<getMaxHp())
+				_infos.Hp+=10;
+			else
+				beingBuilt = false;
 			
-		if(_infos.Mp>getMaxMp())
-			_infos.Mp = getMaxMp();
+			sendHps();
+		}
+		else
+		{
+			bool hpChanged = false;
+			bool mpChanged = false;
+			
+			if(_infos.Hp<getMaxHp())
+			{
+				_infos.Hp+=getHpRegen();
+				hpChanged = true;
+			}
+			
+			if(_infos.Mp<getMaxMp())
+			{
+				_infos.Mp+=getMpRegen();
+				mpChanged = true;
+			}
+			
+			if(_infos.Hp>getMaxHp())
+			{
+				_infos.Hp=getMaxHp();
+				hpChanged = true;
+			}
+			
+			if(_infos.Mp>getMaxMp())
+			{
+				_infos.Mp = getMaxMp();
+				mpChanged = true;
+			}
+			
+			if(hpChanged)
+				sendHps();
+			
+			if(mpChanged)
+				sendMps();
+		}
+	}
+	
+	long lastTimeInMs;
+	/// <summary>
+	/// Tries to launch a basic attack if the attack is ready.
+	/// </summary>
+	public void tryToLaunchBasicAttack(Entity target)
+	{
+		if(getCurrentTimeInMs()-lastTimeInMs>getAttackIntervalInMs())
+		{
+			launchBasicAttack (target);
+			lastTimeInMs = getCurrentTimeInMs();
+		}
+	}
+	
+	long getCurrentTimeInMs()
+	{
+		return DateTime.Now.Ticks/TimeSpan.TicksPerMillisecond;
+	}
+	
+	void launchBasicAttack(Entity target)
+	{
+		if(getAttackRange()>1)
+		{
+			Hashtable spellObject = new Hashtable();
+			spellObject.Add("type", "attack");
+			spellObject.Add("author", this);
+			spellObject.Add("damages", getAttackValue());
+			spellObject.Add("target", target);
+			spellObject.Add("time", getProjectileTimeToHitInMs(position, target.position, 0.2f)/100f);
+			
+			myGame.spellsQueue.Add(spellObject);
+			
+			//send projectile...
+			Hashtable data = new Hashtable();
+			data.Add("author", Id);
+			data.Add("target", target.Id);
+			data.Add("name", _infos.ProjectilePrefab);
+			HashMapSerializer serializer = new HashMapSerializer();
+			myGame.Send(ServerEventType.Tspell, serializer.hashMapToData(data)); 
+		}
+		else
+		{
+			target.hitMeWithPhysic(this, getAttackValue());
+			
+			Hashtable data = new Hashtable();
+			data.Add("id", Id);
+			data.Add("target", target.Id);
+			HashMapSerializer serializer = new HashMapSerializer();
+			myGame.Send(ServerEventType.attack, serializer.hashMapToData(data)); 
+		}
 	}
 	
 	public float physicShield = 0;
+	
+	/// <summary>
+	/// Hits me (the entity) with physic.
+	/// </summary>
+	/// <param name='author'>
+	/// Author.
+	/// </param>
+	/// <param name='dmg'>
+	/// Dmg.
+	/// </param>
     public void hitMeWithPhysic(Entity author, float dmg)
     {
         try
@@ -233,7 +401,9 @@ public class Entity
                     dmg = 0;
 				
                 _infos.Hp -= dmg;
-
+				
+				checkIfDead(author);
+				
                 sendHps();
             }
         }
@@ -244,6 +414,15 @@ public class Entity
     }
 	
 	float magicShield = 0;
+	/// <summary>
+	/// Hits me (the entity) with magic damages.
+	/// </summary>
+	/// <param name='author'>
+	/// Author.
+	/// </param>
+	/// <param name='dmg'>
+	/// Dmg.
+	/// </param>
     public void hitMeWithMagic(Entity author, float dmg)
     {
         try
@@ -292,7 +471,9 @@ public class Entity
                     dmg = 0;
 				
                 _infos.Hp -= dmg;
-
+				
+				checkIfDead(author);
+				
                 sendHps();
             }
         }
@@ -301,6 +482,28 @@ public class Entity
             
         }
     }
+	
+	/// <summary>
+	/// Checks if this entity is dead after taking damages, also triggers many mecanisms related to being hit.
+	/// </summary>
+	/// <param name='author'>
+	/// Author.
+	/// </param>
+	void checkIfDead(Entity author)
+	{
+		if(_infos.Hp<=0)
+		{
+			//I am dead, give rewards etc...
+		}
+		else
+		{
+			//if i am in defensive or agressive mode, I must focus the attacker (if possible)
+			if(basicAutoControl.Behaviour==IABehaviourType.defensive || basicAutoControl.Behaviour==IABehaviourType.agressive)
+			{
+				basicAutoControl.focusEntityIfIAmNotDoingAnythingElse(author);	
+			}
+		}
+	}
 	
 	float getMaxHp()
 	{
@@ -322,12 +525,52 @@ public class Entity
 		return _infos.Stats.MpRegen+_infos.Bonuses.MpRegen;
 	}
 	
-	float getFrameSpeed()
+	/// <summary>
+	/// Gets the movement speed of the entity.
+	/// </summary>
+	/// <returns>
+	/// The frame speed.
+	/// </returns>
+	public float getFrameSpeed()
 	{
 		return (_infos.Stats.RunSpeed+_infos.Bonuses.RunSpeed)/3000f;
 	}
 	
-	//called every 100 ms
+	public float getAttackValue()
+	{
+		return (_infos.Stats.Damages+_infos.Bonuses.Damages);
+	}
+	
+	/// <summary>
+	/// Gets the view range.
+	/// </summary>
+	/// <returns>
+	/// The view range.
+	/// </returns>
+	public float getViewRange()
+	{
+		return (viewRange+_infos.Stats.AttackRange+_infos.Bonuses.AttackRange);
+	}
+	
+	public float getAttackRange()
+	{
+		return (_infos.Stats.AttackRange+_infos.Bonuses.AttackRange);
+	}
+	
+	float getAttackSpeed()
+	{
+		return (_infos.Stats.AttackSpeed+_infos.Bonuses.AttackSpeed);
+	}
+	
+	int getAttackIntervalInMs()
+	{
+		return (int)getAttackSpeed()*1000;
+	}
+	
+	/// <summary>
+	/// Synchronizes the position.
+	/// called every 100 ms
+	/// </summary>
 	public void synchronizePosition()
 	{
 		if (!isSynchronized())
@@ -373,8 +616,9 @@ public class Entity
 	
 	public bool thinking = false;
 	public void findPath(Vector2 point)
-	{
-		pathfinder.initializeSearch(position.smash(myGame.baseStep), new B4.Vector3(point.x, position.y, point.y), 0.5f);
+	{		
+		if(getFrameSpeed()>0 && !beingBuilt)
+			pathfinder.initializeSearch(position.smash(myGame.baseStep), new B4.Vector3(point.x, position.y, point.y), 0.5f);			
 	}
 	
 	public void onPathFound(List<B4.Vector3> _paths)
@@ -386,6 +630,13 @@ public class Entity
 			destination = paths[paths.Count-1];
 			sendMovement = true;
 		}
+	}
+	
+	public void resetPaths()
+	{
+		destination = position.getNewInstance();
+		paths.Clear();
+		sendMovement = true;
 	}
 	
 	public void sendStats()
@@ -421,6 +672,41 @@ public class Entity
 			return paths[0];
 		else
 			return position;
+	}
+	
+	public float getDistance(Entity otherUnit)
+    {
+        return otherUnit.position.Substract(position).SqrMagnitude();
+    }
+
+    public float getDistance(B4.Vector3 point)
+    {
+        return point.Substract(position).SqrMagnitude();
+    }
+
+    public float get2DDistance(B4.Vector3 point)
+    {
+        return (float)Math.Sqrt((point.x - position.x) * (point.x - position.x) + (point.z - position.z) * (point.z - position.z));
+    }
+	
+	/// <summary>
+	/// Gets the projectile time to hit in ms.
+	/// </summary>
+	/// <returns>
+	/// The projectile time to hit in ms.
+	/// </returns>
+	public float getProjectileTimeToHitInMs(B4.Vector3 initialPosition, B4.Vector3 targetPosition, float projectileSpeed)
+	{
+		float tx = targetPosition.x;
+		float ty = targetPosition.y;
+		float tz = targetPosition.z;
+		
+		float bruteDistance = ((tx - initialPosition.x) * (tx - initialPosition.x) + (ty - initialPosition.y) * (ty - initialPosition.y) + (tz - initialPosition.z) * (tz - initialPosition.z));
+		float distance = (float)Math.Sqrt(bruteDistance);
+		
+		
+		//considering the framerate is 60
+		return (float)(distance / (projectileSpeed * 60f)) * 250;
 	}
 	
 	public int Id 

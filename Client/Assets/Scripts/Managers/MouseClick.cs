@@ -24,7 +24,7 @@ public class MouseClick : MonoBehaviour
 			onObjectClicked(Input.mousePosition);
 		
 		if(core.inGame.Visible && Input.GetMouseButtonUp(1))
-			requestMoveAtMousePoint();
+			requestMoveAtMousePointOrAttackEntity();
 	}
 	
 	void onObjectClicked(Vector3 position)
@@ -61,7 +61,7 @@ public class MouseClick : MonoBehaviour
 		}
 	}
 	
-	void requestMoveAtMousePoint()
+	void requestMoveAtMousePointOrAttackEntity()
 	{
 		if(core.inGame.selectedEntity.owner.Equals(core.networkManager.username))
 		{
@@ -70,12 +70,22 @@ public class MouseClick : MonoBehaviour
 			RaycastHit hitFloor2;
 			if (Physics.Raycast (ray.origin, ray.direction, out hitFloor2, 100f)) 
 			{
-				Hashtable infos = new Hashtable();
-				infos.Add("id", core.inGame.selectedEntity.id);
-				infos.Add("x", hitFloor2.point.x);
-				infos.Add("z", hitFloor2.point.z);
-				
-				core.networkManager.send(ServerEventType.position, HashMapSerializer.hashMapToData(infos));
+				if(hitFloor2.collider.gameObject.GetComponent<Entity>())
+				{
+					Hashtable castInfos = new Hashtable();
+					castInfos.Add("author", core.inGame.selectedEntity.id);
+					castInfos.Add("target", hitFloor2.collider.gameObject.GetComponent<Entity>().id);
+					core.networkManager.send(ServerEventType.attack, HashMapSerializer.hashMapToData(castInfos));
+				}
+				else
+				{
+					Hashtable infos = new Hashtable();
+					infos.Add("id", core.inGame.selectedEntity.id);
+					infos.Add("x", hitFloor2.point.x);
+					infos.Add("z", hitFloor2.point.z);
+					
+					core.networkManager.send(ServerEventType.position, HashMapSerializer.hashMapToData(infos));
+				}
 			}
 		}
 	}

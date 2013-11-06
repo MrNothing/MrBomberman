@@ -57,10 +57,19 @@ public class TranslateToPointAndDestroy : MonoBehaviour {
 		}
 		else
 		{
-			transform.LookAt(targetAsTransform.position);
+			Vector3 targetPoint;
+			try
+			{
+				targetPoint = targetAsTransform.position+new Vector3(0, targetAsTransform.collider.bounds.size.y/2, 0);
+			}
+			catch
+			{
+				targetPoint = targetAsTransform.position;
+			}
+			transform.LookAt(targetPoint);
 			transform.Translate(Vector3.forward*speed);
 			
-			if(Vector3.Distance(transform.position, targetAsTransform.position)<speed)
+			if(Vector3.Distance(transform.position, targetPoint)<speed)
 			{
 				try
 				{

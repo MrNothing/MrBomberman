@@ -17,11 +17,11 @@ public class IOManager
 		//we create the new folders if they do not exit.
 		createPathIfItDoesNotExist(path);
 		
-		Hashtable world = new Hashtable(_world);
+		Hashtable world = new Hashtable();
 		//before writing the hashTable, we save the textures and remove the non serializable elements from the hashmap.
-		foreach(string s in world.Keys)
+		foreach(string s in _world.Keys)
 		{
-			Hashtable elementInfos = (Hashtable) world[s];
+			Hashtable elementInfos = new Hashtable((Hashtable) _world[s]);
 			
 			if(elementInfos["doodad"]==null) //if this is not a doodad...
 			{
@@ -58,14 +58,17 @@ public class IOManager
 			{
 				elementInfos.Remove("doodad");
 			}
+			
+			world.Add(s, elementInfos);
 		}
 		
-		Hashtable entities = new Hashtable(_entities);
+		Hashtable entities = new Hashtable();
 		
-		foreach(string s in entities.Keys)
+		foreach(string s in _entities.Keys)
 		{
-			Hashtable elementInfos = (Hashtable) entities[s];
+			Hashtable elementInfos = new Hashtable((Hashtable) _entities[s]);
 			elementInfos.Remove("doodad");
+			entities.Add(s, elementInfos);
 		}
 		
 		Hashtable map = new Hashtable();
@@ -99,6 +102,7 @@ public class IOManager
 		file.Close();
 	}
 	
+	//done in worldeditor.cs using coroutines
 	public Texture2D loadTexture(string path)
 	{
 		return null;

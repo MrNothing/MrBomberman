@@ -21,6 +21,7 @@ public class GameRoom : Channel
 	
 	//all entites's patterns are stored here
 	Dictionary<string, EntityInfos> entitiesInfos = new Dictionary<string, EntityInfos>();
+	Dictionary<string, EntityInfos> entitiesInfosByPrefab = new Dictionary<string, EntityInfos>();
 	
 	//this is an indexed representation of the space entities
 	public Dictionary<string, B4.ViewTile> worldSpace = new Dictionary<string, B4.ViewTile>();
@@ -73,9 +74,9 @@ public class GameRoom : Channel
 		
 		foreach(Hashtable spell in spellsQueue)
 		{
-			if((int)spell["time"]>0)
+			if((float)spell["time"]>0)
 			{
-				spell["time"] = ((int) spell["time"]) - 1;
+				spell["time"] = ((float) spell["time"]) - 1;
 			}
 			else
 			{
@@ -83,6 +84,9 @@ public class GameRoom : Channel
 				
 				if(spell["type"].Equals("zoneSpell"))
 					hitZoneWithMagic(spell);
+				
+				if(spell["type"].Equals("attack"))
+					((Entity)spell["target"]).hitMeWithPhysic(((Entity)spell["author"]), ((Entity)spell["author"]).getAttackValue());
 			}
 		}
 	}
@@ -138,14 +142,14 @@ public class GameRoom : Channel
 		
 	}
 	
-	public void addEntity(string entity, string owner, Vector3 position, int team, bool notifyPlayers)
-	{
+	public Entity addEntity(string entity, string owner, Vector3 position, int team, bool notifyPlayers)
+	{	
 		//we clone entityinfos to avoid unexpected stuff
 		EntityInfos newEntityInfos = new EntityInfos(entitiesInfos[entity]);
 		
 		Entity newEntity = new Entity(this, owner, newEntityInfos, position, team);
 		
-		//newEntity.controlledByPlayer = newEntityInfos.controllable;
+		newEntity.controlledByPlayer = newEntityInfos.controllable;
 		
 		newEntity.position.y = 0;
 		
@@ -158,6 +162,8 @@ public class GameRoom : Channel
 			//we notify every player the entity is in the game
 			sendEntityInfos(newEntity);
 		}
+		
+		return newEntity;
 	}
 	
 	void loadEntities(Hashtable entitiesData)
@@ -186,11 +192,21 @@ public class GameRoom : Channel
 		
 		foreach(string s in infos.Keys)
 		{
-			entitiesInfos.Add(s, new EntityInfos((Hashtable) infos[s]));
+			EntityInfos newInfos = new EntityInfos((Hashtable) infos[s]);
+			entitiesInfos.Add(s, newInfos);
+			
+			try
+			{
+				entitiesInfosByPrefab.Add(newInfos.Prefab, newInfos);
+			}
+			catch
+			{
+				//a unit with this prefab was already added, just ignore this even if this is not a wanted behaviour
+			}
 		}
 	}
 	
-	void sendEntityInfos(Entity entity)
+	public void sendEntityInfos(Entity entity)
 	{
 		Hashtable data = new Hashtable();
 		data.Add("id", entity.Id);
@@ -388,6 +404,11 @@ public class GameRoom : Channel
 	public Hashtable getSpellWithName(string spell)
 	{
 		return (Hashtable)skills[spell];
+	}
+	
+	public string getEntityNameWithPrefab(string prefab)
+	{
+		return entitiesInfosByPrefab[prefab].Name;
 	}
 	
 	public string Map 

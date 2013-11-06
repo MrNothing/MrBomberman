@@ -35,6 +35,8 @@ public class GameManager : MonoBehaviour
 	public Hashtable teamsInfos = new Hashtable();
 	public Hashtable mapInfos = new Hashtable();
 	
+	public bool initalized = false;
+	
 	// Use this for initialization
 	void Start () 
 	{
@@ -54,8 +56,10 @@ public class GameManager : MonoBehaviour
 	
 	}
 	
-	public void clearFog(Vector3 point, float brushSize)
+	public Dictionary<FogTileHandler, List<int>> clearFog(Vector3 point, float brushSize)
 	{
+		Dictionary<FogTileHandler, List<int>> modifiedVertices = new Dictionary<FogTileHandler, List<int>>();
+		
 		int checkRadius = (int)Mathf.Ceil(brushSize*3);
 		if(checkRadius<3)
 			checkRadius = 3;
@@ -69,9 +73,11 @@ public class GameManager : MonoBehaviour
 				
 				Dictionary<int, float> colliders = fog.findColliders(point, brushSize, 0.1f);
 				
-				fog.clearFog(point, brushSize, colliders, 1);		
+				modifiedVertices.Add(fog, fog.clearFog(point, brushSize, colliders, 1));		
 			}
 		}
+		
+		return modifiedVertices;
 	}
 	
 	public void enableFog()
@@ -81,10 +87,13 @@ public class GameManager : MonoBehaviour
 			Hashtable tile = (Hashtable)world[s];
 			(tile["fogTile"] as GameObject).GetComponent<FogTileHandler>().setDefaultFog(new Color32(0, 0, 0, 255));
 		}
+		
+		initalized = true;
 	}
 	
 	public void loadMap(string path)
 	{
+		initalized = false;
 		//clear the previous map Elements
 		removeAllMapElements();
 		
@@ -121,7 +130,15 @@ public class GameManager : MonoBehaviour
 			
 			if(s[0].Equals('d')) //if this is a doodad...
 			{
-				addDoodadSilent(new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), doodadsByName[elementInfos["model"].ToString()]);
+				try
+				{
+					addDoodadSilent(new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), doodadsByName[elementInfos["model"].ToString()]);
+				}
+				catch
+				{
+					Debug.Log("Doodad has no model: "+s);
+					addDoodadSilent(new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), doodads[0]);
+				}
 			}
 			else
 			{

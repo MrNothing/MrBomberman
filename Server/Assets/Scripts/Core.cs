@@ -265,14 +265,13 @@ public class Core : MonoBehaviour
 						//i know this is messed up... if you know a better way to test if a key exists in a dictionary i'm all ears
 						if(disconnectedPlayersByGame[myPlayer.Name]!=int.MaxValue)
 						{
-							Debug.Log("Player "+myPlayer.Name+" was in a game!!");
 							myPlayer.Send(ServerEventType.joinActiveGame, string.Empty);
 							myPlayer.Send(ServerEventType.serverMessage, "You were in the game "+channels[disconnectedPlayersByGame[myPlayer.Name]].Name);
 						}
 					}
 					catch
 					{
-						Debug.Log("Player "+myPlayer.Name+" was not in a game...");	
+						//this player was not in a game, proceed...
 					}
 				}
 			}
@@ -556,7 +555,11 @@ public class Core : MonoBehaviour
 					if(myEntity.Owner.Equals(myPlayer.Name))
 					{
 						if(myEntity.getFinalDestination().Substract(new B4.Vector3((float) infos["x"], 0, (float) infos["z"])).Magnitude()>myEntity.myGame.baseStep)
+						{
+							if(myEntity.basicAutoControl.hasFocus())
+								myEntity.basicAutoControl.cancelFocus();
 							myEntity.findPath(new Vector2((float) infos["x"], (float) infos["z"]));
+						}
 					}
 				}
 			}
@@ -586,6 +589,22 @@ public class Core : MonoBehaviour
 					{
 						myPlayer.Send(ServerEventType.serverMessage, "Spell not found");
 					}
+				}
+			}
+		}
+		
+		if(eventType==(byte)ServerEventType.attack)
+		{
+			Hashtable infos = serializer.dataToHashMap(data);
+			
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.game)
+				{
+					Entity target = ((GameRoom)myPlayer.Channel).getEntity((int)infos["target"]);
+					Entity author = ((GameRoom)myPlayer.Channel).getEntity((int)infos["author"]);
+					
+					author.basicAutoControl.forceEntityToFocusSpecifiedTarget(target);
 				}
 			}
 		}

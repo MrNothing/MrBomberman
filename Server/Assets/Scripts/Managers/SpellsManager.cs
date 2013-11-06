@@ -3,6 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
+public enum SpellUsage
+{
+	zone = 0,
+	target = 1,
+	passive = 2,
+	self = 3,
+	showBuildUI = 4,
+	build = 5,
+	cancel = 6,
+}
+
 public class SpellsManager 
 {
 	public void useSpell(Hashtable spell, Entity author, Entity target, Vector3 targetPoint)
@@ -12,13 +23,19 @@ public class SpellsManager
 			return;
 		}
 		
-		if((float)spell["usage"]==0) //this is a zone spell
+		if((float)spell["usage"]==(float)SpellUsage.zone) //this is a zone spell
 		{
 			castZoneSpell(spell["name"].ToString(), author, targetPoint);
 		}
-		else
+		
+		if((float)spell["usage"]==(float)SpellUsage.build)
 		{
-			//cast target spell...
+			string unitToBuild = spell["type"].ToString();
+			
+			Entity newBuilding = author.myGame.addEntity(author.myGame.getEntityNameWithPrefab(unitToBuild), author.Owner, targetPoint, author.team, false);
+			newBuilding.beingBuilt = true;
+			newBuilding.Infos.Hp = 1;
+			author.myGame.sendEntityInfos(newBuilding);
 		}
 	}
 	
@@ -40,7 +57,7 @@ public class SpellsManager
 			spellObject.Add("damages", (float)100);
 			spellObject.Add("targetPoint", targetPoint);
 			spellObject.Add("range", (float)2);
-			spellObject.Add("time", 20);
+			spellObject.Add("time", 20f);
 			
 			author.myGame.spellsQueue.Add(spellObject);
 		}

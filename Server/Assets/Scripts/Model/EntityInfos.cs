@@ -5,7 +5,8 @@ public class EntityInfos
 {
 	string _name;
 	string _prefab;
-	
+	string _projectilePrefab;
+
 	int _level;
 	
 	float _hp=0;
@@ -43,6 +44,15 @@ public class EntityInfos
 			_level = 1;
 		}
 		
+		try
+		{
+			_projectilePrefab = infos["projectile"].ToString();
+		}
+		catch
+		{
+			_projectilePrefab = "defaultTargetProjectile";
+		}
+		
 		stats = new EntityStats();
 		
 		_hp = (float) infos["hp"];
@@ -76,6 +86,25 @@ public class EntityInfos
 		{
 			stats.MpRegen = 0;
 		}
+		
+		try
+		{
+			stats.AttackRange = (float) infos["range"];
+		}
+		catch
+		{
+			stats.AttackRange = 1;
+		}
+		
+		try
+		{
+			stats.AttackSpeed = (float) infos["attackSpeed"];
+		}
+		catch
+		{
+			stats.AttackSpeed = 1;
+		}
+		
 		
 		stats.Resistance = (float) infos["resistance"];
 		stats.SpellPower = (float) infos["power"];
@@ -198,4 +227,15 @@ public class EntityInfos
 		}
 	}	
 	
+	public string ProjectilePrefab 
+	{
+		get 
+		{
+			return this._projectilePrefab;
+		}
+		set 
+		{
+			_projectilePrefab = value;
+		}
+	}	
 }

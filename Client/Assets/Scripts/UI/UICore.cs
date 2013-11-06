@@ -31,6 +31,13 @@ public class UICore : MonoBehaviour
 	public Texture2D blackAlphaBg;
 	public Texture2D whiteAlphaBg;
 	
+	public Transform gameCameraTransform;
+	
+	void Start()
+	{
+		gameCameraTransform = GameObject.Find("Main Camera").transform;
+	}
+	
 	/*
 	 *  These are just tests for the MGUI class
 	// Use this for initialization

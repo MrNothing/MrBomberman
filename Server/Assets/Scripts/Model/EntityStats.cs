@@ -24,6 +24,9 @@ public class EntityStats
 	float _crit=0;
 	float _spellCrit=0;
 	
+	float _attackSpeed = 1;
+	float _attackRange = 1;
+
 	public EntityStats()
 	{
 		
@@ -43,6 +46,10 @@ public class EntityStats
 		_spellPower = (float)infos["power"];
 		_damages = (float)infos["damage"];
 		_runSpeed = (float)infos["speed"];
+		
+		_attackSpeed = (float)infos["attackSpeed"];
+		_attackRange = (float)infos["range"];
+		
 	}
 	
 	public EntityStats(EntityStats infos)
@@ -59,6 +66,9 @@ public class EntityStats
 		_spellPower = infos._spellPower;
 		_damages = infos._damages;
 		_runSpeed = infos._runSpeed;
+		
+		_attackSpeed = infos._attackSpeed;
+		_attackRange = infos._attackRange;
 	}
 	
 	public Hashtable export()
@@ -71,6 +81,8 @@ public class EntityStats
 		newEntity.Add("armor", Armor);
 		newEntity.Add("resistance", Resistance);
 		newEntity.Add("speed", RunSpeed);
+		newEntity.Add("attackSpeed", AttackSpeed);
+		newEntity.Add("range", AttackRange);
 		return newEntity;
 	}
 	
@@ -241,5 +253,29 @@ public class EntityStats
 			_mpRegen = value;
 		}
 	}
+	
+	public float AttackRange 
+	{
+		get 
+		{
+			return this._attackRange;
+		}
+		set 
+		{
+			_attackRange = value;
+		}
+	}
+
+	public float AttackSpeed 
+	{
+		get 
+		{
+			return this._attackSpeed;
+		}
+		set 
+		{
+			_attackSpeed = value;
+		}
+	}	
 }
 

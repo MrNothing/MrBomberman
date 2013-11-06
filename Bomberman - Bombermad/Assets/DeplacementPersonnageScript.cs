@@ -44,8 +44,26 @@ public class DeplacementPersonnageScript : MonoBehaviour {
 	private RaycastHit hit;  // objet remplit si il y a collision entre le rayon de position et un mur
 	
 	private int Stock_Bombe;
+
+	public int StockBombe {
+		get {
+			return this.Stock_Bombe;
+		}
+		set {
+			Stock_Bombe = value;
+		}
+	}
+
 	private int Bombe_a_terre;
-	
+
+	public int BombeATerre {
+		get {
+			return this.Bombe_a_terre;
+		}
+		set {
+			Bombe_a_terre = value;
+		}
+	}	
 	private bool Est_en_vie;
 
 	// Use this for initialization

@@ -6,7 +6,8 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class HashMapSerializer {
+public class HashMapSerializer 
+{
 	
 	//converts a string to a HashMap if the string was serialized with the Eternity protocol.
 	public static Hashtable dataToHashMap(String data)

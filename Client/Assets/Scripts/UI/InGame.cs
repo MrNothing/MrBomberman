@@ -96,7 +96,7 @@ public class InGame : MonoBehaviour
 		UnitInfosSpellBg = (MGUIImage) core.gui.setImage("UnitInfosSpellBg", new Rect(25.2f, -14, 15, 9), Vector2.zero, unitSpellsBg);
 		UnitInfosSpellBg.setDepth(2);
 		
-		spellInfosHover = (MGUITextArea) core.gui.setTextArea("spellInfosHover", new Rect(10.6f, 1, 0, 0), 6, 15, "Spell infos", core.normalFont, Color.white);
+		spellInfosHover = (MGUITextArea) core.gui.setTextArea("spellInfosHover", new Rect(10.6f, 1, 0, 0), 6, 15, "", core.normalFont, Color.white);
 		
 		Visible = false;
 	}
@@ -114,11 +114,14 @@ public class InGame : MonoBehaviour
 		}
 	}
 	
+	[HideInInspector]
+	public bool forceReload=false;
+	
 	void LateUpdate()
 	{
 		if(selectedEntity!=null)
 		{
-			if(!UnitAvatar.Texture.Equals(selectedEntity.icon))
+			if(!UnitAvatar.Texture.Equals(selectedEntity.icon) || forceReload)
 			{	
 				UnitAvatar.Texture = selectedEntity.icon;
 			
@@ -126,29 +129,12 @@ public class InGame : MonoBehaviour
 				UnitInfosAdditionalInfos.Text = "Level "+selectedEntity.getLevel();
 				UnitInfosHp.Text = selectedEntity.hp+"/"+selectedEntity.getMaxHp();
 				UnitInfosMp.Text = selectedEntity.mp+"/"+selectedEntity.getMaxMp();
+			
+				core.gameManager.selectionCircle.transform.localScale = Vector3.one*((selectedEntity.collider.bounds.size.x/0.5f)*2.4f);
 				
-				foreach(MGUIButton b in spells)
-					core.gui.removeElement(b.id);
+				reloadSpellsUI();
 				
-				spells.Clear();
-				
-				if(selectedEntity.owner.Equals(core.networkManager.username))
-				{
-					int counterX = 0;
-					int counterY = 0;
-					foreach(Spell s in selectedEntity._spells)
-					{
-						MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX+14.13f,counterY-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
-						tmpSpell.custom = s;
-						tmpSpell.setDepth(1);
-						tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
-						tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
-						tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
-						tmpSpell.captureMouseOver = true;
-						spells.Add(tmpSpell);
-						counterX++;
-					}
-				}
+				forceReload = false;
 			}
 			core.gameManager.selectionCircle.transform.position = selectedEntity.transform.position+new Vector3(0, 0.1f, 0);
 		}
@@ -189,7 +175,93 @@ public class InGame : MonoBehaviour
 	
 	void onSpellPressed(MGUIButton button)
 	{
-		core.spellsManager.activateSpell((Spell)button.custom);
+		Spell mySpell = (Spell)button.custom;
+		
+		if(mySpell.Usage<=3) //if this is a regular spell
+			core.spellsManager.activateSpell((Spell)button.custom);
+		
+		if(mySpell.Usage == (int)SpellUsage.cancel)
+			reloadSpellsUI();
+		
+		if(mySpell.Usage == (int)SpellUsage.showBuildUI)
+			showBuildingUI();
+		
+		if(mySpell.Usage == (int)SpellUsage.build)
+			core.spellsManager.activateSpell((Spell)button.custom);
+	}
+	
+	void reloadSpellsUI()
+	{
+		foreach(MGUIButton b in spells)
+			core.gui.removeElement(b.id);
+				
+		spells.Clear();
+				
+		if(selectedEntity.owner.Equals(core.networkManager.username))
+		{
+			int counterX = 0;
+			int counterY = 0;
+			foreach(Spell s in selectedEntity._spells)
+			{
+				MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
+				tmpSpell.custom = s;
+				tmpSpell.setDepth(1);
+				tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
+				tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
+				tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
+				tmpSpell.captureMouseOver = true;
+				spells.Add(tmpSpell);
+				counterX++;
+			}
+			
+			if(selectedEntity._buildings.Count>0)
+			{
+				Spell buildSpell = new Spell("build_Humans", "Build", "Construct a building", SpellUsage.showBuildUI);
+				MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_Build", new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, buildSpell.Icon, buildSpell.Icon, buildSpell.Icon); 
+				tmpSpell.custom = buildSpell;
+				tmpSpell.setDepth(1);
+				tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
+				tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
+				tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
+				tmpSpell.captureMouseOver = true;
+				spells.Add(tmpSpell);
+			}
+		}
+	}
+	
+	void showBuildingUI()
+	{
+		foreach(MGUIButton b in spells)
+			core.gui.removeElement(b.id);
+				
+		spells.Clear();
+		
+		int counterX = 0;
+		int counterY = 0;
+		foreach(Spell s in selectedEntity._buildings)
+		{
+			MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
+			tmpSpell.custom = s;
+			tmpSpell.setDepth(1);
+			tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
+			tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
+			tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
+			tmpSpell.captureMouseOver = true;
+			spells.Add(tmpSpell);
+			counterX++;
+		}
+		
+		{
+			Spell cancelSpell = new Spell("cancel", "Cancel", "Return", SpellUsage.cancel);
+			MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_cancel", new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, cancelSpell.Icon, cancelSpell.Icon, cancelSpell.Icon); 
+			tmpSpell.custom = cancelSpell;
+			tmpSpell.setDepth(1);
+			tmpSpell.OnButtonPressed += new MGUIButton.ButtonPressed(onSpellPressed);
+			tmpSpell.OnMouseOver += new MGUIButton.MouseOver(onMouseOverSpell);
+			tmpSpell.OnMouseOut += new MGUIButton.MouseOut(onMouseOutOfSpell);
+			tmpSpell.captureMouseOver = true;
+			spells.Add(tmpSpell);
+		}
 	}
 	
 	void onMouseOverSpell(MGUIButton button)

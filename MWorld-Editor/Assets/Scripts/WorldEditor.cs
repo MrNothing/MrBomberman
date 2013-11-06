@@ -58,7 +58,7 @@ public class WorldEditor : MonoBehaviour {
 	public float DEFAULT_DOODAD_STEP=1f;
 	
 	//This is where all the map's indexed informations are stored.
-	Hashtable world = new Hashtable();
+	public Hashtable world = new Hashtable();
 	
 	List<string> tiles = new List<string>();
 	
@@ -85,6 +85,7 @@ public class WorldEditor : MonoBehaviour {
 			tiles = value;
 		}
 	}
+	
 	public Hashtable World 
 	{
 		get 
@@ -222,8 +223,9 @@ public class WorldEditor : MonoBehaviour {
 	//render an empty map with default grass texture.
 	public void drawEmptyMap(Vector2 mapSize)
 	{
+		Hashtable clonedWorld = new Hashtable(world);
 		//clear the previous map Elements
-		foreach(string s in world.Keys)
+		foreach(string s in clonedWorld.Keys)
 		{
 			removeElement(s);	
 		}
@@ -254,7 +256,8 @@ public class WorldEditor : MonoBehaviour {
 	public void loadMap(string path)
 	{
 		//clear the previous map Elements
-		foreach(string s in world.Keys)
+		Hashtable worldClone = new Hashtable(world);
+		foreach(string s in worldClone.Keys)
 		{
 			removeElement(s);	
 		}
@@ -302,6 +305,8 @@ public class WorldEditor : MonoBehaviour {
 			
 			if(s[0].Equals('d')) //if this is a doodad...
 			{
+				foreach(string s2 in elementInfos.Keys)
+					Debug.Log(s2+" is "+elementInfos[s2]);
 				addDoodadSilent(new Vector3((float)elementInfos["x"], (float)elementInfos["y"], (float)elementInfos["z"]), doodadsByName[elementInfos["model"].ToString()]);
 			}
 			else
@@ -498,6 +503,7 @@ public class WorldEditor : MonoBehaviour {
 			
 			//we keep a reference to the doodad's gameobjects
 			tileInfos.Add("doodad", tmpDoodad); 
+			tileInfos.Add("model", doodad.name); 
 			
 			world.Add(id, tileInfos);
 		}

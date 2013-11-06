@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace B4
 {
@@ -101,7 +102,7 @@ namespace B4
                 parent.myGame.worldSpace.Add(newTiledPosition.toString(), newTile);
                 //parent.myGame.core.DebugLog("added myself here: " + newTiledPosition.toString() + " id: " + parent.id + " name: " + parent.name, "ViewsTilesManager.log");
             }
-        }
+		}
 
         /// <summary>
         /// removes the parent entity from all entities and its viewTile.

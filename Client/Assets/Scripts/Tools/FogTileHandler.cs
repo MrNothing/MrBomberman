@@ -70,13 +70,13 @@ public class FogTileHandler : MonoBehaviour
 	
 	//Update is disabled if there is no transparent vertex
 	List<int> modifiedVertexes = new List<int>();
-	Dictionary<int, float> timeToWaitPerVertex = new Dictionary<int, float>();
+	public Dictionary<int, float> timeToWaitPerVertex = new Dictionary<int, float>();
 	void Update()
 	{
 		List<int> modifiedVertexesClone = new List<int>(modifiedVertexes);
 		foreach(int i in modifiedVertexesClone)
 		{
-			if(timeToWaitPerVertex[i]<0)
+			if(timeToWaitPerVertex[i]<=0)
 			{
 				if(colors[i].a!=defaultAlpha)
 				{
@@ -89,7 +89,8 @@ public class FogTileHandler : MonoBehaviour
 			}
 			else
 			{
-				timeToWaitPerVertex[i]-=Time.deltaTime;
+				//timeToWaitPerVertex is now modified by the unit itself.
+				//timeToWaitPerVertex[i]-=Time.deltaTime;
 			}
 		}
 		
@@ -122,8 +123,10 @@ public class FogTileHandler : MonoBehaviour
 		defaultAlpha = color.a;
 	}
 	
-	public void clearFog(Vector3 point, float brushSize)
+	public List<int> clearFog(Vector3 point, float brushSize)
 	{
+		List<int> modifiedVertexesToReturn = new List<int>();
+		
 		for(int i=0; i<vertices.Length; i++)
 		{
 			Vector3 vert = vertices[i];
@@ -134,15 +137,20 @@ public class FogTileHandler : MonoBehaviour
 				colors[i] = new Color32(0, 0, 0, 0);
 				
 				updateModifiedVertices(i);
+				
+				modifiedVertexesToReturn.Add(i);
 			}
 		}
 		
 		mesh.colors32 = colors;
+		
+		return modifiedVertexesToReturn;
 	}
 	
 	//the value of the collider is its radius while the key is the vertice.
-	public void clearFog(Vector3 point, float brushSize, Dictionary<int, float> colliders, float smoothRate)
+	public List<int> clearFog(Vector3 point, float brushSize, Dictionary<int, float> colliders, float smoothRate)
 	{
+		List<int> modifiedVertexesToReturn = new List<int>();
 		for(int i=0; i<vertices.Length; i++)
 		{
 			try
@@ -167,6 +175,8 @@ public class FogTileHandler : MonoBehaviour
 						colors[i] = new Color32(0, 0, 0, (byte)alpha);	
 						
 						updateModifiedVertices(i);
+						
+						modifiedVertexesToReturn.Add(i);
 					}
 				}
 			}
@@ -180,11 +190,15 @@ public class FogTileHandler : MonoBehaviour
 					colors[i] = new Color32(0, 0, 0, 0);
 					
 					updateModifiedVertices(i);
+					
+					modifiedVertexesToReturn.Add(i);
 				}
 			}
 		}
 		
 		mesh.colors32 = colors;
+		
+		return modifiedVertexesToReturn;
 	}
 	
 	public Dictionary<int, float> findColliders(Vector3 point, float brushSize, float maxStep)
@@ -263,7 +277,7 @@ public class FogTileHandler : MonoBehaviour
 		
 		try
 		{
-			timeToWaitPerVertex[i] = 1;
+			timeToWaitPerVertex[i] += 1;
 		}
 		catch
 		{

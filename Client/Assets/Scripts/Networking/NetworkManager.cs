@@ -329,6 +329,8 @@ public class NetworkManager : MonoBehaviour
 			
 			Hashtable entityInfos = (Hashtable)infos["infos"];
 			
+			Debug.Log("instanciating entity: "+entityInfos["prefab"]);
+			
 			GameObject newEntity = (GameObject) Instantiate(Resources.Load("Entities/"+entityInfos["prefab"], typeof(GameObject)), new Vector3((float)entityInfos["x"], (float)entityInfos["y"], (float)entityInfos["z"]), Quaternion.identity);
 			newEntity.transform.parent = core.gameManager.mapContainer.transform;
 			
@@ -381,14 +383,30 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			Entity caster = core.gameManager.entities[(int)infos["author"]];
 			
-			caster.currentAnim = caster.attackAnims[0];
+			caster.mixedAnim = caster.attackAnims[0];
 			caster.animationCounter = 30;
 			
 			Entity target = core.gameManager.entities[(int)infos["target"]];
 			
-			GameObject spellModel = (GameObject)Instantiate(Resources.Load("Spells/"+infos["name"], typeof(GameObject)), caster.transform.position, Quaternion.identity);
-			TranslateToPointAndDestroy spellScript = spellModel.GetComponent<TranslateToPointAndDestroy>();
-			spellScript.targetAsTransform = target.transform;
+			caster.target = target.gameObject;
+			caster.forceLookAt = 15;
+			
+			if(target.Visible)
+			{
+				Vector3 origin;
+				try
+				{
+					origin = caster.projectileOrigin.position;
+				}
+				catch
+				{
+					origin = caster.transform.position;
+				}
+				
+				GameObject spellModel = (GameObject)Instantiate(Resources.Load("Spells/"+infos["name"], typeof(GameObject)), origin, Quaternion.identity);
+				TranslateToPointAndDestroy spellScript = spellModel.GetComponent<TranslateToPointAndDestroy>();
+				spellScript.targetAsTransform = target.transform;
+			}
 		}	
 		
 		if(eventType==(byte)ServerEventType.attack)
@@ -396,20 +414,30 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			Entity caster = core.gameManager.entities[(int)infos["id"]];
 			
-			caster.currentAnim = caster.attackAnims[0];
+			caster.mixedAnim = caster.attackAnims[0];
 			caster.animationCounter = 30;	
+			
+			Entity target = core.gameManager.entities[(int)infos["target"]];
+			caster.target = target.gameObject;
+			caster.forceLookAt = 15;
 		}
 		
 		if(eventType==(byte)ServerEventType.hp)
 		{
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setHps((float)infos["v"]);
+			
+			if(core.inGame.selectedEntity.id==(int)infos["id"])
+				core.inGame.forceReload = true;
 		}
 		
 		if(eventType==(byte)ServerEventType.mp)
 		{
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setMps((float)infos["v"]);
+			
+			if(core.inGame.selectedEntity.id==(int)infos["id"])
+				core.inGame.forceReload = true;
 		}
 		
 		if(eventType==(byte)ServerEventType.stats)

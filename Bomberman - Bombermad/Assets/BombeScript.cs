@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum axes
+{
+	N=0, S=1, E=2, W=3
+}
+
 public class BombeScript : MonoBehaviour {
 	
 	[SerializeField]
@@ -14,6 +19,16 @@ public class BombeScript : MonoBehaviour {
 	
 	private RaycastHit hit;
 	
+	DeplacementPersonnageScript _lien;
+
+	public DeplacementPersonnageScript Lien {
+		get {
+			return this._lien;
+		}
+		set {
+			_lien = value;
+		}
+	}	
 	public Transform pad1
 	{
 		get {return _pad1;}
@@ -59,6 +74,8 @@ public class BombeScript : MonoBehaviour {
 				
 				
 			}
+				
+			_lien.BombeATerre --;
 
 	}
 					/********Rayon vers le bas*************/
@@ -81,7 +98,8 @@ public class BombeScript : MonoBehaviour {
 				
 				
 			}
-
+			_lien.BombeATerre --;
+				
 	}
 					/***************Rayon gauche******************/
 		
@@ -104,7 +122,8 @@ public class BombeScript : MonoBehaviour {
 				
 				
 			}
-
+			_lien.BombeATerre --;
+				
 	}
 				/*******rayon droite ********/
 		
