@@ -427,8 +427,11 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setHps((float)infos["v"]);
 			
-			if(core.inGame.selectedEntity.id==(int)infos["id"])
-				core.inGame.forceReload = true;
+			if(core.inGame.selectedEntity!=null)
+			{
+				if(core.inGame.selectedEntity.id==(int)infos["id"])
+					core.inGame.forceReload = true;
+			}
 		}
 		
 		if(eventType==(byte)ServerEventType.mp)
@@ -436,8 +439,11 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setMps((float)infos["v"]);
 			
-			if(core.inGame.selectedEntity.id==(int)infos["id"])
-				core.inGame.forceReload = true;
+			if(core.inGame.selectedEntity!=null)
+			{
+				if(core.inGame.selectedEntity.id==(int)infos["id"])
+					core.inGame.forceReload = true;
+			}
 		}
 		
 		if(eventType==(byte)ServerEventType.stats)

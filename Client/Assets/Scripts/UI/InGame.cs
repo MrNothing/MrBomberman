@@ -132,7 +132,8 @@ public class InGame : MonoBehaviour
 			
 				core.gameManager.selectionCircle.transform.localScale = Vector3.one*((selectedEntity.collider.bounds.size.x/0.5f)*2.4f);
 				
-				reloadSpellsUI();
+				if(!forceReload)
+					reloadSpellsUI();
 				
 				forceReload = false;
 			}
