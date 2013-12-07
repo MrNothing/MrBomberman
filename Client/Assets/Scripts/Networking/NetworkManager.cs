@@ -70,6 +70,8 @@ public enum ServerEventType
 	joinActiveGame = 25,
 	
 	declineActiveGame = 26,
+	
+	pauseGame = 27,
 }
 
 public class NetworkManager : MonoBehaviour 
@@ -78,6 +80,7 @@ public class NetworkManager : MonoBehaviour
 	
 	public string username = string.Empty;
 	public int currentTeam = 0;
+	public string currentChannel = string.Empty;
 	
 	public void Start()
 	{
@@ -153,6 +156,8 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			
 			string msg = "Joined the Channel: "+infos["name"];
+			
+			currentChannel = infos["name"].ToString();
 			
 			//game
 			if(infos["type"].Equals("game"))
@@ -427,9 +432,9 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setHps((float)infos["v"]);
 			
-			if(core.inGame.selectedEntity!=null)
+			if(core.inGame.selectedEntities.Count>0 && core.inGame.activeEntity<core.inGame.selectedEntities.Count)
 			{
-				if(core.inGame.selectedEntity.id==(int)infos["id"])
+				if(core.inGame.selectedEntities[core.inGame.activeEntity].id==(int)infos["id"])
 					core.inGame.forceReload = true;
 			}
 		}
@@ -439,9 +444,9 @@ public class NetworkManager : MonoBehaviour
 			Hashtable infos = HashMapSerializer.dataToHashMap(data);
 			core.gameManager.entities[(int)infos["id"]].setMps((float)infos["v"]);
 			
-			if(core.inGame.selectedEntity!=null)
+			if(core.inGame.selectedEntities.Count>0 && core.inGame.activeEntity<core.inGame.selectedEntities.Count)
 			{
-				if(core.inGame.selectedEntity.id==(int)infos["id"])
+				if(core.inGame.selectedEntities[core.inGame.activeEntity].id==(int)infos["id"])
 					core.inGame.forceReload = true;
 			}
 		}
@@ -461,6 +466,22 @@ public class NetworkManager : MonoBehaviour
 			};
 			
 			core.errorInterface.showMessage("You had a game in progress, join it?", Color.cyan, options);
+		}
+		
+		if(eventType==(byte)ServerEventType.pauseGame)
+		{
+			if(data.Equals("0"))
+			{
+				core.gameManager.gamePaused = true;
+				if(core.inGame.Visible)
+					core.gui.insertText(core.inGame.textArea.id, "Game paused, type /pause to resume it.", core.normalFont, Color.cyan); 
+			}
+			else
+			{
+				core.gameManager.gamePaused = false;
+				if(core.inGame.Visible)
+					core.gui.insertText(core.inGame.textArea.id, "Game resumed!", core.normalFont, Color.cyan); 
+			}
 		}
 	}
 	

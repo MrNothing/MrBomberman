@@ -30,6 +30,11 @@ namespace B4
         {
             return new Vector3((float)Math.Floor(vector.x / factorAsVector.x) * factorAsVector.x, (float)Math.Floor(vector.y / factorAsVector.y) * factorAsVector.y, (float)Math.Floor(vector.z / factorAsVector.z) * factorAsVector.z);
         }
+		
+		public static UnityEngine.Vector3 toUnityVector3(Vector3 vector)
+		{
+			return new UnityEngine.Vector3(vector.x, vector.y, vector.z);
+		}
 	}
 	
 	public class Vector3

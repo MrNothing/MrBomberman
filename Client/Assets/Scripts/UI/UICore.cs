@@ -23,6 +23,9 @@ public class UICore : MonoBehaviour
 	public GameManager gameManager;
 	public SpellsManager spellsManager;
 	
+	public Menu menu;
+	public Options options;
+	
 	public Font normalFont;
 	public Texture2D ButtonNormal;
 	public Texture2D ButtonHover;
@@ -38,6 +41,13 @@ public class UICore : MonoBehaviour
 		gameCameraTransform = GameObject.Find("Main Camera").transform;
 	}
 	
+	void Update()
+	{
+		if(Input.GetKey(KeyCode.Escape))
+		{
+			menu.Visible = true;
+		}
+	}
 	/*
 	 *  These are just tests for the MGUI class
 	// Use this for initialization

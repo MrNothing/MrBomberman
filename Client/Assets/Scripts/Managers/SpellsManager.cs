@@ -10,6 +10,8 @@ public enum SpellUsage
 	showBuildUI = 4,
 	build = 5,
 	cancel = 6,
+	invokeUnit = 7,
+	buyItem = 8,
 }
 
 public class SpellsManager : MonoBehaviour 
@@ -54,7 +56,7 @@ public class SpellsManager : MonoBehaviour
 					Hashtable castInfos = new Hashtable();
 					castInfos.Add("name", currentSpell.Name);
 					castInfos.Add("target", string.Empty);
-					castInfos.Add("author", core.inGame.selectedEntity.id);
+					castInfos.Add("author", core.inGame.selectedEntities[core.inGame.activeEntity].id);
 					castInfos.Add("x", hitFloor2.point.x);
 					castInfos.Add("z", hitFloor2.point.z);
 					core.networkManager.send(ServerEventType.spell, HashMapSerializer.hashMapToData(castInfos));
@@ -72,7 +74,7 @@ public class SpellsManager : MonoBehaviour
 					{
 						Hashtable castInfos = new Hashtable();
 						castInfos.Add("name", currentSpell.Name);
-						castInfos.Add("author", core.inGame.selectedEntity.id);
+						castInfos.Add("author", core.inGame.selectedEntities[core.inGame.activeEntity].id);
 						castInfos.Add("target", hitFloor2.collider.gameObject.GetComponent<Entity>().id);
 						castInfos.Add("x", 0);
 						castInfos.Add("z", 0);
@@ -106,6 +108,8 @@ public class SpellsManager : MonoBehaviour
 	{
 		currentSpell = spell;
 		
+		Debug.Log("sending spell: "+spell.Usage);
+		
 		if(spell.Usage==(int)SpellUsage.zone) //zone spell
 		{
 			spellInfosMessage.Text = "Select the target zone fot this spell";
@@ -130,8 +134,9 @@ public class SpellsManager : MonoBehaviour
 			Hashtable castInfos = new Hashtable();
 			castInfos.Add("name", spell.Name);
 			castInfos.Add("target", string.Empty);
-			castInfos.Add("x", 0);
-			castInfos.Add("z", 0);
+			castInfos.Add("author", core.inGame.selectedEntities[core.inGame.activeEntity].id);
+			castInfos.Add("x", 0f);
+			castInfos.Add("z", 0f);
 			core.networkManager.send(ServerEventType.spell, HashMapSerializer.hashMapToData(castInfos));
 			return;
 		}
@@ -140,6 +145,30 @@ public class SpellsManager : MonoBehaviour
 		{
 			spellInfosMessage.Text = "Select the zone you want to build in";
 			insert3DBuildInfo();
+		}
+		
+		if(spell.Usage == (int)SpellUsage.invokeUnit)
+		{
+			Hashtable castInfos = new Hashtable();
+			castInfos.Add("name", spell.Name);
+			castInfos.Add("target", string.Empty);
+			castInfos.Add("author", core.inGame.selectedEntities[core.inGame.activeEntity].id);
+			castInfos.Add("x", 0f);
+			castInfos.Add("z", 0f);
+			core.networkManager.send(ServerEventType.spell, HashMapSerializer.hashMapToData(castInfos));
+			return;
+		}
+		
+		if(spell.Usage == (int)SpellUsage.buyItem)
+		{
+			Hashtable castInfos = new Hashtable();
+			castInfos.Add("name", spell.Name);
+			castInfos.Add("target", string.Empty);
+			castInfos.Add("author", core.inGame.selectedEntities[core.inGame.activeEntity].id);
+			castInfos.Add("x", 0f);
+			castInfos.Add("z", 0f);
+			core.networkManager.send(ServerEventType.spell, HashMapSerializer.hashMapToData(castInfos));
+			return;
 		}
 		
 		spellInfosMessage.Visible = true;

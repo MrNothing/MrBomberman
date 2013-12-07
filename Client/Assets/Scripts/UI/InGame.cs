@@ -14,6 +14,12 @@ public class InGame : MonoBehaviour
 	public TopDownCameraController rtsCameraController;
 	public Light gamelight;
 	
+	public GameObject selectionCircle;
+	public Color controlledColor;
+	public Color allyColor;
+	public Color neutralColor;
+	public Color foeColor;
+	
 	public bool Visible 
 	{
 		get 
@@ -46,7 +52,8 @@ public class InGame : MonoBehaviour
 		}
 	}
 	
-	public Entity selectedEntity = null;
+	public List<Entity> selectedEntities = new List<Entity>();
+	public int activeEntity = 0;
 	
 	MGUITextfield textField;
 	public MGUITextArea textArea;
@@ -66,6 +73,8 @@ public class InGame : MonoBehaviour
 	MGUITextArea spellInfosHover;
 	
 	List<MGUIButton> spells = new List<MGUIButton>();
+	List<MGUIButton> entities = new List<MGUIButton>();
+	public Vector2[] formations;
 	
 	//TODO, add an ingame interface for selected units and menu elements
 	//TODO, add a minimap
@@ -117,46 +126,171 @@ public class InGame : MonoBehaviour
 	[HideInInspector]
 	public bool forceReload=false;
 	
+	int lastEntitiesSize = 0;
+	
 	void LateUpdate()
 	{
-		if(selectedEntity!=null)
+		if(selectedEntities.Count>1)
 		{
-			if(!UnitAvatar.Texture.Equals(selectedEntity.icon) || forceReload)
+			if(activeEntity>=selectedEntities.Count)
+				activeEntity = selectedEntities.Count-1;
+				
+			if(!UnitAvatar.Texture.Equals(selectedEntities[activeEntity].icon) || lastEntitiesSize!=selectedEntities.Count || forceReload)
 			{	
-				UnitAvatar.Texture = selectedEntity.icon;
+				lastEntitiesSize = selectedEntities.Count;
+				resetSelectionCricles();
+				resetInterface();
+				
+				int counterX = 0;
+				int counterY = 0;
+				
+				for(int i=0; i<selectedEntities.Count; i++)
+				{
+					Entity entity = selectedEntities[i];
+					
+					float scale = 1;
+					
+					if(i==activeEntity)
+						scale = 1.3f;
+					
+					MGUIButton tmpBut = (MGUIButton)core.gui.setButton("selectedUnit_"+i, new Rect(counterX*4-10.75356f,counterY*4-12.9444f, 1.8f*scale, 1.8f*scale), Vector2.zero, "", core.normalFont, Color.white, entity.icon, entity.icon, entity.icon); 
+					tmpBut.custom = i;
+					tmpBut.OnButtonPressed+=new MGUIButton.ButtonPressed(onEntityIconPressed);
+					tmpBut.setDepth(-0.5f);
+					entities.Add(tmpBut);
+					
+					if(counterX>3)
+					{
+						counterX=0;
+						counterY--;
+					}
+					else
+						counterX++;
+					GameObject newSelectionCricle = (GameObject) Instantiate(selectionCircle);
+					core.gameManager.selectionCircles.Add(newSelectionCricle);
+					core.gameManager.selectionCircles[i].transform.localScale = Vector3.one*((selectedEntities[i].collider.bounds.size.x/0.5f)*2.4f);
+					core.gameManager.selectionCircles[i].transform.position = selectedEntities[i].transform.position+new Vector3(0, 0.1f, 0);
+					core.gameManager.selectionCircles[i].transform.parent = selectedEntities[i].transform;
+				
+					if(selectedEntities[i].owner.Equals(core.networkManager.username))
+					{
+						newSelectionCricle.renderer.material.SetColor("_TintColor", controlledColor);
+					}
+					else
+					{
+						if(selectedEntities[i].team.Equals(core.networkManager.currentTeam))
+							newSelectionCricle.renderer.material.SetColor("_TintColor", allyColor);
+						else
+						{
+							if(selectedEntities[i].agressive)
+								newSelectionCricle.renderer.material.SetColor("_TintColor", foeColor);
+							else
+								newSelectionCricle.renderer.material.SetColor("_TintColor", neutralColor);
+						}	
+					}
+					
+				}
+				
+				UnitAvatar.Texture = selectedEntities[activeEntity].icon;
+				
+				UnitInfosHp.Text = selectedEntities[activeEntity].hp+"/"+selectedEntities[activeEntity].getMaxHp();
+				UnitInfosMp.Text = selectedEntities[activeEntity].mp+"/"+selectedEntities[activeEntity].getMaxMp();
+				
+				
+				if(!forceReload)
+					reloadSpellsUI();
+			}
+		}
+		else if(selectedEntities.Count==1)
+		{
+			if(!UnitAvatar.Texture.Equals(selectedEntities[0].icon) || forceReload)
+			{	
+				resetSelectionCricles();
+				activeEntity = 0;
+				
+				foreach(MGUIButton b in entities)
+					core.gui.removeElement(b.id);
+				
+				entities.Clear();
+				
+				UnitAvatar.Texture = selectedEntities[0].icon;
 			
-				UnitInfosName.Text = selectedEntity.getName();
-				UnitInfosAdditionalInfos.Text = "Level "+selectedEntity.getLevel();
-				UnitInfosHp.Text = selectedEntity.hp+"/"+selectedEntity.getMaxHp();
-				UnitInfosMp.Text = selectedEntity.mp+"/"+selectedEntity.getMaxMp();
-			
-				core.gameManager.selectionCircle.transform.localScale = Vector3.one*((selectedEntity.collider.bounds.size.x/0.5f)*2.4f);
+				UnitInfosName.Text = selectedEntities[0].getName();
+				UnitInfosAdditionalInfos.Text = "Level "+selectedEntities[0].getLevel();
+				UnitInfosHp.Text = selectedEntities[0].hp+"/"+selectedEntities[0].getMaxHp();
+				UnitInfosMp.Text = selectedEntities[0].mp+"/"+selectedEntities[0].getMaxMp();
+				
+				GameObject newSelectionCricle = (GameObject) Instantiate(selectionCircle);
+				
+				if(selectedEntities[0].owner.Equals(core.networkManager.username))
+				{
+					newSelectionCricle.renderer.material.SetColor("_TintColor", controlledColor);
+				}
+				else
+				{
+					if(selectedEntities[0].team.Equals(core.networkManager.currentTeam))
+						newSelectionCricle.renderer.material.SetColor("_TintColor", allyColor);
+					else
+					{
+						if(selectedEntities[0].agressive)
+							newSelectionCricle.renderer.material.SetColor("_TintColor", foeColor);
+						else
+							newSelectionCricle.renderer.material.SetColor("_TintColor", neutralColor);
+					}	
+				}
+				
+				core.gameManager.selectionCircles.Add(newSelectionCricle);
+				
+				core.gameManager.selectionCircles[0].transform.localScale = Vector3.one*((selectedEntities[0].collider.bounds.size.x/0.5f)*2.4f);
+				core.gameManager.selectionCircles[0].transform.position = selectedEntities[0].transform.position+new Vector3(0, 0.1f, 0);
+				core.gameManager.selectionCircles[0].transform.parent = selectedEntities[0].transform;
 				
 				if(!forceReload)
 					reloadSpellsUI();
 				
 				forceReload = false;
-			}
-			core.gameManager.selectionCircle.transform.position = selectedEntity.transform.position+new Vector3(0, 0.1f, 0);
+				
+				}
 		}
 		else
 		{
 			if(!UnitAvatar.Texture.Equals(core.blackAlphaBg))
 			{
-				UnitAvatar.Texture = core.blackAlphaBg;
-			
-				UnitInfosName.Text = "";
-				UnitInfosAdditionalInfos.Text = "";
-				UnitInfosHp.Text = "";
-				UnitInfosMp.Text = "";
-				core.gameManager.selectionCircle.transform.position = new Vector3(0, 100f, 0);
-				
-				foreach(MGUIButton b in spells)
-					core.gui.removeElement(b.id);
-				
-				spells.Clear();
+				resetInterface();
 			}
 		}
+	}
+	
+	void resetInterface()
+	{
+		foreach(MGUIButton b in entities)
+			core.gui.removeElement(b.id);
+		
+		entities.Clear();
+		
+		UnitAvatar.Texture = core.blackAlphaBg;
+	
+		UnitInfosName.Text = "";
+		UnitInfosAdditionalInfos.Text = "";
+		UnitInfosHp.Text = "";
+		UnitInfosMp.Text = "";
+		resetSelectionCricles();
+		
+		foreach(MGUIButton b in spells)
+			core.gui.removeElement(b.id);
+		
+		spells.Clear();
+	}
+	
+	void resetSelectionCricles()
+	{
+		foreach(GameObject o in core.gameManager.selectionCircles)
+		{
+			Destroy(o);
+		}
+		
+		core.gameManager.selectionCircles.Clear();
+		
 	}
 	
 	public void applyTeams(Dictionary<string, int> playersByTeam)
@@ -187,8 +321,27 @@ public class InGame : MonoBehaviour
 		if(mySpell.Usage == (int)SpellUsage.showBuildUI)
 			showBuildingUI();
 		
-		if(mySpell.Usage == (int)SpellUsage.build)
+		if(mySpell.Usage == (int)SpellUsage.build
+			|| mySpell.Usage == (int) SpellUsage.invokeUnit
+			|| mySpell.Usage == (int) SpellUsage.buyItem)
 			core.spellsManager.activateSpell((Spell)button.custom);
+	}
+	
+	void onEntityIconPressed(MGUIButton button)
+	{
+		if(activeEntity!=(int)button.custom)
+		{
+			activeEntity = (int)button.custom;
+			UnitAvatar.Texture = core.blackAlphaBg;
+		}
+		else
+		{
+			Entity chosenEntity = selectedEntities[(int)button.custom];
+			selectedEntities.Clear();
+			selectedEntities.Add(chosenEntity);
+			UnitAvatar.Texture = core.blackAlphaBg;
+			activeEntity = 0;
+		}
 	}
 	
 	void reloadSpellsUI()
@@ -198,11 +351,12 @@ public class InGame : MonoBehaviour
 				
 		spells.Clear();
 				
-		if(selectedEntity.owner.Equals(core.networkManager.username))
+		if(selectedEntities[activeEntity].owner.Equals(core.networkManager.username))
 		{
 			int counterX = 0;
 			int counterY = 0;
-			foreach(Spell s in selectedEntity._spells)
+			
+			foreach(Spell s in selectedEntities[activeEntity]._spells)
 			{
 				MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
 				tmpSpell.custom = s;
@@ -215,7 +369,7 @@ public class InGame : MonoBehaviour
 				counterX++;
 			}
 			
-			if(selectedEntity._buildings.Count>0)
+			if(selectedEntities[activeEntity]._buildings.Count>0)
 			{
 				Spell buildSpell = new Spell("build_Humans", "Build", "Construct a building", SpellUsage.showBuildUI);
 				MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_Build", new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, buildSpell.Icon, buildSpell.Icon, buildSpell.Icon); 
@@ -239,7 +393,7 @@ public class InGame : MonoBehaviour
 		
 		int counterX = 0;
 		int counterY = 0;
-		foreach(Spell s in selectedEntity._buildings)
+		foreach(Spell s in selectedEntities[activeEntity]._buildings)
 		{
 			MGUIButton tmpSpell = (MGUIButton)core.gui.setButton("spell_"+s.Name, new Rect(counterX*4+14.13f,counterY*4-9.97f, 1.8f, 1.8f), Vector2.zero, "", core.normalFont, Color.white, s.Icon, s.Icon, s.Icon); 
 			tmpSpell.custom = s;

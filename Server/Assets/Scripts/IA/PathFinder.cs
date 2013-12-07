@@ -15,7 +15,7 @@ namespace B4
 	public class PathFinder
 	{
         float baseStep = 1;
-		
+				
 		//open tiles are sorted by distance the closest one will always be picked first
 		SortedDictionary<float, Vector3> openTiles;
 		
@@ -139,11 +139,11 @@ namespace B4
 				//if there is a walkable tile and I have not already visited this tile
                 if (isNotTooHighIfExists(wayPoints, rangeId, lastPoint) && closedTiles[rangeId]==null)
                 {
-                    closedTiles.Add(rangeId, true);
+					closedTiles.Add(rangeId, true);
 					
 					//if i am closer than the last point to the target
-                    if ((lastPoint.Substract(target)).Magnitude() > newPoint.Substract(target).Magnitude())
-                    {
+                    //if ((lastPoint.Substract(target)).Magnitude() > newPoint.Substract(target).Magnitude())
+                    //{
 						try
 						{
                     		openTiles.Add(newPoint.Substract(target).Magnitude(), newPoint);
@@ -155,7 +155,7 @@ namespace B4
 						
 						newPoint.parent = lastPoint;
 					
-                	}
+                	//}
             	}
 				
 				angle+=checkAngleStep;
@@ -164,8 +164,14 @@ namespace B4
 			 //if i have ways left...
             if (openTiles.Count > 0)
             {
-                float minKey = openTiles.Keys.First();
+				float minKey=0;
                 
+				foreach(float f in openTiles.Keys)
+				{
+					minKey = f;
+					break;
+				}
+				
 				if(bestPath!=null)
 				{
 					//if the new chosen path is closer than the last best path, we choose it as the new best path
@@ -177,9 +183,17 @@ namespace B4
 					bestPath = openTiles[minKey];
 				}
 				
-                openTiles.Remove(minKey);
-				
-				search(bestPath);
+				if (Math.Floor(bestPath.Substract(target).Magnitude()/baseStep) == 0)
+				{
+					//path found! 
+					 end();
+				}
+				else
+				{
+					//path still not found!!
+                	openTiles.Remove(minKey);
+					search(bestPath);
+				}
             }
             else 
             {

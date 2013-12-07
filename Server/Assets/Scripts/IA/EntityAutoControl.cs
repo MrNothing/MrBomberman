@@ -74,7 +74,7 @@ public class EntityAutoControl
 		}
 		else
 		{
-			if(checkIfTargetInAttackRange())
+			if(checkIfTargetInNotAttackRange())
 			{
 				if(_entity.getFrameSpeed()>0)
 					walkToFocusedUnitUntilItIsInRange();
@@ -175,7 +175,7 @@ public class EntityAutoControl
 		{
 			if(checkIfFocusedTargetIsNotTooFar() && focusedTarget.Infos.Hp>0)
 			{
-				if(checkIfTargetInAttackRange())
+				if(checkIfTargetInNotAttackRange())
 				{
 					bool hasToRecalculatePath = false;
 					
@@ -249,7 +249,7 @@ public class EntityAutoControl
 	/// <returns>
 	/// The bool defining if target in attack range.
 	/// </returns>
-	public bool checkIfTargetInAttackRange()
+	public bool checkIfTargetInNotAttackRange()
 	{
 		return _entity.position.Substract(focusedTarget.position).SqrMagnitude()>_entity.getAttackRange();
 	}

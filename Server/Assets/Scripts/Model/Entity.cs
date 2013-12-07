@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 /*
  * Entities include all game elements that have a position and stats 
- * */
+ */
 
 public enum EntityStatus
 {
@@ -15,6 +15,42 @@ public enum EntityStatus
 public enum EntityType
 {
 	unit, hero, building
+}
+
+public class WaitingUnit
+{
+	string unitName;
+	float timeBeforeInvoke;
+
+	public float TimeBeforeInvoke 
+	{
+		get 
+		{
+			return this.timeBeforeInvoke;
+		}
+		set 
+		{
+			timeBeforeInvoke = value;
+		}
+	}
+
+	public string UnitName 
+	{
+		get 
+		{
+			return this.unitName;
+		}
+		set 
+		{
+			unitName = value;
+		}
+	}
+
+	public WaitingUnit(string _unitName, float _timeBeforeInvoke)
+	{
+		unitName = _unitName;
+		timeBeforeInvoke = _timeBeforeInvoke;
+	}
 }
 
 public class Entity 
@@ -98,6 +134,10 @@ public class Entity
 	/// The visible allies this Entity can see.
 	/// </summary>
 	public Hashtable visibleAllies = new Hashtable();
+	#endregion
+	
+	#region invokeList
+	public List<WaitingUnit> invokingQueue = new List<WaitingUnit>();
 	#endregion
 	
 	System.Random mainSeed = new System.Random();
@@ -208,9 +248,18 @@ public class Entity
 			}
 			else
 				passiveRegenerationCounter --;
+			
+			processInvokingQueue();
 		}
 		else
+		{
+			if(status != EntityStatus.dead)
+			{
+				invokingQueue.Clear();	
+			}
+			
 			status = EntityStatus.dead;
+		}
 		
 		if(sendMovement)
 			_sendMovement();
@@ -632,6 +681,33 @@ public class Entity
 		}
 	}
 	
+	void processInvokingQueue()
+	{
+		foreach(WaitingUnit w in invokingQueue)
+		{
+			if(w.TimeBeforeInvoke>0)
+			{
+				w.TimeBeforeInvoke -= 1;
+			}
+			else
+			{
+				Entity newEntity = myGame.addEntity(myGame.getEntityNameWithPrefab(w.UnitName), Owner, B4.Vector3Tools.toUnityVector3(position.Add(new B4.Vector3(1, 0, 2))), team, false);
+				myGame.sendEntityInfos(newEntity);
+				
+				if(Owner.Length>0)
+				{
+					Hashtable data = new Hashtable();
+					data.Add("type", "invokedUnit-");
+					data.Add("index", invokingQueue.IndexOf(w));
+					HashMapSerializer serializer = new HashMapSerializer();
+					getMyOwner().Send(ServerEventType.custom, serializer.hashMapToData(data)); 
+				}
+				
+				invokingQueue.Remove(w);
+			}
+		}
+	}
+	
 	public void resetPaths()
 	{
 		destination = position.getNewInstance();
@@ -707,6 +783,11 @@ public class Entity
 		
 		//considering the framerate is 60
 		return (float)(distance / (projectileSpeed * 60f)) * 250;
+	}
+	
+	public Player getMyOwner()
+	{
+		return myGame._core.getPlayerByName(Owner);
 	}
 	
 	public int Id 

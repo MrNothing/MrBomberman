@@ -32,6 +32,9 @@ public class GameRoom : Channel
 	//what team is each player assigned to
 	Dictionary<string, int> playerTeamPair = new Dictionary<string, int>();
 	
+	public Dictionary<int, int> goldByPlayer = new Dictionary<int, int>();
+	public Dictionary<int, int> woodByPlayer = new Dictionary<int, int>();
+	
 	//every active spell effect is listed here
 	public List<Hashtable> spellsQueue = new List<Hashtable>();
 	
@@ -43,6 +46,8 @@ public class GameRoom : Channel
 	
 	//spell infos
 	public Hashtable skills;
+	
+	public bool gamePaused = false;
 	
 	public GameRoom(Core core, string name, int maxPlayers, bool isPrivate, string map, GameTypes type, Hashtable rawMap):base(core, name, ChannelType.game, maxPlayers, isPrivate)
 	{
@@ -57,6 +62,7 @@ public class GameRoom : Channel
 		Hashtable entitiesData = (Hashtable)rawMap["entities"];
 		
 		skills = (Hashtable)rawMap["skills"];
+		
 		Hashtable items = (Hashtable)rawMap["items"];
 		
 		rebuildIndexedVertices(mapData);
@@ -67,6 +73,9 @@ public class GameRoom : Channel
 	//main loop for game Rooms, this is where all the recursive game logic is handled (IA moves, stats etc)
 	public void run()
 	{
+		if(gamePaused)
+			return;
+		
 		foreach(int i in entities.Keys)
 		{
 			entities[i].run();
@@ -135,6 +144,9 @@ public class GameRoom : Channel
 		{
 			
 		}
+		
+		goldByPlayer.Add(player.Id, 0);
+		woodByPlayer.Add(player.Id, 0);
 	}
 	
 	public void onPlayerLeave(Player player)
@@ -220,7 +232,7 @@ public class GameRoom : Channel
 		{
 			string tmpSpell = tmpSpellString.Substring(0, tmpSpellString.IndexOf(","));
 			tmpSpellString = tmpSpellString.Substring(tmpSpell.Length+1, tmpSpellString.Length-tmpSpell.Length-1);
-			spells.Add(spells, skills[spells]);
+			spells.Add(tmpSpell, skills[tmpSpell]);
 		}
 		
 		data.Add("spells", spells);

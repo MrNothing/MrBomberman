@@ -76,6 +76,8 @@ public enum ServerEventType
 	joinActiveGame = 25,
 	
 	declineActiveGame = 26,
+	
+	pauseGame = 27,
 }
 
 public class Core : MonoBehaviour 
@@ -136,6 +138,17 @@ public class Core : MonoBehaviour
 			
 			spheres.Add(satellite);
 		}*/
+		
+		SortedDictionary<float, string> test = new SortedDictionary<float, string>();
+		test.Add(0.1f, "medium");
+		test.Add(0.001f, "smallest");
+		test.Add(1f, "biggest");
+		foreach(float f in test.Keys)
+		{
+			Debug.Log("first occurence is: "+f);
+			break;
+		}
+		//Debug.Log("smallest key is: "+minKey);
 	}
 	/*List<GameObject> spheres = new List<GameObject>();
 	
@@ -179,7 +192,7 @@ public class Core : MonoBehaviour
 	{
         Player newPlayer = new Player(this, player);
 		players.Add(player.GetHashCode(), newPlayer);
-    }
+	}
 	
 	void OnPlayerDisconnected(NetworkPlayer player) 
 	{
@@ -608,6 +621,30 @@ public class Core : MonoBehaviour
 				}
 			}
 		}
+		
+		if(eventType==(byte)ServerEventType.pauseGame)
+		{
+			if(myPlayer.Channel!=null)
+			{
+				if(myPlayer.Channel.Type==ChannelType.game)
+				{
+					((GameRoom)myPlayer.Channel).gamePaused = !((GameRoom)myPlayer.Channel).gamePaused;
+					
+					if(((GameRoom)myPlayer.Channel).gamePaused)
+						myPlayer.Send(ServerEventType.pauseGame, "0");
+					else
+						myPlayer.Send(ServerEventType.pauseGame, "1");
+				}
+				else
+				{
+					myPlayer.Send(ServerEventType.serverMessage, "You are not in a Game!");
+				}
+			}
+			else
+			{
+				myPlayer.Send(ServerEventType.serverMessage, "You are not in a Game!");
+			}
+		}
 	}
 	
 	public void DestroyChannel(Channel channel)
@@ -643,6 +680,18 @@ public class Core : MonoBehaviour
 		catch
 		{
 			
+		}
+	}
+	
+	public Player getPlayerByName(string _name)
+	{
+		try
+		{
+			return players[playersByName[_name]];
+		}
+		catch
+		{
+			return null;
 		}
 	}
 }

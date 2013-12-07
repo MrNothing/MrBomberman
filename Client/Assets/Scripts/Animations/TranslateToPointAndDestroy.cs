@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class TranslateToPointAndDestroy : MonoBehaviour {
+public class TranslateToPointAndDestroy : MonoBehaviour 
+{
 	
 	public bool isTransform = false;
 	public bool isLocal = false;
@@ -12,17 +13,25 @@ public class TranslateToPointAndDestroy : MonoBehaviour {
 	public GameObject instantiateOnDestroy;
 	
 	Vector3 initialPosition;
+	
+	UICore core;
 	// Use this for initialization
-	void Start () {
+	void Start () 
+	{
 		initialPosition = transform.position;
+		core = ((GameObject)GameObject.Find("GUI Camera")).GetComponent<UICore>();
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
+		if(core.gameManager.gamePaused)
+			return;
+		
 		if(!isTransform)
 		{
 			transform.LookAt(target);
-			transform.Translate(Vector3.forward*speed);
+			transform.Translate(Vector3.forward*speed*Time.deltaTime*60);
 			
 			if(Vector3.Distance(transform.position, target)<speed)
 			{
@@ -40,7 +49,7 @@ public class TranslateToPointAndDestroy : MonoBehaviour {
 		else if(isLocal)
 		{
 			transform.LookAt(initialPosition+target);
-			transform.Translate(Vector3.forward*speed);
+			transform.Translate(Vector3.forward*speed*Time.deltaTime*60);
 			
 			if(Vector3.Distance(transform.position, initialPosition+target)<speed)
 			{
@@ -67,7 +76,7 @@ public class TranslateToPointAndDestroy : MonoBehaviour {
 				targetPoint = targetAsTransform.position;
 			}
 			transform.LookAt(targetPoint);
-			transform.Translate(Vector3.forward*speed);
+			transform.Translate(Vector3.forward*speed*Time.deltaTime*60);
 			
 			if(Vector3.Distance(transform.position, targetPoint)<speed)
 			{

@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 	
 	public Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
 	
-	public GameObject selectionCircle;
+	public List<GameObject> selectionCircles = new List<GameObject>();
 	
 	public GameObject defaultTextureTile;
 	public GameObject defaultFogTile;
@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour
 	public Hashtable mapInfos = new Hashtable();
 	
 	public bool initalized = false;
+	public bool gamePaused = false;
 	
 	// Use this for initialization
 	void Start () 

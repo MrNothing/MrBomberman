@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class Entity : MonoBehaviour {
 	
@@ -95,21 +96,22 @@ public class Entity : MonoBehaviour {
 		GameObject GO = (GameObject)GameObject.Find("GUI Camera");
 		core = GO.GetComponent<UICore>();
 		
-		try
+		foreach(System.Object o in spells.Keys)
 		{
-			foreach(string s in spells.Keys)
+			try
 			{
-				Spell newSpell = new Spell((Hashtable)spells[s]);
+			
+				Spell newSpell = new Spell((Hashtable)spells[o]);
 				
 				if(newSpell.Usage==(int)SpellUsage.build)
 					_buildings.Add(newSpell);
 				else
-					_spells.Add(newSpell);
+					_spells	.Add(newSpell);
 			}
-		}
-		catch
-		{
-			
+			catch(Exception e)
+			{
+				Debug.Log("adding spell failed: o is a "+o.GetType()+ " content: "+spells[o]);
+			}
 		}
 		
 		hpBar = generateQuad(new Vector2(0.8f, 0.05f));
@@ -121,7 +123,23 @@ public class Entity : MonoBehaviour {
 		hpBar.AddComponent<MeshRenderer>();
 		hpBar.renderer.material = new Material (Shader.Find("Transparent/VertexLit"));
 		Texture2D hpTex = new Texture2D(1, 1);
-		hpTex.SetPixels(new Color[]{Color.green});
+		if(owner.Equals(core.networkManager.username))
+		{
+			hpTex.SetPixels(new Color[]{Color.green});
+		}
+		else
+		{
+			if(team.Equals(core.networkManager.currentTeam))
+				hpTex.SetPixels(new Color[]{Color.cyan});
+			else
+			{
+				if(agressive)
+					hpTex.SetPixels(new Color[]{Color.red});
+				else
+					hpTex.SetPixels(new Color[]{Color.yellow});
+			}	
+		}
+		
 		hpTex.Apply();
 		hpBar.renderer.material.SetTexture("_MainTex", hpTex);
 		hpBar.name = "hpBar";
@@ -133,6 +151,9 @@ public class Entity : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
+		if(core.gameManager.gamePaused)
+			return;
+		
 		hpBar.transform.LookAt(core.gameCameraTransform);
 		hpBar.transform.localEulerAngles = new Vector3(hpBar.transform.localEulerAngles.x-90, 0, hpBar.transform.localEulerAngles.z);
 		

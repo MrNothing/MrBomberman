@@ -139,6 +139,12 @@ public class MainLobby : MonoBehaviour {
 				return;
 			}
 			
+			if(command.IndexOf("/pause")==0)
+			{
+				core.networkManager.send(ServerEventType.pauseGame, string.Empty);
+				return;
+			}
+			
 			if(command.IndexOf("/w ")==0)
 			{
 				command = command.Replace("/w ", "");
